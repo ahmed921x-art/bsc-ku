@@ -1,0 +1,350 @@
+/* ═══════════════════════════════════════════════════════
+   Aurora Dark — BSC KU Design System
+   Link this file LAST so it overrides all other sheets.
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Design tokens ── */
+:root {
+  --ink:     #818cf8;
+  --ink2:    #6366f1;
+  --c1:      #818cf8;
+  --c2:      #38bdf8;
+  --c3:      #f472b6;
+  --c4:      #34d399;
+  --green:   #34d399;
+  --cyan:    #38bdf8;
+  --bg:      #04050a;
+  --bg2:     #080a14;
+  --bg3:     #0d1022;
+  --surface: rgba(8,10,20,.65);
+  --border:  rgba(129,140,248,.12);
+  --border2: rgba(129,140,248,.22);
+  --text:    #f0f2ff;
+  --muted:   #5d6b98;
+  --radius:  20px;
+  --radius-lg: 28px;
+}
+
+/* ── Base ── */
+body { background: #04050a !important; color: #f0f2ff !important; }
+
+/* ── Aurora background ── */
+.bg-canvas {
+  background: linear-gradient(180deg, rgba(129,140,248,.05) 0%, transparent 200px) !important;
+}
+.bg-canvas::before {
+  background: radial-gradient(ellipse, rgba(129,140,248,.13) 0%, rgba(56,189,248,.07) 40%, transparent 70%) !important;
+  width: 900px !important;
+  height: 900px !important;
+  top: -350px !important;
+  right: -250px !important;
+}
+.bg-canvas::after {
+  background: radial-gradient(ellipse, rgba(244,114,182,.09) 0%, rgba(52,211,153,.07) 50%, transparent 70%) !important;
+  width: 700px !important;
+  height: 700px !important;
+  bottom: -250px !important;
+  left: -150px !important;
+}
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(129,140,248,.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(129,140,248,.022) 1px, transparent 1px) !important;
+}
+
+/* ── Navbar ── */
+.navbar {
+  background: rgba(4,5,10,.88) !important;
+  border-bottom-color: rgba(129,140,248,.13) !important;
+}
+.nav-links a:hover,
+.nav-links a.active {
+  background: rgba(129,140,248,.15) !important;
+  color: #fff !important;
+}
+.nav-links a.active {
+  background: linear-gradient(135deg, rgba(129,140,248,.22), rgba(99,102,241,.15)) !important;
+  border-color: rgba(129,140,248,.3) !important;
+}
+.ku-btn:hover {
+  background: rgba(129,140,248,.12) !important;
+  border-color: rgba(129,140,248,.3) !important;
+  color: #fff !important;
+}
+.ku-menu {
+  background: rgba(4,5,10,.98) !important;
+  border-color: rgba(129,140,248,.2) !important;
+}
+.ku-item:hover { background: rgba(129,140,248,.1) !important; }
+#themeToggle:hover { background: rgba(129,140,248,.15) !important; }
+.mobile-menu { background: rgba(4,5,10,.98) !important; }
+.mobile-nav a:hover,
+.mobile-nav a.active {
+  background: rgba(129,140,248,.12) !important;
+  border-color: rgba(129,140,248,.25) !important;
+  color: #fff !important;
+}
+
+/* ── Top banner ── */
+.top-banner {
+  background: linear-gradient(135deg, #818cf8, #6366f1) !important;
+}
+[data-theme="light"] .top-banner {
+  background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+}
+
+/* ── Hero (index) ── */
+.hero h1 .accent {
+  background: linear-gradient(90deg, var(--c1), var(--c4)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+.hero h1 .grad {
+  background: linear-gradient(135deg, #fff 0%, #c7d2fe 60%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+.hero-logo-glow {
+  background: radial-gradient(circle, rgba(129,140,248,.3) 0%, transparent 70%) !important;
+}
+.ring { border-color: rgba(129,140,248,.2) !important; }
+.ring-2 { border-color: rgba(129,140,248,.1) !important; }
+.ring-3 { border-color: rgba(129,140,248,.05) !important; }
+
+/* ── Badges ── */
+.page-badge,
+.hero-badge {
+  background: rgba(129,140,248,.1) !important;
+  border-color: rgba(129,140,248,.28) !important;
+  color: var(--c1) !important;
+}
+.page-badge::before,
+.hero-badge::before {
+  background: var(--c1) !important;
+}
+
+/* ── Section labels ── */
+.section-label { color: var(--c1) !important; }
+.section-label::before { background: var(--c1) !important; }
+
+/* ── Cards ── */
+.card { background: rgba(8,10,20,.78) !important; }
+.card::after,
+.note-card::after {
+  background: linear-gradient(90deg, var(--c1), var(--c2)) !important;
+}
+.card:hover,
+.note-card:hover {
+  border-color: rgba(129,140,248,.3) !important;
+  box-shadow: 0 24px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(129,140,248,.1) !important;
+}
+
+/* ── Tags ── */
+.note-tag,
+.tag {
+  color: var(--c1) !important;
+  background: rgba(129,140,248,.1) !important;
+  border-color: rgba(129,140,248,.22) !important;
+}
+.event-date {
+  color: var(--c4) !important;
+  background: rgba(52,211,153,.1) !important;
+  border-color: rgba(52,211,153,.22) !important;
+}
+
+/* ── Buttons ── */
+.btn-primary {
+  background: linear-gradient(135deg, var(--c1), var(--ink2)) !important;
+  box-shadow: 0 8px 28px rgba(129,140,248,.35) !important;
+}
+.btn-primary:hover {
+  box-shadow: 0 16px 44px rgba(129,140,248,.55) !important;
+}
+.dl-btn {
+  color: var(--c1) !important;
+  background: rgba(129,140,248,.1) !important;
+  border-color: rgba(129,140,248,.22) !important;
+}
+.dl-btn:hover { background: rgba(129,140,248,.22) !important; }
+.see-all {
+  color: var(--c1) !important;
+  background: rgba(8,10,20,.7) !important;
+  border-color: rgba(129,140,248,.22) !important;
+}
+.see-all:hover {
+  background: rgba(129,140,248,.12) !important;
+  border-color: rgba(129,140,248,.5) !important;
+}
+
+/* ── Stats ── */
+.stat { background: rgba(8,10,20,.7) !important; }
+.stat:hover {
+  border-color: rgba(129,140,248,.4) !important;
+  box-shadow: 0 24px 64px rgba(129,140,248,.18) !important;
+}
+.stat strong,
+.stat-mini strong {
+  background: linear-gradient(135deg, var(--c1), var(--c2)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+/* ── Majors ── */
+.major-card { background: rgba(8,10,20,.82) !important; }
+.major-card:nth-child(1)::before { background: linear-gradient(135deg, rgba(129,140,248,.15), transparent) !important; }
+.major-card:nth-child(1):hover   { border-color: rgba(129,140,248,.5) !important; box-shadow: 0 32px 80px rgba(129,140,248,.15) !important; }
+.major-card:nth-child(2)::before { background: linear-gradient(135deg, rgba(52,211,153,.15), transparent) !important; }
+.major-card:nth-child(2):hover   { border-color: rgba(52,211,153,.5) !important; box-shadow: 0 32px 80px rgba(52,211,153,.12) !important; }
+.major-card:nth-child(3)::before { background: linear-gradient(135deg, rgba(99,102,241,.15), transparent) !important; }
+.major-card:nth-child(3):hover   { border-color: rgba(99,102,241,.5) !important; box-shadow: 0 32px 80px rgba(99,102,241,.12) !important; }
+.major-card:nth-child(4)::before { background: linear-gradient(135deg, rgba(56,189,248,.15), transparent) !important; }
+.major-card:nth-child(4):hover   { border-color: rgba(56,189,248,.5) !important; box-shadow: 0 32px 80px rgba(56,189,248,.12) !important; }
+.major-card:nth-child(5)::before { background: linear-gradient(135deg, rgba(244,114,182,.15), transparent) !important; }
+.major-card:nth-child(5):hover   { border-color: rgba(244,114,182,.5) !important; box-shadow: 0 32px 80px rgba(244,114,182,.1) !important; }
+
+/* ── Footer ── */
+.footer {
+  background: rgba(4,5,10,.88) !important;
+  border-color: rgba(129,140,248,.1) !important;
+}
+.social-btn:hover {
+  background: rgba(129,140,248,.15) !important;
+  border-color: rgba(129,140,248,.4) !important;
+  color: #fff !important;
+}
+
+/* ── About page ── */
+.about-text h2 span {
+  background: linear-gradient(90deg, var(--c1), var(--c4)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+.value-card {
+  background: rgba(8,10,20,.78) !important;
+}
+.value-card:hover {
+  border-color: rgba(129,140,248,.4) !important;
+  box-shadow: 0 20px 50px rgba(129,140,248,.15) !important;
+}
+.about-visual { background: rgba(4,5,10,.8) !important; }
+.stat-mini { background: rgba(8,10,20,.7) !important; }
+.stat-mini:hover { border-color: rgba(129,140,248,.4) !important; }
+
+/* ── Page hero titles ── */
+.page-hero h1 {
+  background: linear-gradient(135deg, #fff 0%, var(--c1) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+/* ── Filters ── */
+.filter-input,
+.filter-select {
+  background: rgba(8,10,20,.7) !important;
+  border-color: rgba(129,140,248,.15) !important;
+  color: #f0f2ff !important;
+}
+.filter-input:focus,
+.filter-select:focus {
+  border-color: rgba(129,140,248,.5) !important;
+  background: rgba(129,140,248,.06) !important;
+}
+.filter-select option { background: #080a14; }
+
+/* ── Announcement banner ── */
+#annBanner {
+  background: linear-gradient(90deg, rgba(129,140,248,.12), rgba(99,102,241,.08)) !important;
+  border-bottom-color: rgba(129,140,248,.22) !important;
+}
+
+/* ── Advisor / member cards ── */
+.advisor-card,
+.member-card {
+  background: rgba(8,10,20,.78) !important;
+}
+.advisor-card:hover,
+.member-card:hover {
+  border-color: rgba(129,140,248,.3) !important;
+  box-shadow: 0 20px 50px rgba(0,0,0,.5) !important;
+}
+
+/* ── Services ── */
+.gpa-wrap,
+.chat-wrap,
+.schedule-builder,
+.tree-container,
+.pref-card {
+  background: rgba(8,10,20,.72) !important;
+  border-color: rgba(129,140,248,.12) !important;
+}
+.chat-input,
+.sched-input,
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background: rgba(8,10,20,.7) !important;
+  border-color: rgba(129,140,248,.15) !important;
+  color: #f0f2ff !important;
+}
+
+/* ── Light mode: keep aurora dark ── */
+[data-theme="light"] body { background: #04050a !important; color: #f0f2ff !important; }
+[data-theme="light"] .bg-canvas::before {
+  background: radial-gradient(ellipse, rgba(129,140,248,.1) 0%, rgba(56,189,248,.06) 40%, transparent 70%) !important;
+}
+[data-theme="light"] .bg-canvas::after {
+  background: radial-gradient(ellipse, rgba(244,114,182,.07) 0%, rgba(52,211,153,.05) 50%, transparent 70%) !important;
+}
+[data-theme="light"] .navbar {
+  background: rgba(4,5,10,.92) !important;
+  border-bottom-color: rgba(129,140,248,.15) !important;
+  box-shadow: none !important;
+}
+[data-theme="light"] .nav-links a { color: #5d6b98 !important; }
+[data-theme="light"] .nav-links a:hover,
+[data-theme="light"] .nav-links a.active { color: #fff !important; }
+[data-theme="light"] .card,
+[data-theme="light"] .note-card,
+[data-theme="light"] .event-card,
+[data-theme="light"] .major-card,
+[data-theme="light"] .advisor-card,
+[data-theme="light"] .member-card,
+[data-theme="light"] .value-card,
+[data-theme="light"] .stat,
+[data-theme="light"] .stat-mini,
+[data-theme="light"] .gpa-wrap,
+[data-theme="light"] .chat-wrap,
+[data-theme="light"] .schedule-builder,
+[data-theme="light"] .tree-container,
+[data-theme="light"] .pref-card,
+[data-theme="light"] .ann-card {
+  background: rgba(8,10,20,.78) !important;
+  border-color: rgba(129,140,248,.12) !important;
+}
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3 { color: #f0f2ff !important; }
+[data-theme="light"] .footer {
+  background: rgba(4,5,10,.9) !important;
+  border-color: rgba(129,140,248,.1) !important;
+}
+[data-theme="light"] .filter-input,
+[data-theme="light"] .filter-select,
+[data-theme="light"] .chat-input,
+[data-theme="light"] .sched-input,
+[data-theme="light"] .form-group input,
+[data-theme="light"] .form-group select,
+[data-theme="light"] .form-group textarea {
+  background: rgba(8,10,20,.7) !important;
+  border-color: rgba(129,140,248,.15) !important;
+  color: #f0f2ff !important;
+}
+[data-theme="light"] .particle { opacity: 0 !important; }
+[data-theme="light"] .ku-menu { background: rgba(4,5,10,.98) !important; }
+[data-theme="light"] .mobile-menu { background: rgba(4,5,10,.98) !important; }
+[data-theme="light"] .brand img { mix-blend-mode: screen !important; filter: drop-shadow(0 0 12px rgba(129,140,248,.6)) brightness(1.2) !important; }
