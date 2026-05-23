@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BSC KU Admin</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080c14;--bg2:#0f172a;--surface:rgba(255,255,255,.05);--border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.18);--text:#f1f5f9;--muted:#94a3b8;--ink:#6366f1;--ink2:#8b5cf6;--green:#10b981;--gold:#f59e0b;--red:#ef4444;--radius:16px}
+body{font-family:'Tajawal',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:inherit;text-decoration:none}
+/* HEADER */
+.admin-header{background:rgba(8,12,20,.95);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:999}
+.admin-brand{display:flex;align-items:center;gap:10px}
+.admin-brand img{height:36px;mix-blend-mode:screen;filter:brightness(1.2)}
+.admin-brand strong{font-size:1.05rem;font-weight:800;background:linear-gradient(90deg,#a5b4fc,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent}
+.header-actions{display:flex;align-items:center;gap:.75rem}
+.status-text{font-size:.8rem;color:var(--muted)}
+/* LAYOUT */
+.admin-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px)}
+.sidebar{background:rgba(15,23,42,.6);border-left:1px solid var(--border);padding:1.25rem .75rem;display:flex;flex-direction:column;gap:.25rem}
+.sidebar-label{font-size:.65rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:.5rem .75rem;margin-top:.75rem}
+.sidebar-label:first-child{margin-top:0}
+.nav-item{display:flex;align-items:center;gap:.65rem;padding:.6rem .85rem;border-radius:10px;font-size:.875rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s;border:none;background:transparent;font-family:'Tajawal',system-ui,sans-serif;width:100%;text-align:right}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,.06)}
+.nav-item.active{color:#fff;background:linear-gradient(135deg,rgba(99,102,241,.25),rgba(139,92,246,.15));border:1px solid rgba(99,102,241,.3)}
+.nav-item .ni{font-size:1rem;flex-shrink:0}
+/* MAIN PANEL */
+.admin-main{padding:2rem;overflow-y:auto}
+.panel{display:none}
+.panel.active{display:block;animation:fu .3s ease both}
+@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.panel-header{margin-bottom:1.75rem}
+.panel-header h2{font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:.3rem}
+.panel-header p{font-size:.875rem;color:var(--muted)}
+/* CARDS */
+.card{background:rgba(15,23,42,.75);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.25rem}
+.card h3{font-size:1rem;font-weight:700;color:#fff;margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem}
+/* FORM */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:1rem}
+.form-group{display:flex;flex-direction:column;gap:.4rem}
+.form-group label{font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.form-group input,.form-group select,.form-group textarea{padding:.75rem 1rem;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Tajawal',system-ui,sans-serif;font-size:.9rem;outline:none;transition:border-color .2s,background .2s;width:100%}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.06)}
+.form-group input::placeholder,.form-group textarea::placeholder{color:var(--muted)}
+.form-group select option{background:#0f172a}
+.form-group textarea{min-height:90px;resize:vertical}
+.form-full{grid-column:1/-1}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.35rem;border-radius:999px;font-size:.875rem;font-weight:700;cursor:pointer;border:none;font-family:'Tajawal',system-ui,sans-serif;transition:all .25s}
+.btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 4px 16px rgba(99,102,241,.35)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(99,102,241,.5)}
+.btn-green{background:linear-gradient(135deg,#10b981,#059669);color:#fff}
+.btn-gold{background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff}
+.btn-danger{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171}
+.btn-danger:hover{background:rgba(239,68,68,.25)}
+.btn-ghost{background:rgba(255,255,255,.06);border:1px solid var(--border2);color:var(--muted)}
+.btn-ghost:hover{color:#fff;background:rgba(255,255,255,.1)}
+.btn-sm{padding:.42rem .85rem;font-size:.78rem}
+.btn-row{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1rem}
+/* ITEMS LIST */
+.items-list{margin-top:1.5rem;display:flex;flex-direction:column;gap:.75rem}
+.list-item{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+.list-item-body h4{font-size:.93rem;font-weight:700;color:var(--text);margin-bottom:.2rem}
+.list-item-body p{font-size:.8rem;color:var(--muted)}
+.list-item-actions{display:flex;gap:.5rem;flex-shrink:0}
+.badge{display:inline-block;font-size:.7rem;font-weight:700;border-radius:999px;padding:.2rem .65rem}
+.badge-blue{color:#a5b4fc;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.25)}
+.badge-green{color:#6ee7b7;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.25)}
+.badge-gold{color:#fcd34d;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.25)}
+.badge-red{color:#fca5a5;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.25)}
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1rem;margin-bottom:2rem}
+.stat-card{background:rgba(15,23,42,.75);border:1px solid var(--border);border-radius:14px;padding:1.25rem;text-align:center}
+.stat-card strong{display:block;font-size:2rem;font-weight:900;background:linear-gradient(135deg,#6366f1,#a5b4fc);-webkit-background-clip:text;background-clip:text;color:transparent;font-family:'Plus Jakarta Sans',system-ui}
+.stat-card span{font-size:.8rem;color:var(--muted)}
+/* MAJOR SHEET BUILDER */
+.course-node{background:rgba(15,23,42,.8);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem;transition:border-color .2s}
+.course-node:hover{border-color:rgba(99,102,241,.3)}
+.cn-handle{color:var(--muted);cursor:grab;font-size:1rem}
+.cn-body{flex:1;min-width:0}
+.cn-code{font-size:.75rem;font-weight:700;color:#a5b4fc;margin-bottom:.2rem}
+.cn-name{font-size:.88rem;font-weight:600;color:var(--text)}
+.cn-prereqs{font-size:.72rem;color:var(--muted);margin-top:.2rem}
+.cn-type{font-size:.68rem;font-weight:700;border-radius:999px;padding:.18rem .55rem;flex-shrink:0}
+.type-required{color:#6ee7b7;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25)}
+.type-dept{color:#a5b4fc;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25)}
+.type-support{color:#fcd34d;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25)}
+.type-elective{color:#c4b5fd;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25)}
+/* TREE PREVIEW */
+.tree-wrap{background:rgba(8,12,20,.8);border:1px solid var(--border);border-radius:14px;padding:1.5rem;overflow-x:auto;min-height:200px}
+.tree-level{display:flex;gap:1rem;justify-content:center;margin-bottom:2rem;flex-wrap:wrap;position:relative}
+.tree-level::after{content:'';position:absolute;bottom:-1.1rem;left:50%;transform:translateX(-50%);width:1px;height:1rem;background:var(--border2)}
+.tree-level:last-child::after{display:none}
+.tree-node{background:rgba(15,23,42,.9);border:1px solid var(--border);border-radius:8px;padding:.5rem .85rem;font-size:.78rem;font-weight:700;color:var(--text);text-align:center;position:relative;min-width:80px}
+.tree-node.tn-required{border-color:rgba(16,185,129,.4);color:#6ee7b7}
+.tree-node.tn-dept{border-color:rgba(99,102,241,.4);color:#a5b4fc}
+.tree-node.tn-support{border-color:rgba(245,158,11,.4);color:#fcd34d}
+.tree-node.tn-elective{border-color:rgba(139,92,246,.4);color:#c4b5fd}
+.tree-arrow{display:flex;justify-content:center;margin:-1rem 0;color:var(--muted);font-size:.85rem}
+/* NEWS */
+.news-type-select{display:flex;gap:.5rem;margin-bottom:1rem}
+.type-btn{padding:.45rem 1rem;border-radius:999px;font-size:.8rem;font-weight:700;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Tajawal',system-ui,sans-serif;transition:all .2s}
+.type-btn.active{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-color:transparent}
+/* LOGIN */
+#loginArea{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg)}
+.login-card{background:rgba(15,23,42,.9);border:1px solid var(--border);border-radius:24px;padding:3rem;text-align:center;max-width:380px;width:90%}
+.login-card .logo{font-size:3rem;margin-bottom:1rem}
+.login-card h2{font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:.5rem}
+.login-card p{font-size:.9rem;color:var(--muted);margin-bottom:2rem}
+#statusMsg{font-size:.85rem;color:#f87171;margin-top:1rem;min-height:1.2em}
+.hidden{display:none!important}
+/* RESPONSIVE */
+@media(max-width:768px){.admin-layout{grid-template-columns:1fr}.sidebar{display:none}.admin-main{padding:1.25rem}}
+    /* ════════════════════════════════════
+       LIGHT MODE — Complete Override
+    ════════════════════════════════════ */
+    [data-theme="light"] {
+      color-scheme: light;
+    }
+    [data-theme="light"] body {
+      background: #ffffff;
+      color: #0f172a;
+    }
+    [data-theme="light"] .bg-canvas::before {
+      background: radial-gradient(circle, rgba(99,102,241,.08) 0%, transparent 70%);
+    }
+    [data-theme="light"] .bg-canvas::after {
+      background: radial-gradient(circle, rgba(16,185,129,.06) 0%, transparent 70%);
+    }
+    [data-theme="light"] .bg-grid {
+      background-image:
+        linear-gradient(rgba(99,102,241,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,.04) 1px, transparent 1px);
+    }
+    /* Navbar */
+    [data-theme="light"] .navbar {
+      background: rgba(255,255,255,.96) !important;
+      border-bottom-color: rgba(99,102,241,.12) !important;
+      box-shadow: 0 1px 20px rgba(99,102,241,.08);
+    }
+    [data-theme="light"] .brand-text strong {
+      background: linear-gradient(90deg,#4f46e5,#6366f1,#7c3aed);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    [data-theme="light"] .brand-text span { color: #94a3b8 !important; }
+    [data-theme="light"] .nav-links a { color: #64748b !important; }
+    [data-theme="light"] .nav-links a:hover,
+    [data-theme="light"] .nav-links a.active { color: #fff !important; }
+    /* Cards */
+    [data-theme="light"] .card,
+    [data-theme="light"] .note-card,
+    [data-theme="light"] .event-card,
+    [data-theme="light"] .major-card,
+    [data-theme="light"] .advisor-card,
+    [data-theme="light"] .value-card,
+    [data-theme="light"] .stat-mini,
+    [data-theme="light"] .stat-card,
+    [data-theme="light"] .member-card,
+    [data-theme="light"] .supervisor-card {
+      background: #ffffff !important;
+      border-color: rgba(99,102,241,.15) !important;
+      box-shadow: 0 2px 16px rgba(99,102,241,.08) !important;
+      backdrop-filter: none !important;
+    }
+    [data-theme="light"] .card:hover,
+    [data-theme="light"] .note-card:hover,
+    [data-theme="light"] .event-card:hover,
+    [data-theme="light"] .major-card:hover,
+    [data-theme="light"] .advisor-card:hover {
+      border-color: rgba(99,102,241,.35) !important;
+      box-shadow: 0 8px 32px rgba(99,102,241,.15) !important;
+    }
+    /* Typography */
+    [data-theme="light"] h1,[data-theme="light"] h2,[data-theme="light"] h3,
+    [data-theme="light"] .section-h2,[data-theme="light"] .section-title {
+      color: #0f172a !important;
+    }
+    [data-theme="light"] p,[data-theme="light"] .card p,
+    [data-theme="light"] .note-card p { color: #475569 !important; }
+    [data-theme="light"] .page-hero h1 {
+      background: linear-gradient(135deg,#1e1b4b,#4f46e5) !important;
+      -webkit-background-clip: text !important; background-clip: text !important; color: transparent !important;
+    }
+    [data-theme="light"] .page-badge {
+      background: rgba(99,102,241,.08) !important;
+      border-color: rgba(99,102,241,.25) !important;
+      color: #4f46e5 !important;
+    }
+    [data-theme="light"] .page-badge::before { background: #6366f1 !important; }
+    [data-theme="light"] .section-label { color: #4f46e5 !important; }
+    [data-theme="light"] .section-label::before { background: #6366f1 !important; }
+    /* Inputs */
+    [data-theme="light"] .input,
+    [data-theme="light"] .filter-input,
+    [data-theme="light"] .filter-select,
+    [data-theme="light"] .sched-input,
+    [data-theme="light"] .chat-input,
+    [data-theme="light"] .form-group input,
+    [data-theme="light"] .form-group select,
+    [data-theme="light"] .form-group textarea {
+      background: #f8fafc !important;
+      border-color: rgba(99,102,241,.2) !important;
+      color: #0f172a !important;
+    }
+    [data-theme="light"] .input:focus,
+    [data-theme="light"] .filter-input:focus,
+    [data-theme="light"] .sched-input:focus {
+      background: #fff !important;
+      border-color: #6366f1 !important;
+      box-shadow: 0 0 0 3px rgba(99,102,241,.1);
+    }
+    [data-theme="light"] .input::placeholder,
+    [data-theme="light"] .filter-input::placeholder,
+    [data-theme="light"] .sched-input::placeholder { color: #94a3b8 !important; }
+    /* Tags */
+    [data-theme="light"] .note-tag,
+    [data-theme="light"] .tag,
+    [data-theme="light"] .tag-blue {
+      background: rgba(99,102,241,.08) !important;
+      border-color: rgba(99,102,241,.2) !important;
+      color: #4f46e5 !important;
+    }
+    [data-theme="light"] .tag-green {
+      background: rgba(16,185,129,.08) !important;
+      border-color: rgba(16,185,129,.2) !important;
+      color: #059669 !important;
+    }
+    /* Buttons */
+    [data-theme="light"] .dl-btn {
+      background: rgba(99,102,241,.08) !important;
+      border-color: rgba(99,102,241,.2) !important;
+      color: #4f46e5 !important;
+    }
+    [data-theme="light"] .dl-btn:hover {
+      background: rgba(99,102,241,.15) !important;
+    }
+    [data-theme="light"] .back-btn,
+    [data-theme="light"] .btn-ghost {
+      background: #f8fafc !important;
+      border-color: rgba(99,102,241,.2) !important;
+      color: #475569 !important;
+    }
+    /* Hero stats */
+    [data-theme="light"] .stat-mini strong,
+    [data-theme="light"] .stat-card strong {
+      background: linear-gradient(135deg,#4f46e5,#6366f1) !important;
+      -webkit-background-clip: text !important; background-clip: text !important; color: transparent !important;
+    }
+    [data-theme="light"] .stat-mini span,
+    [data-theme="light"] .stat-card span { color: #64748b !important; }
+    /* Chat */
+    [data-theme="light"] .chat-wrap,
+    [data-theme="light"] .gpa-wrap,
+    [data-theme="light"] .schedule-builder,
+    [data-theme="light"] .pref-card,
+    [data-theme="light"] .news-card,
+    [data-theme="light"] .ann-card {
+      background: #ffffff !important;
+      border-color: rgba(99,102,241,.15) !important;
+      box-shadow: 0 2px 16px rgba(99,102,241,.08) !important;
+    }
+    [data-theme="light"] .chat-header,
+    [data-theme="light"] .quick-prompts {
+      border-color: rgba(99,102,241,.1) !important;
+    }
+    [data-theme="light"] .msg.bot {
+      background: rgba(99,102,241,.06) !important;
+      border-color: rgba(99,102,241,.15) !important;
+      color: #0f172a !important;
+    }
+    [data-theme="light"] .msg.user {
+      background: linear-gradient(135deg,rgba(99,102,241,.12),rgba(139,92,246,.08)) !important;
+      color: #1e1b4b !important;
+    }
+    [data-theme="light"] .qp-btn {
+      background: #f8fafc !important;
+      border-color: rgba(99,102,241,.15) !important;
+      color: #475569 !important;
+    }
+    [data-theme="light"] .qp-btn:hover { color: #4f46e5 !important; }
+    /* Tree */
+    [data-theme="light"] .tree-container,
+    [data-theme="light"] .prereq-tree-wrap {
+      background: #f8fafc !important;
+      border-color: rgba(99,102,241,.12) !important;
+    }
+    [data-theme="light"] .tree-legend { background: #fff !important; border-color: rgba(99,102,241,.1) !important; }
+    [data-theme="light"] .legend-item { color: #475569 !important; }
+    [data-theme="light"] .node-tooltip {
+      background: rgba(255,255,255,.98) !important;
+      border-color: rgba(99,102,241,.25) !important;
+    }
+    [data-theme="light"] .tt-code { color: #4f46e5 !important; }
+    [data-theme="light"] .tt-name { color: #0f172a !important; }
+    [data-theme="light"] .tt-hours,[data-theme="light"] .tt-prereq { color: #475569 !important; }
+    /* Footer */
+    [data-theme="light"] .footer {
+      background: rgba(248,250,252,.97) !important;
+      border-color: rgba(99,102,241,.12) !important;
+    }
+    [data-theme="light"] .footer-copy { color: #64748b !important; }
+    [data-theme="light"] .footer-copy strong { color: #0f172a !important; }
+    [data-theme="light"] .social-btn {
+      background: #f1f5f9 !important;
+      border-color: rgba(99,102,241,.15) !important;
+      color: #475569 !important;
+    }
+    [data-theme="light"] .social-btn:hover {
+      background: rgba(99,102,241,.1) !important;
+      color: #4f46e5 !important;
+    }
+    /* Service tabs */
+    [data-theme="light"] .service-tabs,
+    [data-theme="light"] .page-tabs {
+      background: #f8fafc !important;
+      border-color: rgba(99,102,241,.12) !important;
+    }
+    [data-theme="light"] .stab:not(.active),
+    [data-theme="light"] .ptab:not(.active) { color: #64748b !important; }
+    [data-theme="light"] .stab:hover:not(.active),
+    [data-theme="light"] .ptab:hover:not(.active) { background: rgba(99,102,241,.06) !important; color: #4f46e5 !important; }
+    /* Divider */
+    [data-theme="light"] .divider {
+      background: linear-gradient(90deg,transparent,rgba(99,102,241,.2),transparent) !important;
+    }
+    /* GPA grade display */
+    [data-theme="light"] .gpa-result {
+      background: linear-gradient(135deg,rgba(99,102,241,.06),rgba(139,92,246,.04)) !important;
+      border-color: rgba(99,102,241,.2) !important;
+    }
+    [data-theme="light"] .gpa-num {
+      background: linear-gradient(135deg,#4f46e5,#6366f1) !important;
+      -webkit-background-clip: text !important; background-clip: text !important; color: transparent !important;
+    }
+    /* Theme toggle button */
+    #themeToggle {
+      width:34px;height:34px;
+      background:var(--surface);
+      border:1px solid var(--border2);
+      border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;color:var(--muted);
+      transition:all .25s;flex-shrink:0;
+    }
+    #themeToggle:hover { color:var(--text); transform:scale(1.1); }
+    [data-theme="light"] #themeToggle {
+      background:#f1f5f9;
+      border-color:rgba(99,102,241,.2);
+      color:#64748b;
+    }
+    [data-theme="light"] #themeToggle:hover { background:#e8eeff; color:#4f46e5; }
+
+    </style>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap" rel="stylesheet">
+
+  
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginArea">
+  <div class="login-card">
+    <div class="logo">🧬</div>
+    <h2>BSC KU Admin</h2>
+    <p>سجّل دخولك للوحة الإدارة</p>
+    <button class="btn btn-primary" id="loginBtn" style="width:100%;justify-content:center;font-size:1rem;padding:1rem">🔐 تسجيل الدخول بـ Google</button>
+    <div style="display:flex;align-items:center;gap:.75rem;margin:.75rem 0">
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+      <span style="font-size:.75rem;color:var(--muted)">أو</span>
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:.6rem">
+      <input id="emailInput" type="email" placeholder="الإيميل" style="padding:.75rem 1rem;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.95rem;outline:none;direction:ltr">
+      <input id="passInput" type="password" placeholder="الباسورد" style="padding:.75rem 1rem;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.95rem;outline:none;direction:ltr">
+      <button class="btn" id="emailLoginBtn" style="width:100%;justify-content:center;font-size:1rem;padding:.85rem;background:rgba(99,102,241,.2);border:1px solid rgba(99,102,241,.4);color:#a5b4fc;cursor:pointer">دخول بالإيميل والباسورد</button>
+    </div>
+    <div id="statusMsg" style="margin-top:.75rem;font-size:.85rem;color:#f87171;text-align:center;min-height:1.2em"></div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp" class="hidden">
+  <header class="admin-header">
+    <div class="admin-brand">
+      <img src="logo.png" alt="BSC KU">
+      <strong>BSC KU Admin</strong>
+    </div>
+    <div class="header-actions">
+      <span class="status-text" id="userEmail"></span>
+      <a href="index.html" class="btn btn-ghost btn-sm">← الموقع</a>
+      <button class="btn btn-danger btn-sm" id="logoutBtn">خروج</button>
+    </div>
+  </header>
+
+  <div class="admin-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-label">المحتوى</div>
+      <button class="nav-item active" data-panel="dashboard"><span class="ni">📊</span>لوحة التحكم</button>
+      <button class="nav-item" data-panel="notes"><span class="ni">📚</span>النوتات</button>
+      <button class="nav-item" data-panel="news"><span class="ni">📰</span>الأخبار</button>
+      <button class="nav-item" data-panel="announcements"><span class="ni">📢</span>الإعلانات</button>
+      <button class="nav-item" data-panel="events"><span class="ni">🎤</span>الفعاليات</button>
+      <div class="sidebar-label">التخصصات</div>
+      <button class="nav-item" data-panel="majorsheet"><span class="ni">🗺️</span>الميجرشيت</button>
+      <button class="nav-item" data-panel="advisors"><span class="ni">🎓</span>المرشدون</button>
+      <button class="nav-item" data-panel="resources"><span class="ni">📁</span>ملفات التخصصات</button>
+      <button class="nav-item" data-panel="team"><span class="ni">👥</span>عائلة النادي</button>
+      <div class="sidebar-label">الذكاء الاصطناعي</div>
+      <button class="nav-item" data-panel="aiknowledge"><span class="ni">🤖</span>معرفة المساعد</button>
+      <button class="nav-item" data-panel="aichats"><span class="ni">💬</span>أسئلة الطلبة</button>
+      <button class="nav-item" data-panel="suggestions"><span class="ni">💡</span>اقتراحات المواد</button>
+      <div class="sidebar-label">الإعدادات</div>
+      <button class="nav-item" data-panel="admins"><span class="ni">🔐</span>الأدمنز</button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin-main">
+
+      <!-- DASHBOARD -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="panel-header"><h2>📊 لوحة التحكم</h2><p>نظرة عامة على محتوى الموقع</p></div>
+        <div class="stats-row" id="dashStats">
+          <div class="stat-card"><strong id="ds-notes">—</strong><span>نوتة</span></div>
+          <div class="stat-card"><strong id="ds-events">—</strong><span>فعالية</span></div>
+          <div class="stat-card"><strong id="ds-advisors">—</strong><span>مرشد</span></div>
+          <div class="stat-card"><strong id="ds-news">—</strong><span>خبر</span></div>
+          <div class="stat-card"><strong id="ds-ann">—</strong><span>إعلان</span></div>
+          <div class="stat-card"><strong id="ds-ai">—</strong><span>معلومة AI</span></div>
+          <div class="stat-card"><strong id="ds-chats">—</strong><span>سؤال طالب</span></div>
+          <div class="stat-card"><strong id="ds-courses">—</strong><span>مادة ميجرشيت</span></div>
+        </div>
+        <div class="card"><h3>⚡ وصول سريع</h3>
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="goPanel('notes')">+ نوتة</button>
+            <button class="btn btn-green" onclick="goPanel('news')">+ خبر</button>
+            <button class="btn btn-gold" onclick="goPanel('announcements')">+ إعلان</button>
+            <button class="btn btn-ghost" onclick="goPanel('majorsheet')">تعديل الميجرشيت</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="panel" id="panel-notes">
+        <div class="panel-header"><h2>📚 النوتات</h2><p>إضافة وإدارة النوتات الدراسية</p></div>
+        <div class="card"><h3>إضافة نوتة جديدة</h3>
+          <div class="form-grid">
+            <div class="form-group"><label>عنوان النوتة</label><input id="noteTitle" placeholder="Genetics Review"></div>
+            <div class="form-group"><label>اسم المادة</label><input id="noteCourse" placeholder="Genetics 301"></div>
+            <div class="form-group"><label>التخصص</label>
+              <select id="noteMajor">
+                <option value="molecular">الأحياء الجزيئية</option><option value="micro">مايكروبيولوجي</option>
+                <option value="plant">أحياء النبات</option><option value="animal">أحياء الحيوان</option>
+                <option value="biochem">الكيمياء الحيوية</option><option value="forensic">الأدلة الجنائية</option>
+                <option value="agri">الزراعة</option><option value="biotech">التقنية الحيوية</option>
+              </select>
+            </div>
+            <div class="form-group"><label>نوع الملف</label>
+              <select id="noteType"><option>Summary</option><option>Midterm</option><option>Final</option><option>Slides</option><option>Lab</option><option>Past Exam</option></select>
+            </div>
+            <div class="form-group"><label>الفصل</label><input id="noteTerm" placeholder="2025 - الفصل الثاني"></div>
+            <div class="form-group"><label>رابط الملف</label><input id="noteUrl" placeholder="https://drive.google.com/..."></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" id="addNote">+ إضافة النوتة</button></div>
+        </div>
+        <div class="items-list" id="notesList"></div>
+      </div>
+
+      <!-- NEWS -->
+      <div class="panel" id="panel-news">
+        <div class="panel-header"><h2>📰 الأخبار</h2><p>إضافة وإدارة أخبار النادي والقسم</p></div>
+        <div class="card"><h3>إضافة خبر جديد</h3>
+          <div class="form-grid">
+            <div class="form-group"><label>عنوان الخبر</label><input id="newsTitle" placeholder="افتتاح مختبر جديد في القسم"></div>
+            <div class="form-group"><label>نوع الخبر</label>
+              <select id="newsType">
+                <option value="info">📌 خبر عام</option>
+                <option value="event">🎤 فعالية</option>
+                <option value="urgent">🚨 عاجل</option>
+              </select>
+            </div>
+            <div class="form-group form-full"><label>محتوى الخبر</label><textarea id="newsContent" placeholder="اكتب تفاصيل الخبر هنا..."></textarea></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" id="addNews">+ نشر الخبر</button></div>
+        </div>
+        <div class="items-list" id="newsList"></div>
+      </div>
+
+      <!-- ANNOUNCEMENTS -->
+      <div class="panel" id="panel-announcements">
+        <div class="panel-header"><h2>📢 الإعلانات</h2><p>تظهر كبانر في أعلى الموقع وفي صفحة الخدمات</p></div>
+        <div class="card"><h3>إضافة إعلان</h3>
+          <div class="form-grid">
+            <div class="form-group"><label>عنوان الإعلان</label><input id="annTitle" placeholder="التسجيل في النادي مفتوح الآن"></div>
+            <div class="form-group"><label>نوع الإعلان</label>
+              <select id="annType">
+                <option value="info">📌 عادي</option>
+                <option value="urgent">🚨 عاجل</option>
+                <option value="event">🎤 فعالية</option>
+              </select>
+            </div>
+            <div class="form-group form-full"><label>تفاصيل (اختياري)</label><textarea id="annContent" placeholder="اكتب التفاصيل هنا..."></textarea></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" id="addAnn">+ نشر الإعلان</button></div>
+        </div>
+        <div class="items-list" id="annList"></div>
+      </div>
+
+      <!-- EVENTS -->
+      <div class="panel" id="panel-events">
+        <div class="panel-header"><h2>🎤 الفعاليات</h2><p>إضافة وإدارة فعاليات النادي</p></div>
+        <div class="card"><h3>إضافة فعالية</h3>
+          <div class="form-grid">
+            <div class="form-group"><label>اسم الفعالية</label><input id="eventTitle" placeholder="ورشة مهارات المختبر"></div>
+            <div class="form-group"><label>التاريخ</label><input id="eventDate" placeholder="20 May 2026"></div>
+            <div class="form-group"><label>الموقع</label><input id="eventLoc" placeholder="قاعة 101 - كلية العلوم"></div>
+            <div class="form-group"><label>رابط التسجيل</label><input id="eventUrl" placeholder="https://..."></div>
+            <div class="form-group form-full"><label>وصف الفعالية</label><textarea id="eventDesc" placeholder="وصف مختصر..."></textarea></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" id="addEvent">+ إضافة الفعالية</button></div>
+        </div>
+        <div class="items-list" id="eventsList"></div>
+      </div>
+
+      <!-- MAJOR SHEET -->
+      <div class="panel" id="panel-majorsheet">
+        <div class="panel-header"><h2>🗺️ الميجرشيت التفاعلي</h2><p>أضف المواد والمسبقات — تظهر كخريطة تفاعلية للطلبة</p></div>
+        <div class="card"><h3>⚡ استيراد سريع للمسبقات</h3>
+          <p style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">استيراد بيانات المسبقات الكاملة لكل التخصصات من دليل الطالب مباشرة</p>
+          <div class="btn-row"><button class="btn btn-gold" id="seedAllSheets">📥 استيراد مسبقات كل التخصصات</button></div>
+        </div>
+        <div class="card"><h3>اختر التخصص</h3>
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap" id="majorTabsBtns">
+            <button class="btn btn-primary" onclick="selectSheetMajor('molecular')">🧬 الأحياء الجزيئية</button>
+            <button class="btn btn-ghost" onclick="selectSheetMajor('micro')">🦠 مايكروبيولوجي</button>
+            <button class="btn btn-ghost" onclick="selectSheetMajor('plant')">🌱 أحياء النبات</button>
+            <button class="btn btn-ghost" onclick="selectSheetMajor('animal')">🐾 أحياء الحيوان</button>
+            <button class="btn btn-ghost" onclick="selectSheetMajor('biochem')">⚗️ الكيمياء الحيوية</button>
+            <button class="btn btn-ghost" onclick="selectSheetMajor('forensic')">🔍 الأدلة الجنائية</button>
+            <button class="btn btn-ghost" onclick="selectSheetMajor('agri')">🌾 الزراعة</button>
+            <button class="btn btn-ghost" onclick="selectSheetMajor('biotech')">🧪 التقنية الحيوية</button>
+          </div>
+        </div>
+        <div class="card"><h3>➕ إضافة مادة — <span id="sheetMajorLabel" style="color:#a5b4fc">الأحياء الجزيئية</span></h3>
+          <div class="form-grid">
+            <div class="form-group"><label>رمز المادة</label><input id="cCode" placeholder="ب 281"></div>
+            <div class="form-group"><label>اسم المادة عربي</label><input id="cNameAr" placeholder="علم الوراثة"></div>
+            <div class="form-group"><label>اسم المادة إنجليزي</label><input id="cNameEn" placeholder="Genetics"></div>
+            <div class="form-group"><label>عدد الساعات</label><input id="cHours" type="number" value="3" min="1" max="6"></div>
+            <div class="form-group"><label>المستوى (Level)</label>
+              <select id="cLevel"><option value="1">Level 1</option><option value="2">Level 2</option><option value="3">Level 3</option><option value="4">Level 4</option></select>
+            </div>
+            <div class="form-group"><label>نوع المادة</label>
+              <select id="cType">
+                <option value="required">متطلب إلزامي (أخضر)</option>
+                <option value="dept">متطلب القسم (أزرق)</option>
+                <option value="major">متطلب التخصص (أصفر)</option>
+                <option value="support">متطلب مساند (وردي)</option>
+                <option value="elective">اختياري تخصص (بنفسجي)</option>
+              </select>
+            </div>
+            <div class="form-group form-full"><label>المسبقات (رموز المواد مفصولة بفاصلة)</label><input id="cPrereqs" placeholder="ب 101، ب 102 أو فاضي إذا ما في مسبق"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="addCourse">+ إضافة المادة</button>
+            <button class="btn btn-green" id="saveSheet">💾 حفظ الميجرشيت</button>
+          </div>
+        </div>
+        <!-- Course list -->
+        <div class="card"><h3>📋 المواد المضافة</h3>
+          <div id="sheetCoursesList" style="max-height:520px;overflow-y:auto"></div>
+          <div class="btn-row" style="margin-top:1rem">
+            <button class="btn btn-green" id="saveSheet">💾 حفظ التعديلات</button>
+          </div>
+        </div>
+        <!-- Tree preview -->
+        <div class="card"><h3>👁️ معاينة الخريطة</h3>
+          <div class="tree-wrap" id="treePreview"><p style="color:var(--muted);text-align:center;padding:2rem">أضف مواد لمعاينة الخريطة</p></div>
+        </div>
+      </div>
+
+      <!-- ADVISORS -->
+      <div class="panel" id="panel-advisors">
+        <div class="panel-header"><h2>🎓 المرشدون الأكاديميون</h2></div>
+        <div class="card"><h3>إضافة مرشد</h3>
+          <div class="form-grid">
+            <div class="form-group"><label>الاسم</label><input id="advisorName" placeholder="د. اسم المرشد"></div>
+            <div class="form-group"><label>الإيميل</label><input id="advisorEmail" placeholder="name@ku.edu.kw"></div>
+            <div class="form-group"><label>التخصص</label>
+              <select id="advisorMajor">
+                <option value="molecular">الأحياء الجزيئية</option><option value="micro">مايكروبيولوجي</option>
+                <option value="plant">أحياء النبات</option><option value="animal">أحياء الحيوان</option>
+                <option value="biochem">الكيمياء الحيوية</option><option value="forensic">الأدلة الجنائية</option>
+                <option value="agri">الزراعة</option><option value="biotech">التقنية الحيوية</option>
+              </select>
+            </div>
+            <div class="form-group"><label>مكتب / ساعات الاستقبال</label><input id="advisorOffice" placeholder="مبنى 13 - مكتب 205"></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" id="addAdvisor">+ إضافة المرشد</button></div>
+        </div>
+        <div class="items-list" id="advisorsList"></div>
+      </div>
+
+      <!-- TEAM / CLUB FAMILY -->
+      <div class="panel" id="panel-team">
+        <div class="panel-header">
+          <h2>👥 عائلة النادي</h2>
+          <p>إضافة وتعديل وحذف أعضاء النادي</p>
+        </div>
+        <div class="card">
+          <h3>إضافة / تعديل عضو</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>الاسم الكامل *</label>
+              <input id="memberName" placeholder="اسم العضو">
+            </div>
+            <div class="form-group">
+              <label>المنصب / الدور *</label>
+              <input id="memberRole" placeholder="مثال: رئيس النادي، نائب الرئيس...">
+            </div>
+            <div class="form-group">
+              <label>الرقم الجامعي</label>
+              <input id="memberStudentId" placeholder="2XXXXXXXX">
+            </div>
+            <div class="form-group">
+              <label>التخصص</label>
+              <select id="memberMajor">
+                <option value="">— اختر التخصص —</option>
+                <option value="molecular">البيولوجيا الجزيئية</option>
+                <option value="micro">علم الميكروبيولوجي</option>
+                <option value="plant">بيولوجيا النبات</option>
+                <option value="animal">بيولوجيا الحيوان</option>
+                <option value="biochem">الكيمياء الحيوية</option>
+                <option value="forensic">علم الأدلة الجنائية</option>
+                <option value="agri">الزراعة</option>
+                <option value="biotech">التقنية الحيوية</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>إيميل التواصل</label>
+              <input id="memberEmail" placeholder="name@ku.edu.kw">
+            </div>
+            <div class="form-group">
+              <label>الصورة الشخصية (اختياري)</label>
+              <div style="display:flex;flex-direction:column;gap:.5rem">
+                <div style="display:flex;align-items:center;gap:.75rem">
+                  <label for="memberPhotoFile" style="display:inline-flex;align-items:center;gap:.5rem;padding:.55rem 1rem;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.35);border-radius:10px;color:#a5b4fc;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s">
+                    📎 ارفع صورة
+                  </label>
+                  <input id="memberPhotoFile" type="file" accept="image/*" style="display:none">
+                  <span id="memberPhotoName" style="font-size:.78rem;color:var(--muted)">أو</span>
+                  <input id="memberPhoto" placeholder="https://... رابط مباشر" style="flex:1">
+                </div>
+                <div id="memberPhotoPreview" style="display:none;margin-top:.25rem">
+                  <img id="memberPhotoImg" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid rgba(99,102,241,.4)">
+                  <button type="button" onclick="clearMemberPhoto()" style="margin-right:.5rem;background:none;border:none;color:#f87171;cursor:pointer;font-size:.8rem">✕ إزالة</button>
+                </div>
+              </div>
+            </div>
+            <div class="form-group form-full">
+              <label>نبذة مختصرة (اختياري)</label>
+              <textarea id="memberBio" placeholder="نبذة قصيرة عن العضو..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>ترتيب الظهور</label>
+              <input id="memberOrder" type="number" min="1" value="99" placeholder="1 = أول">
+            </div>
+            <div class="form-group">
+              <label>الفئة</label>
+              <select id="memberCategory">
+                <option value="board">الهيئة الإدارية</option>
+                <option value="academic">الفريق الأكاديمي</option>
+                <option value="media">فريق الإعلام</option>
+                <option value="events">فريق الفعاليات</option>
+                <option value="other">أخرى</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="addMemberBtn">+ إضافة العضو</button>
+            <button class="btn" id="clearMemberFormBtn" style="background:rgba(255,255,255,.06);border:1px solid var(--border)">مسح النموذج</button>
+          </div>
+          <div id="memberFormStatus" style="margin-top:.75rem;font-size:.85rem;color:var(--muted);min-height:1.2em"></div>
+        </div>
+
+        <!-- استيراد جماعي -->
+        <div class="card" style="border-color:rgba(16,185,129,.25)">
+          <h3 style="color:#10b981">📥 استيراد الأعضاء دفعة واحدة</h3>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">اضغط الزر وسيتم رفع كل أعضاء النادي الـ 26 لـ Firebase مباشرة</p>
+          <div id="importProgress" style="display:none;margin-bottom:1rem">
+            <div style="background:rgba(255,255,255,.06);border-radius:8px;overflow:hidden;height:8px;margin-bottom:.5rem">
+              <div id="importBar" style="height:100%;background:linear-gradient(90deg,#10b981,#6366f1);width:0%;transition:width .3s;border-radius:8px"></div>
+            </div>
+            <div id="importLog" style="font-size:.78rem;color:var(--muted);max-height:140px;overflow-y:auto;line-height:1.8"></div>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-primary" id="importMembersBtn" id="importMembersBtn2" style="background:linear-gradient(135deg,#10b981,#059669);border:none">
+              ⬆️ استيراد الـ 26 عضو
+            </button>
+            <span id="importStatus" style="font-size:.82rem;color:var(--muted)"></span>
+          </div>
+        </div>
+
+        <div class="items-list" id="membersList"></div>
+      </div>
+
+      <!-- RESOURCES -->
+      <div class="panel" id="panel-resources">
+        <div class="panel-header"><h2>📁 ملفات التخصصات</h2><p>ملفات PDF وروابط تظهر داخل صفحة كل تخصص</p></div>
+        <div class="card"><h3>إضافة ملف أو رابط</h3>
+          <div class="form-grid">
+            <div class="form-group"><label>التخصص</label>
+              <select id="resourceMajor">
+                <option value="molecular">الأحياء الجزيئية</option><option value="micro">مايكروبيولوجي</option>
+                <option value="plant">أحياء النبات</option><option value="animal">أحياء الحيوان</option>
+                <option value="biochem">الكيمياء الحيوية</option><option value="forensic">الأدلة الجنائية</option>
+                <option value="agri">الزراعة</option><option value="biotech">التقنية الحيوية</option>
+              </select>
+            </div>
+            <div class="form-group"><label>عنوان الملف</label><input id="resourceTitle" placeholder="ميجرشيت الأحياء الجزيئية 2025"></div>
+            <div class="form-group"><label>النوع</label>
+              <select id="resourceType" onchange="toggleUpload(this.value)">
+                <option value="pdf">PDF</option>
+                <option value="image">صورة</option>
+                <option value="link">رابط</option>
+              </select>
+            </div>
+            <!-- URL input -->
+            <div class="form-group" id="urlGroup"><label>الرابط</label><input id="resourceUrl" placeholder="https://drive.google.com/..."></div>
+            <!-- File upload -->
+            <div class="form-group" id="uploadGroup" style="display:none">
+              <label>رفع ملف مباشر</label>
+              <div style="border:2px dashed var(--border2);border-radius:12px;padding:1.5rem;text-align:center;cursor:pointer;transition:border-color .2s;background:rgba(99,102,241,.04)"
+                id="dropZone"
+                ondragover="event.preventDefault();this.style.borderColor='#6366f1'"
+                ondragleave="this.style.borderColor=''"
+                ondrop="handleDrop(event)">
+                <div style="font-size:2rem;margin-bottom:.5rem">📂</div>
+                <div style="font-size:.85rem;color:var(--muted);margin-bottom:.75rem">اسحب الملف هنا أو</div>
+                <label style="display:inline-block;padding:.45rem 1rem;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer">
+                  اختر ملف
+                  <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg,.gif,.webp" style="display:none" onchange="handleFileSelect(this)">
+                </label>
+                <div id="fileStatus" style="margin-top:.75rem;font-size:.8rem;color:var(--muted)"></div>
+                <div id="uploadProgress" style="display:none;margin-top:.75rem">
+                  <div style="background:rgba(255,255,255,.1);border-radius:999px;height:6px;overflow:hidden">
+                    <div id="progressBar" style="height:100%;background:linear-gradient(90deg,#6366f1,#8b5cf6);width:0%;transition:width .3s;border-radius:999px"></div>
+                  </div>
+                  <div id="progressText" style="font-size:.75rem;color:#a5b4fc;margin-top:.4rem;text-align:center">0%</div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group form-full"><label>وصف مختصر</label><textarea id="resourceDesc" placeholder="وصف يظهر للطلبة..."></textarea></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="addResource">+ إضافة</button>
+          </div>
+        </div>
+        <div class="items-list" id="resourcesList"></div>
+      </div>
+
+      <!-- AI KNOWLEDGE -->
+      <div class="panel" id="panel-aiknowledge">
+        <div class="panel-header"><h2>🤖 معرفة المساعد الذكي</h2><p>المعلومات التي يستخدمها المساعد للإجابة على أسئلة الطلبة</p></div>
+        <div class="card"><h3>إضافة معلومة</h3>
+          <div class="form-grid">
+            <div class="form-group"><label>عنوان المعلومة</label><input id="aiTitle" placeholder="طريقة التسجيل بالنادي"></div>
+            <div class="form-group"><label>كلمات مفتاحية</label><input id="aiKeywords" placeholder="تسجيل، عضوية، join"></div>
+            <div class="form-group form-full"><label>الإجابة</label><textarea id="aiAnswer" placeholder="اكتب الإجابة الكاملة هنا..."></textarea></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" id="addAI">+ إضافة للمساعد</button></div>
+        </div>
+        <div class="items-list" id="aiList"></div>
+      </div>
+
+      <!-- AI CHATS -->
+      <div class="panel" id="panel-aichats">
+        <div class="panel-header"><h2>💬 أسئلة الطلبة</h2><p>الأسئلة التي وجّهها الطلبة للمساعد الذكي</p></div>
+        <div class="items-list" id="aiChatsList"></div>
+      </div>
+
+      <!-- SUGGESTIONS -->
+      <div class="panel" id="panel-suggestions">
+        <div class="panel-header"><h2>💡 اقتراحات المواد</h2><p>مواد مقترحة من الطلبة لإضافتها للميجرشيت</p></div>
+        <div class="items-list" id="suggestionsList"></div>
+      </div>
+
+      <!-- ADMINS -->
+      <div class="panel" id="panel-admins">
+        <div class="panel-header"><h2>🔐 الأدمنز</h2><p>المصرح لهم بالدخول للوحة التحكم</p></div>
+        <div class="card">
+          <div class="items-list" id="adminsList">
+            <div class="list-item"><div class="list-item-body"><h4>ahmed921x@gmail.com</h4><p>Super Admin</p></div><span class="badge badge-green">Active</span></div>
+            <div class="list-item"><div class="list-item-body"><h4>abdullaalshewaya66@gmail.com</h4><p>Admin</p></div><span class="badge badge-blue">Active</span></div>
+          </div>
+          <p style="font-size:.8rem;color:var(--muted);margin-top:1rem">لإضافة أدمن جديد: أضف إيميله في Firebase Authentication + عدّل قائمة allowedAdmins في الكود</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, query, orderBy, serverTimestamp, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+import { MAJOR_SHEETS_SEED } from "./majorsheets-seed.js";
+
+const FB = {apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"};
+const app=initializeApp(FB);
+const auth=getAuth(app);
+const db=getFirestore(app);
+const storage=getStorage(app);
+const ALLOWED=["ahmed921x@gmail.com","abdullaalshewaya66@gmail.com","kmaldebs@gmail.com","biosciclub@gmail.com"];
+const MN={molecular:"الأحياء الجزيئية",micro:"مايكروبيولوجي",plant:"أحياء النبات",animal:"أحياء الحيوان",biochem:"الكيمياء الحيوية",forensic:"الأدلة الجنائية",agri:"الزراعة",biotech:"التقنية الحيوية"};
+
+// AUTH
+document.getElementById("loginBtn").onclick=()=>signInWithPopup(auth,new GoogleAuthProvider());
+document.getElementById("emailLoginBtn").onclick=async()=>{
+  const em=document.getElementById("emailInput").value.trim().toLowerCase();
+  const pw=document.getElementById("passInput").value;
+  const msg=document.getElementById("statusMsg");
+  if(!em||!pw){msg.textContent="أدخل الإيميل والباسورد";return;}
+  try{
+    await signInWithEmailAndPassword(auth,em,pw);
+  }catch(e){
+    msg.textContent="خطأ: "+( e.code==="auth/invalid-credential"?"إيميل أو باسورد غلط":e.message);
+  }
+};
+document.getElementById("logoutBtn").onclick=()=>signOut(auth);
+onAuthStateChanged(auth,user=>{
+  if(!user){document.getElementById("loginArea").classList.remove("hidden");document.getElementById("adminApp").classList.add("hidden");return}
+  const em=user.email.toLowerCase().trim();
+  if(!ALLOWED.includes(em)){document.getElementById("statusMsg").textContent="هذا الإيميل غير مصرح له: "+em;return}
+  document.getElementById("loginArea").classList.add("hidden");
+  document.getElementById("adminApp").classList.remove("hidden");
+  document.getElementById("userEmail").textContent=em;
+  loadAll();
+});
+
+// PANELS NAV
+document.querySelectorAll(".nav-item[data-panel]").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".nav-item").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("panel-"+btn.dataset.panel).classList.add("active");
+  }
+});
+window.goPanel=function(id){
+  document.querySelectorAll(".nav-item").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.querySelector(`.nav-item[data-panel="${id}"]`).classList.add("active");
+  document.getElementById("panel-"+id).classList.add("active");
+};
+
+// FIREBASE HELPERS
+async function getItems(col){try{const s=await getDocs(query(collection(db,col),orderBy("createdAt","desc")));return s.docs.map(d=>({id:d.id,...d.data()}))}catch{const s=await getDocs(collection(db,col));return s.docs.map(d=>({id:d.id,...d.data()}))}}
+async function addItem(col,data){await addDoc(collection(db,col),{...data,createdAt:serverTimestamp()});loadAll()}
+async function delItem(col,id){if(confirm("متأكد من الحذف؟")){await deleteDoc(doc(db,col,id));loadAll()}}
+
+// RENDER HELPERS
+function renderItems(elId,items,fields,col){
+  const el=document.getElementById(elId);if(!el)return;
+  if(!items.length){el.innerHTML='<p style="color:var(--muted);padding:1rem">لا توجد عناصر حالياً.</p>';return}
+  el.innerHTML=items.map(item=>`
+    <div class="list-item">
+      <div class="list-item-body">
+        <h4>${item[fields[0]]||item.title||item.name||"—"}</h4>
+        <p>${[fields[1]&&item[fields[1]],fields[2]&&item[fields[2]],item.major?MN[item.major]||item.major:""].filter(Boolean).join(" · ")}</p>
+      </div>
+      <div class="list-item-actions">
+        <button class="btn btn-danger btn-sm" onclick="delItem_('${col}','${item.id}')">حذف</button>
+      </div>
+    </div>`).join("");
+}
+window.delItem_=delItem;
+
+// ADD HANDLERS
+document.getElementById("addNote").onclick=async()=>{
+  const d={title:noteTitle.value.trim(),course:noteCourse.value.trim(),major:noteMajor.value,type:noteType.value,term:noteTerm.value.trim()||"General",url:noteUrl.value.trim()};
+  if(!d.title||!d.url)return alert("عبّي العنوان والرابط");
+  await addItem("notes",d);noteTitle.value=noteCourse.value=noteTerm.value=noteUrl.value="";alert("✅ تمت إضافة النوتة");
+};
+document.getElementById("addNews").onclick=async()=>{
+  const d={title:newsTitle.value.trim(),type:newsType.value,content:newsContent.value.trim()};
+  if(!d.title)return alert("اكتب عنوان الخبر");
+  await addItem("news",d);newsTitle.value=newsContent.value="";alert("✅ تم نشر الخبر");
+};
+document.getElementById("addAnn").onclick=async()=>{
+  const d={title:annTitle.value.trim(),type:annType.value,content:annContent.value.trim()};
+  if(!d.title)return alert("اكتب عنوان الإعلان");
+  await addItem("announcements",d);annTitle.value=annContent.value="";alert("✅ تم نشر الإعلان");
+};
+document.getElementById("addEvent").onclick=async()=>{
+  const d={title:eventTitle.value.trim(),date:eventDate.value.trim(),location:eventLoc.value.trim(),description:eventDesc.value.trim(),url:eventUrl.value.trim()};
+  if(!d.title)return alert("اكتب اسم الفعالية");
+  await addItem("events",d);eventTitle.value=eventDate.value=eventLoc.value=eventDesc.value=eventUrl.value="";alert("✅ تمت إضافة الفعالية");
+};
+document.getElementById("addAdvisor").onclick=async()=>{
+  const d={name:advisorName.value.trim(),email:advisorEmail.value.trim(),major:advisorMajor.value,office:advisorOffice.value.trim()};
+  if(!d.name||!d.email)return alert("عبّي الاسم والإيميل");
+  await addItem("advisors",d);advisorName.value=advisorEmail.value=advisorOffice.value="";alert("✅ تمت إضافة المرشد");
+};
+// File upload helpers
+let uploadedFileUrl = '';
+window.toggleUpload = function(type){
+  const urlG = document.getElementById('urlGroup');
+  const upG  = document.getElementById('uploadGroup');
+  if(type === 'link'){urlG.style.display='';upG.style.display='none';}
+  else{urlG.style.display='none';upG.style.display='';}
+};
+window.handleFileSelect = function(input){
+  if(input.files[0]) handleFile(input.files[0]);
+};
+window.handleDrop = function(e){
+  e.preventDefault();
+  document.getElementById('dropZone').style.borderColor='';
+  if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+};
+function handleFile(file){
+  const maxMB = 10;
+  if(file.size > maxMB*1024*1024){alert(`الملف أكبر من ${maxMB}MB — استخدم رابط Google Drive بدل ذلك`);return;}
+  document.getElementById('fileStatus').textContent = `✅ ${file.name} (${(file.size/1024/1024).toFixed(2)} MB)`;
+  uploadedFileUrl = '';
+  window._pendingFile = file;
+}
+async function uploadFileToStorage(file){
+  const prog = document.getElementById('uploadProgress');
+  const bar  = document.getElementById('progressBar');
+  const txt  = document.getElementById('progressText');
+  prog.style.display = 'block';
+  const path = `resources/${Date.now()}_${file.name}`;
+  const storageRef = ref(storage, path);
+  const task = uploadBytesResumable(storageRef, file);
+  return new Promise((res,rej)=>{
+    task.on('state_changed',
+      snap=>{const p=Math.round(snap.bytesTransferred/snap.totalBytes*100);bar.style.width=p+'%';txt.textContent=p+'%';},
+      err=>{prog.style.display='none';rej(err);},
+      async()=>{const url=await getDownloadURL(task.snapshot.ref);bar.style.width='100%';txt.textContent='اكتمل ✅';setTimeout(()=>prog.style.display='none',1500);res(url);}
+    );
+  });
+}
+document.getElementById("addResource").onclick=async()=>{
+  const title=resourceTitle.value.trim();
+  const type=resourceType.value;
+  let url='';
+  if(type==='link'){
+    url=resourceUrl.value.trim();
+    if(!title||!url)return alert("عبّي العنوان والرابط");
+  } else {
+    if(!window._pendingFile)return alert("اختر ملفاً أولاً");
+    document.getElementById('addResource').disabled=true;
+    document.getElementById('addResource').textContent='⏳ جاري الرفع...';
+    try{url = await uploadFileToStorage(window._pendingFile);}
+    catch(e){alert("خطأ في الرفع: "+e.message);document.getElementById('addResource').disabled=false;document.getElementById('addResource').textContent='+ إضافة';return;}
+    document.getElementById('addResource').disabled=false;
+    document.getElementById('addResource').textContent='+ إضافة';
+    window._pendingFile=null;
+    document.getElementById('fileStatus').textContent='';
+  }
+  const d={title,major:resourceMajor.value,type,url,description:resourceDesc.value.trim()};
+  await addItem("majorResources",d);
+  resourceTitle.value=resourceUrl.value=resourceDesc.value="";
+  alert("✅ تمت الإضافة");
+};
+
+document.getElementById("addAI").onclick=async()=>{
+  const d={title:aiTitle.value.trim(),keywords:aiKeywords.value.trim(),answer:aiAnswer.value.trim()};
+  if(!d.title||!d.answer)return alert("عبّي العنوان والإجابة");
+  await addItem("aiKnowledge",d);aiTitle.value=aiKeywords.value=aiAnswer.value="";alert("✅ تمت الإضافة");
+};
+
+// SEED ALL SHEETS
+document.getElementById("seedAllSheets").onclick=async()=>{
+  if(!confirm("سيتم استيراد مسبقات كل التخصصات الخمسة من دليل الطالب. المتابعة؟"))return;
+  const btn=document.getElementById("seedAllSheets");
+  btn.disabled=true;btn.textContent="جاري الاستيراد...";
+  try{
+    for(const [major,data] of Object.entries(MAJOR_SHEETS_SEED)){
+      await setDoc(doc(db,"majorSheets",major),{...data,updatedAt:serverTimestamp()});
+    }
+    alert("✅ تم استيراد مسبقات كل التخصصات بنجاح!");
+    await loadSheetCourses(currentSheetMajor);
+  }catch(e){alert("خطأ: "+e.message);}
+  finally{btn.disabled=false;btn.textContent="📥 استيراد مسبقات كل التخصصات";}
+};
+
+// MAJORSHEET LOGIC
+let currentSheetMajor="molecular";
+let sheetCourses=[];
+window.selectSheetMajor=function(major){
+  currentSheetMajor=major;
+  document.getElementById("sheetMajorLabel").textContent=MN[major]||major;
+  loadSheetCourses(major);
+};
+async function loadSheetCourses(major){
+  try{
+    const d=await getDoc(doc(db,"majorSheets",major));
+    sheetCourses=d.exists()?(d.data().courses||[]):[];
+  }catch{sheetCourses=[]}
+  renderSheetCourses();renderTreePreview();
+  document.getElementById("ds-courses").textContent=sheetCourses.length;
+}
+document.getElementById("addCourse").onclick=()=>{
+  const code=cCode.value.trim(),nameAr=cNameAr.value.trim(),nameEn=cNameEn.value.trim();
+  if(!code||!nameAr)return alert("عبّي رمز المادة واسمها");
+  sheetCourses.push({code,nameAr,nameEn,hours:parseInt(cHours.value)||3,level:parseInt(cLevel.value)||1,type:cType.value,prereqs:cPrereqs.value.trim().split(/[,،]/).map(s=>s.trim()).filter(Boolean)});
+  cCode.value=cNameAr.value=cNameEn.value=cPrereqs.value="";
+  renderSheetCourses();renderTreePreview();
+};
+document.getElementById("saveSheet").onclick=async()=>{
+  await setDoc(doc(db,"majorSheets",currentSheetMajor),{major:currentSheetMajor,courses:sheetCourses,updatedAt:serverTimestamp()});
+  alert("✅ تم حفظ الميجرشيت");
+};
+function renderSheetCourses(){
+  const el=document.getElementById("sheetCoursesList");
+  if(!sheetCourses.length){el.innerHTML='<p style="color:var(--muted);padding:1rem">اضغط "استيراد" أولاً ثم عدّل المسبقات.</p>';return}
+  const typeLabel={required:"إلزامي",dept:"قسم",major:"تخصص",support:"مساند",elective:"اختياري"};
+  const typeColors={required:"rgba(16,185,129,.15)",dept:"rgba(59,130,246,.15)",major:"rgba(245,158,11,.15)",support:"rgba(239,68,68,.12)",elective:"rgba(139,92,246,.15)"};
+  el.innerHTML=`
+  <style>
+  .edit-row{display:grid;grid-template-columns:90px 1fr 80px 80px 1fr 36px;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;margin-bottom:6px;border:1px solid var(--border)}
+  .edit-row:hover{border-color:rgba(99,102,241,.3)}
+  .edit-row input,.edit-row select{padding:5px 8px;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:Tajawal,system-ui;font-size:.82rem;width:100%;outline:none}
+  .edit-row input:focus,.edit-row select:focus{border-color:rgba(99,102,241,.5)}
+  .edit-row select option{background:#0f172a}
+  .edit-label{font-size:.68rem;color:var(--muted);font-weight:700;text-align:center;display:block;margin-bottom:2px}
+  .col-head{display:grid;grid-template-columns:90px 1fr 80px 80px 1fr 36px;gap:8px;padding:4px 10px;margin-bottom:4px}
+  .col-head span{font-size:.68rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  </style>
+  <div class="col-head">
+    <span>رمز المادة</span><span>اسم المادة</span><span>ساعات</span><span>النوع</span><span>المسبقات (مفصولة بفاصلة)</span><span></span>
+  </div>
+  `+sheetCourses.map((c,i)=>`
+    <div class="edit-row" style="background:${typeColors[c.type]||'rgba(255,255,255,.03)'}">
+      <input value="${c.code}" onchange="updateCourse(${i},'code',this.value)" placeholder="رمز">
+      <input value="${c.nameAr}" onchange="updateCourse(${i},'nameAr',this.value)" placeholder="اسم المادة">
+      <input type="number" value="${c.hours}" min="1" max="9" onchange="updateCourse(${i},'hours',parseInt(this.value))" style="text-align:center">
+      <select onchange="updateCourse(${i},'type',this.value)">
+        <option value="required" ${c.type==='required'?'selected':''}>إلزامي</option>
+        <option value="dept"     ${c.type==='dept'    ?'selected':''}>قسم</option>
+        <option value="major"    ${c.type==='major'   ?'selected':''}>تخصص</option>
+        <option value="support"  ${c.type==='support' ?'selected':''}>مساند</option>
+        <option value="elective" ${c.type==='elective'?'selected':''}>اختياري</option>
+      </select>
+      <input value="${(c.prereqs||[]).join('، ')}"
+        onchange="updateCourse(${i},'prereqs',this.value.split(/[,،]/).map(s=>s.trim()).filter(Boolean))"
+        placeholder="مثال: ب 101، E 161">
+      <button onclick="removeCourse(${i})" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:7px;padding:4px 8px;cursor:pointer;font-size:.85rem">×</button>
+    </div>`).join('');
+}
+window.updateCourse=function(i,field,val){sheetCourses[i][field]=val;};
+window.removeCourse=function(i){if(confirm('حذف '+sheetCourses[i].code+'؟')){sheetCourses.splice(i,1);renderSheetCourses();}};
+function renderTreePreview(){
+  const el=document.getElementById("treePreview");
+  if(!sheetCourses.length){el.innerHTML='<p style="color:var(--muted);text-align:center;padding:2rem">أضف مواد لمعاينة الخريطة</p>';return}
+  const levels={};
+  sheetCourses.forEach(c=>{if(!levels[c.level])levels[c.level]=[];levels[c.level].push(c)});
+  const typeClass={required:"tn-required",dept:"tn-dept",major:"tn-support",support:"tn-support",elective:"tn-elective"};
+  let html="";
+  Object.keys(levels).sort((a,b)=>a-b).forEach(lv=>{
+    html+=`<div style="margin-bottom:4px;font-size:.7rem;font-weight:700;color:var(--muted);text-align:center">Level ${lv}</div>`;
+    html+=`<div class="tree-level">`;
+    levels[lv].forEach(c=>{
+      html+=`<div class="tree-node ${typeClass[c.type]||''}" title="${c.prereqs.length?'مسبق: '+c.prereqs.join('، '):'لا مسبقات'}">${c.code}<br><span style="font-size:.65rem;font-weight:400">${c.nameAr}</span></div>`;
+    });
+    html+=`</div>`;
+    if(Object.keys(levels).sort().indexOf(String(lv))<Object.keys(levels).length-1)html+=`<div class="tree-arrow">↓</div>`;
+  });
+  el.innerHTML=html;
+}
+
+// LOAD ALL
+async function loadAll(){
+  try{
+    const[notes,events,advisors,ann,resources,ai,chats,news]=await Promise.all([
+      getItems("notes"),getItems("events"),getItems("advisors"),getItems("announcements"),
+      getItems("majorResources"),getItems("aiKnowledge"),getItems("aiChats"),getItems("news"),getItems("suggestions")
+    ]);
+    // stats
+    document.getElementById("ds-notes").textContent=notes.length;
+    document.getElementById("ds-events").textContent=events.length;
+    document.getElementById("ds-advisors").textContent=advisors.length;
+    document.getElementById("ds-news").textContent=news.length;
+    document.getElementById("ds-ann").textContent=ann.length;
+    document.getElementById("ds-ai").textContent=ai.length;
+    document.getElementById("ds-chats").textContent=chats.length;
+    // render
+    renderItems("notesList",notes,["title","course","term"],"notes");
+    renderItems("newsList",news,["title","type",""],"news");
+    renderItems("annList",ann,["title","type","content"],"announcements");
+    renderItems("eventsList",events,["title","date","location"],"events");
+    renderItems("advisorsList",advisors,["name","email","major"],"advisors");
+    renderItems("resourcesList",resources,["title","major","type"],"majorResources");
+    renderItems("aiList",ai,["title","keywords",""],"aiKnowledge");
+    // ai chats
+    const cc=document.getElementById("aiChatsList");
+    if(cc)cc.innerHTML=chats.length?chats.map(c=>`<div class="list-item"><div class="list-item-body"><h4>${c.question||"سؤال"}</h4><p>${c.answer||""}</p></div><button class="btn btn-danger btn-sm" onclick="delItem_('aiChats','${c.id}')">حذف</button></div>`).join(""):'<p style="color:var(--muted);padding:1rem">لا توجد أسئلة.</p>';
+    // suggestions
+    const MN2={molecular:"الأحياء الجزيئية",micro:"مايكروبيولوجي",plant:"أحياء النبات",animal:"أحياء الحيوان",biochem:"الكيمياء الحيوية"};
+    const sl=document.getElementById("suggestionsList");
+    if(sl)sl.innerHTML=suggestions.length?suggestions.map(s=>`
+      <div class="list-item">
+        <div class="list-item-body">
+          <h4>${s.code||"?"} — ${s.nameAr||""} ${s.nameEn?"("+s.nameEn+")":""}</h4>
+          <p>${MN2[s.major]||s.major||""} · ${s.hours||3} ساعات · المسبقات: ${(s.prereqs||[]).join("، ")||"لا مسبقات"}</p>
+          ${s.notes?`<p style="margin-top:.3rem;font-style:italic">${s.notes}</p>`:""}
+        </div>
+        <div style="display:flex;gap:.5rem;flex-shrink:0">
+          <button class="btn btn-green btn-sm" onclick="addSuggToSheet('${s.id}')">+ أضف للميجرشيت</button>
+          <button class="btn btn-danger btn-sm" onclick="delItem_('suggestions','${s.id}')">حذف</button>
+        </div>
+      </div>`).join(""):'<p style="color:var(--muted);padding:1rem">لا توجد اقتراحات بعد.</p>';
+    // load sheet for default major
+    await loadSheetCourses(currentSheetMajor);
+  }catch(e){console.error(e)}
+}
+// Add suggestion directly to majorsheet
+window.addSuggToSheet=async function(id){
+  try{
+    const snap=await getDoc(doc(db,'suggestions',id));
+    if(!snap.exists())return;
+    const s=snap.data();
+    await loadSheetCourses(s.major||currentSheetMajor);
+    sheetCourses.push({code:s.code,nameAr:s.nameAr,nameEn:s.nameEn||"",hours:s.hours||3,level:1,type:"major",prereqs:s.prereqs||[]});
+    await setDoc(doc(db,"majorSheets",s.major||currentSheetMajor),{major:s.major||currentSheetMajor,courses:sheetCourses,updatedAt:serverTimestamp()});
+    await deleteDoc(doc(db,"suggestions",id));
+    alert("✅ تمت إضافة المادة للميجرشيت");
+    loadAll();
+  }catch(e){alert("خطأ: "+e.message);}
+};
+// expose for inline calls
+window.addItem=addItem;window.delItem=delItem;
+
+// ── PHOTO UPLOAD (Base64) ──
+(function(){
+  const fileInput = document.getElementById('memberPhotoFile');
+  if(!fileInput) return;
+
+  fileInput.addEventListener('change', function(){
+    const file = this.files[0];
+    if(!file) return;
+
+    // Validate size (max 800KB)
+    if(file.size > 800 * 1024){
+      alert('الصورة كبيرة — الحد الأقصى 800KB. قلل حجمها وحاول مجدداً.');
+      this.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e){
+      const base64 = e.target.result;
+      // Show preview
+      const preview = document.getElementById('memberPhotoPreview');
+      const img     = document.getElementById('memberPhotoImg');
+      const name    = document.getElementById('memberPhotoName');
+      img.src = base64;
+      preview.style.display = 'flex';
+      preview.style.alignItems = 'center';
+      name.textContent = file.name;
+      // Store in hidden input
+      document.getElementById('memberPhoto').value = base64;
+      document.getElementById('memberPhoto').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  window.clearMemberPhoto = function(){
+    document.getElementById('memberPhoto').value = '';
+    document.getElementById('memberPhoto').style.display = '';
+    document.getElementById('memberPhotoPreview').style.display = 'none';
+    document.getElementById('memberPhotoName').textContent = 'أو';
+    document.getElementById('memberPhotoFile').value = '';
+  };
+})();
+
+// ── TEAM MANAGEMENT ──
+(function(){
+  async function loadMembers(){
+    const members = await getItems('teamMembers').catch(()=>[]);
+    const list = document.getElementById('membersList');
+    if(!list) return;
+    if(!members.length){ list.innerHTML='<p style="color:var(--muted);padding:1rem">لا يوجد أعضاء بعد.</p>'; return; }
+    // Sort by order
+    members.sort((a,b)=>(+a.order||99)-(+b.order||99));
+    const catNames = {board:'الهيئة الإدارية',academic:'الفريق الأكاديمي',media:'فريق الإعلام',events:'فريق الفعاليات',other:'أخرى'};
+    list.innerHTML = members.map(m=>`
+      <div class="list-item" id="mi-${m.id}">
+        <div style="display:flex;align-items:center;gap:.85rem;flex:1;min-width:0">
+          ${m.photo?`<img src="${m.photo}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border)" onerror="this.style.display='none'">`:'<div style="width:44px;height:44px;border-radius:50%;background:rgba(99,102,241,.2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">👤</div>'}
+          <div class="list-item-body" style="min-width:0">
+            <h4>${m.name||'—'}</h4>
+            <p>${m.role||''} ${m.category?'· '+(catNames[m.category]||m.category):''} ${m.major?'· '+m.major:''}</p>
+            ${m.email?`<p style="font-size:.75rem;color:var(--muted)">${m.email}</p>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:.4rem;flex-shrink:0">
+          <button class="btn btn-sm" style="background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);color:#a5b4fc" onclick="editMember('${m.id}')">تعديل</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteMember('${m.id}')">حذف</button>
+        </div>
+      </div>`).join('');
+  }
+
+  window.editMember = function(id){
+    getItems('teamMembers').then(members=>{
+      const m = members.find(x=>x.id===id);
+      if(!m) return;
+      document.getElementById('memberName').value = m.name||'';
+      document.getElementById('memberRole').value = m.role||'';
+      document.getElementById('memberStudentId').value = m.studentId||'';
+      document.getElementById('memberMajor').value = m.major||'';
+      document.getElementById('memberEmail').value = m.email||'';
+      document.getElementById('memberPhoto').value = m.photo||'';
+      // Show photo preview if exists
+      if(m.photo){
+        const preview = document.getElementById('memberPhotoPreview');
+        const img = document.getElementById('memberPhotoImg');
+        img.src = m.photo;
+        preview.style.display = 'flex';
+        preview.style.alignItems = 'center';
+        document.getElementById('memberPhotoName').textContent = 'صورة محفوظة';
+        document.getElementById('memberPhoto').style.display = 'none';
+      }
+      document.getElementById('memberBio').value = m.bio||'';
+      document.getElementById('memberOrder').value = m.order||99;
+      document.getElementById('memberCategory').value = m.category||'board';
+      // Store id for update
+      document.getElementById('addMemberBtn').dataset.editId = id;
+      document.getElementById('addMemberBtn').textContent = '💾 حفظ التعديلات';
+      document.getElementById('memberFormStatus').textContent = 'وضع التعديل — عدّل البيانات واضغط حفظ';
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  };
+
+  window.deleteMember = function(id){
+    if(!confirm('هل أنت متأكد من حذف هذا العضو؟')) return;
+    delItem('teamMembers', id).then(loadMembers);
+  };
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const btn = document.getElementById('addMemberBtn');
+    if(!btn) return;
+
+    btn.onclick = async function(){
+      const name = document.getElementById('memberName').value.trim();
+      const role = document.getElementById('memberRole').value.trim();
+      if(!name || !role){ alert('الاسم والمنصب مطلوبان.'); return; }
+
+      const data = {
+        name,
+        role,
+        studentId: document.getElementById('memberStudentId').value.trim(),
+        major:     document.getElementById('memberMajor').value,
+        email:     document.getElementById('memberEmail').value.trim(),
+        photo:     document.getElementById('memberPhoto').value.trim(),
+        bio:       document.getElementById('memberBio').value.trim(),
+        order:     +document.getElementById('memberOrder').value || 99,
+        category:  document.getElementById('memberCategory').value,
+      };
+
+      const editId = btn.dataset.editId;
+      const status = document.getElementById('memberFormStatus');
+      btn.disabled = true;
+      status.textContent = 'جاري الحفظ...';
+
+      try {
+        if(editId){
+          await updateItem('teamMembers', editId, data).catch(()=>delItem('teamMembers',editId).then(()=>addItem('teamMembers',data)));
+          delete btn.dataset.editId;
+          btn.textContent = '+ إضافة العضو';
+        } else {
+          await addItem('teamMembers', data);
+        }
+        // Clear form
+        ['memberName','memberRole','memberStudentId','memberEmail','memberPhoto','memberBio'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+        document.getElementById('memberOrder').value = 99;
+        document.getElementById('memberMajor').value = '';
+        document.getElementById('memberCategory').value = 'board';
+        status.textContent = '✅ تم الحفظ بنجاح';
+        await loadMembers();
+      } catch(e){
+        status.textContent = '❌ حدث خطأ: ' + e.message;
+      }
+      btn.disabled = false;
+    };
+
+    document.getElementById('clearMemberFormBtn').onclick = function(){
+      ['memberName','memberRole','memberStudentId','memberEmail','memberPhoto','memberBio'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+      document.getElementById('memberOrder').value = 99;
+      document.getElementById('memberMajor').value = '';
+      document.getElementById('memberCategory').value = 'board';
+      delete btn.dataset.editId;
+      btn.textContent = '+ إضافة العضو';
+      document.getElementById('memberFormStatus').textContent = '';
+    };
+
+    loadMembers();
+  });
+
+  // Reload when panel is opened
+  document.addEventListener('click', e=>{
+    if(e.target.closest('[data-panel="team"]')) setTimeout(loadMembers, 100);
+  });
+})();
+
+  // ── استيراد الأعضاء الجماعي ──────────────────────────
+  async function importAllMembers() {
+    const btn = document.getElementById('importMembersBtn');
+    const status = document.getElementById('importStatus');
+    const progress = document.getElementById('importProgress');
+    const bar = document.getElementById('importBar');
+    const log = document.getElementById('importLog');
+
+    const members = [
+      {id:"m01",order:1, name:"عبدالرحمن السالمي", role:"رئيس النادي",           category:"board",    major:"كيمياء حيوية",     minor:"بيولوجيا الحيوان"},
+      {id:"m02",order:2, name:"كيراز الدبس",        role:"نائب رئيس النادي",      category:"board",    major:"كيمياء حيوية",     minor:"بيولوجيا جزيئية"},
+      {id:"m03",order:3, name:"عبدالله الأحمد",     role:"رئيس اللجنة الثقافية", category:"board",    major:"بيولوجيا جزيئية",  minor:""},
+      {id:"m04",order:4, name:"عيسى الكندري",       role:"رئيس اللجنة الإعلامية",category:"board",    major:"كيمياء حيوية",     minor:"علوم بحار"},
+      {id:"m05",order:5, name:"سارة سليم",          role:"أمين السر",             category:"board",    major:"كيمياء حيوية",     minor:""},
+      {id:"m06",order:6, name:"بتول عوض",           role:"أمين الصندوق",          category:"board",    major:"كيمياء حيوية",     minor:""},
+      {id:"m07",order:7, name:"سامية جنادلة",       role:"عضو اللجنة الثقافية",  category:"academic", major:"بيولوجيا جزيئية",  minor:""},
+      {id:"m08",order:8, name:"علياء العجمي",       role:"عضو اللجنة الثقافية",  category:"academic", major:"بيولوجيا جزيئية",  minor:"بيولوجيا الحيوان"},
+      {id:"m09",order:9, name:"شوق المطيري",        role:"عضو اللجنة الثقافية",  category:"academic", major:"ميكروبيولوجي",     minor:"Mass Communication"},
+      {id:"m10",order:10,name:"حنين العنزي",        role:"عضو اللجنة الثقافية",  category:"academic", major:"كيمياء حيوية",     minor:"تغذية"},
+      {id:"m11",order:11,name:"عبدالرحمن النجدي",   role:"عضو اللجنة الثقافية",  category:"academic", major:"ميكروبيولوجي",     minor:"علم اجتماع"},
+      {id:"m12",order:12,name:"مطيعة كاتبي",        role:"عضو اللجنة الثقافية",  category:"academic", major:"كيمياء حيوية",     minor:"تغذية"},
+      {id:"m13",order:13,name:"عبدالرحمن الجمل",    role:"عضو اللجنة الثقافية",  category:"academic", major:"كيمياء حيوية",     minor:"تغذية"},
+      {id:"m14",order:14,name:"عبدالله الشويع",     role:"عضو اللجنة الثقافية",  category:"academic", major:"ميكروبيولوجي",     minor:""},
+      {id:"m15",order:15,name:"شهد الخالدي",        role:"عضو اللجنة الثقافية",  category:"academic", major:"ميكروبيولوجي",     minor:"بيولوجيا جزيئية"},
+      {id:"m16",order:16,name:"مؤنس منتاج",         role:"عضو اللجنة الثقافية",  category:"academic", major:"بيولوجيا جزيئية",  minor:"ميكروبيولوجي"},
+      {id:"m17",order:17,name:"رؤى الشمري",         role:"عضو اللجنة الثقافية",  category:"academic", major:"ميكروبيولوجي",     minor:"تغذية"},
+      {id:"m18",order:18,name:"جنان قديح",          role:"عضو اللجنة الثقافية",  category:"academic", major:"بيولوجيا جزيئية",  minor:""},
+      {id:"m19",order:19,name:"زمزم إبراهيم",       role:"عضو اللجنة الثقافية",  category:"academic", major:"بيولوجيا جزيئية",  minor:"علم نفس"},
+      {id:"m20",order:20,name:"فايزة العنزي",       role:"عضو اللجنة الثقافية",  category:"academic", major:"بيولوجيا جزيئية",  minor:"ميكروبيولوجي"},
+      {id:"m21",order:21,name:"أحمد حسين",          role:"عضو اللجنة الثقافية",  category:"academic", major:"بيولوجيا جزيئية",  minor:"علوم بحار"},
+      {id:"m22",order:22,name:"هاجر عبدالحميد",     role:"عضو اللجنة الثقافية",  category:"academic", major:"ميكروبيولوجي",     minor:"كيمياء حيوية"},
+      {id:"m23",order:23,name:"فاطمة عيسى",         role:"عضو اللجنة الثقافية",  category:"academic", major:"كيمياء حيوية",     minor:"تغذية"},
+      {id:"m24",order:24,name:"أنفال العنزي",       role:"عضو اللجنة الثقافية",  category:"academic", major:"بيولوجيا النبات",  minor:""},
+      {id:"m25",order:25,name:"لجين العوضي",        role:"عضو اللجنة الثقافية",  category:"academic", major:"بيولوجيا جزيئية",  minor:"الإعلام"},
+      {id:"m26",order:26,name:"شوق الدخيل",         role:"عضو اللجنة الإعلامية", category:"media",    major:"بيولوجيا الحيوان", minor:"علم آثار"},
+    ];
+
+    btn.disabled = true;
+    btn.textContent = '⏳ جاري الرفع...';
+    progress.style.display = 'block';
+    log.innerHTML = '';
+    let done = 0;
+
+    for (const m of members) {
+      try {
+        const {id, ...data} = m;
+        await setDoc(doc(collection(db,'teamMembers'), id), data);
+        done++;
+        bar.style.width = (done/members.length*100)+'%';
+        log.innerHTML += `<span style="color:#10b981">✓ ${m.name}</span><br>`;
+        log.scrollTop = log.scrollHeight;
+      } catch(e) {
+        log.innerHTML += `<span style="color:#ef4444">✗ ${m.name}: ${e.message}</span><br>`;
+      }
+    }
+    btn.disabled = false;
+    btn.textContent = '✅ تم الاستيراد!';
+    status.textContent = `رُفع ${done} من ${members.length} عضو`;
+    status.style.color = '#10b981';
+    setTimeout(() => { if(typeof loadMembers === 'function') loadMembers(); }, 800);
+  }
+
+  // ربط الزر بعد تحميل الصفحة
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('importMembersBtn');
+    if(btn) btn.addEventListener('click', importAllMembers);
+  });
+  // ربط فوري في حال الصفحة محملة
+  const _importBtn = document.getElementById('importMembersBtn');
+  if(_importBtn) _importBtn.addEventListener('click', importAllMembers);
+
+</script>
+<script src="theme.js"></script>
+<script>
+// ── KU Dropdown ──
+function toggleKuMenu(){
+  const m=document.getElementById('kuMenu');
+  m.classList.toggle('open');
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.ku-dropdown'))
+    document.getElementById('kuMenu')?.classList.remove('open');
+});
+
+// ── Mobile Menu ──
+function toggleMobileMenu(){
+  const menu=document.getElementById('mobileMenu');
+  const burger=document.getElementById('hamburger');
+  menu.classList.toggle('open');
+  burger.classList.toggle('open');
+}
+
+// ── Navbar shrink on scroll ──
+const navbar=document.getElementById('navbar');
+window.addEventListener('scroll',()=>{
+  navbar.style.height=window.scrollY>60?'56px':'64px';
+  navbar.style.background=window.scrollY>60
+    ?(document.documentElement.getAttribute('data-theme')==='light'?'rgba(255,255,255,.98)':'rgba(8,12,20,.97)')
+    :(document.documentElement.getAttribute('data-theme')==='light'?'rgba(255,255,255,.96)':'rgba(8,12,20,.92)');
+},{passive:true});
+
+// ── Language Toggle ──
+const TRANSLATIONS = {
+  ar: {
+    'الرئيسية':'الرئيسية','التخصصات':'التخصصات','المراجعات':'المراجعات',
+    'المرشدون':'المرشدون','الخدمات':'الخدمات','الهيئة':'الهيئة',
+    'عن النادي':'عن النادي','اسأل النادي':'اسأل النادي',
+    'الجامعة':'الجامعة',
+  },
+  en: {
+    'الرئيسية':'Home','التخصصات':'Majors','المراجعات':'Study Resources',
+    'المرشدون':'Advisors','الخدمات':'Services','الهيئة':'Team',
+    'عن النادي':'About','اسأل النادي':'Ask Us',
+    'الجامعة':'KU Links',
+  }
+};
+
+function toggleLang(){
+  const cur=localStorage.getItem('bscku_lang')||'ar';
+  const next=cur==='ar'?'en':'ar';
+  localStorage.setItem('bscku_lang',next);
+  applyLang(next);
+}
+
+function applyLang(lang){
+  document.documentElement.setAttribute('lang', lang==='ar'?'ar':'en');
+  document.documentElement.setAttribute('dir', lang==='ar'?'rtl':'ltr');
+  document.getElementById('langLabel').textContent = lang==='ar'?'EN':'AR';
+  // Update all elements with data-ar / data-en attributes
+  document.querySelectorAll('[data-ar]').forEach(el=>{
+    const txt = lang==='ar' ? el.dataset.ar : el.dataset.en;
+    if(txt) el.textContent = txt;
+  });
+}
+
+// Init language
+(function(){
+  const saved=localStorage.getItem('bscku_lang')||'ar';
+  applyLang(saved);
+})();
+</script>
+
+</body>
+</html>

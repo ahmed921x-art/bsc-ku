@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BSC KU">
+  <meta name="theme-color" content="#6366f1">
+  <link rel="apple-touch-icon" href="favicon.png">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <link rel="icon" type="image/png" href="favicon.png" sizes="512x512">
+  <link rel="apple-touch-icon" href="favicon.png">
+  <meta property="og:image" content="https://biosci-ku.com/logo.png">
+  <meta property="og:site_name" content="BSC KU">
+  <meta property="og:locale" content="ar_KW">
+  <meta name="theme-color" content="#080c14">
+
+<title>اسأل النادي | BSC KU</title>
+<link href="navbar.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>    /* ══════════════════════════════════
+       NAVBAR — Unified
+    ══════════════════════════════════ */
+    100%{background-position:-200% center}}
+    to{opacity:1;transform:none}}
+    to{opacity:1;transform:none}}
+    [data-theme="light"] [data-theme="light"] [data-theme="light"] .nav-links a:hover,[data-theme="light"] [data-theme="light"] .ku-btn,[data-theme="light"] [data-theme="light"] .ku-btn:hover,[data-theme="light"] [data-theme="light"] [data-theme="light"] [data-theme="light"] [data-theme="light"] @media(max-width:1280px){}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#6366f1;--ink2:#8b5cf6;--green:#10b981;--bg:#080c14;--surface:rgba(255,255,255,.05);--border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.18);--text:#f1f5f9;--muted:#94a3b8;--radius:20px;--radius-lg:28px;--ease:cubic-bezier(.4,0,.2,1)}
+body{font-family:'Tajawal','Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.bg-canvas{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bg-canvas::before{content:'';position:absolute;width:700px;height:700px;top:-150px;right:-150px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,.2)0%,transparent 70%);animation:orb1 18s ease-in-out infinite}
+.bg-canvas::after{content:'';position:absolute;width:500px;height:500px;bottom:-80px;left:-80px;border-radius:50%;background:radial-gradient(circle,rgba(16,185,129,.14)0%,transparent 70%);animation:orb2 22s ease-in-out infinite}
+@keyframes orb1{0%,100%{transform:translate(0,0)}50%{transform:translate(-60px,80px)scale(1.2)}}
+@keyframes orb2{0%,100%{transform:translate(0,0)}50%{transform:translate(80px,-60px)scale(1.15)}}
+.bg-grid{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(255,255,255,.025)1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025)1px,transparent 1px);background-size:64px 64px}
+.particle{position:fixed;pointer-events:none;z-index:1;font-size:18px;opacity:0;animation:pf linear infinite}
+@keyframes pf{0%{transform:translateY(105vh)rotate(0deg);opacity:0}8%{opacity:.055}92%{opacity:.055}100%{transform:translateY(-8vh)rotate(540deg);opacity:0}}
+
+
+
+50%{filter:drop-shadow(0 0 26px rgba(139,92,246,.9))brightness(1.35)}}
+100%{background-position:-200% center}}
+
+
+
+
+
+.page-hero{position:relative;z-index:2;padding:5rem 6% 3.5rem;text-align:center;animation:fu .9s ease both}
+@keyframes fu{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+.page-badge{display:inline-flex;align-items:center;gap:.5rem;padding:.36rem 1.1rem;background:rgba(99,102,241,.13);border:1px solid rgba(99,102,241,.32);border-radius:999px;font-size:.78rem;font-weight:700;color:#a5b4fc;margin-bottom:1.25rem}
+.page-badge::before{content:'';width:6px;height:6px;background:#6366f1;border-radius:50%;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.page-hero h1{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:900;letter-spacing:-.03em;margin-bottom:1rem;background:linear-gradient(135deg,#fff,#c7d2fe);-webkit-background-clip:text;background-clip:text;color:transparent}
+.page-hero p{font-size:1.05rem;color:var(--muted);max-width:520px;margin:0 auto}
+.main-content{position:relative;z-index:2;padding:0 6% 5rem;max-width:860px;margin:0 auto}
+/* Chat */
+.chat-wrap{background:rgba(15,23,42,.75);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.chat-header{padding:1.5rem 1.75rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:1rem}
+.chat-avatar{width:44px;height:44px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.chat-header h3{font-size:1rem;font-weight:700;color:var(--text)}
+.chat-header p{font-size:.82rem;color:var(--muted)}
+.chat-box{padding:1.5rem;height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:1rem}
+.chat-box::-webkit-scrollbar{width:4px}
+.chat-box::-webkit-scrollbar-track{background:transparent}
+.chat-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.msg{max-width:80%;padding:.875rem 1.2rem;border-radius:16px;font-size:.9rem;line-height:1.65;animation:fu .3s ease both}
+.msg.bot{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.2);color:var(--text);align-self:flex-start;border-bottom-right-radius:4px}
+.msg.user{background:linear-gradient(135deg,rgba(99,102,241,.25),rgba(139,92,246,.2));border:1px solid rgba(99,102,241,.3);color:#e2e8f0;align-self:flex-end;border-bottom-left-radius:4px}
+.chat-form{padding:1.25rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:.75rem}
+.chat-input{flex:1;padding:.85rem 1.2rem;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.95rem;outline:none;transition:border-color .25s,background .25s}
+.chat-input:focus{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.06)}
+.chat-input::placeholder{color:var(--muted)}
+.send-btn{padding:.85rem 1.5rem;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:12px;font-weight:700;cursor:pointer;transition:all .25s;font-family:'Tajawal',sans-serif;font-size:.9rem;white-space:nowrap}
+.send-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(99,102,241,.4)}
+.quick-prompts{display:flex;flex-wrap:wrap;gap:.6rem;padding:1rem 1.5rem;border-bottom:1px solid var(--border)}
+.qp-btn{padding:.4rem .9rem;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:999px;font-size:.78rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .25s;font-family:'Tajawal',sans-serif}
+.qp-btn:hover{color:#fff;background:rgba(99,102,241,.2);border-color:rgba(99,102,241,.4)}
+.ai-status{font-size:.75rem;color:var(--muted);padding:.6rem 1.5rem;background:rgba(16,185,129,.06);border-bottom:1px solid rgba(16,185,129,.12);text-align:center}
+.footer{position:relative;z-index:2;margin:2rem 6% 0;padding:2rem 2.5rem;background:rgba(15,23,42,.6);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:28px 28px 0 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.25rem}
+.footer-brand{display:flex;align-items:center;gap:.75rem}
+.footer-brand img{height:36px;mix-blend-mode:screen;filter:brightness(1.1)drop-shadow(0 0 8px rgba(99,102,241,.4))}
+.footer-copy{font-size:.76rem;color:var(--muted)}
+.footer-copy strong{color:#e2e8f0;font-size:.86rem;display:block}
+.footer-socials{display:flex;gap:.75rem}
+.social-btn{display:inline-flex;align-items:center;gap:.5rem;padding:.48rem 1.05rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:999px;font-size:.8rem;font-weight:700;color:var(--muted);transition:all .25s}
+.social-btn:hover{color:#fff;background:rgba(99,102,241,.18);border-color:rgba(99,102,241,.5);transform:translateY(-3px)}
+.social-btn svg{width:14px;height:14px;fill:currentColor}
+@media(max-width:768px){.main-content{padding:0 5% 4rem}.chat-box{height:300px}.footer{flex-direction:column;align-items:center;text-align:center}}
+    /* ════════════════════════════════════
+       LIGHT MODE — Complete Override
+    ════════════════════════════════════ */
+    [data-theme="light"] {
+      color-scheme: light;
+    }
+    [data-theme="light"] body {
+      background: #ffffff;
+      color: #0f172a;
+    }
+    [data-theme="light"] .bg-canvas::before {
+      background: radial-gradient(circle, rgba(99,102,241,.08) 0%, transparent 70%);
+    }
+    [data-theme="light"] .bg-canvas::after {
+      background: radial-gradient(circle, rgba(16,185,129,.06) 0%, transparent 70%);
+    }
+    [data-theme="light"] .bg-grid {
+      background-image:
+        linear-gradient(rgba(99,102,241,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,.04) 1px, transparent 1px);
+    }
+    /* Navbar */
+    
+    [data-theme="light"]       background: linear-gradient(90deg,#4f46e5,#6366f1,#7c3aed);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    [data-theme="light"]     
+    [data-theme="light"] 
+    /* Cards */
+    [data-theme="light"] .card,
+    [data-theme="light"] .note-card,
+    [data-theme="light"] .event-card,
+    [data-theme="light"] .major-card,
+    [data-theme="light"] .advisor-card,
+    [data-theme="light"] .value-card,
+    [data-theme="light"] .stat-mini,
+    [data-theme="light"] .stat-card,
+    [data-theme="light"] .member-card,
+    [data-theme="light"] .supervisor-card {
+      background: #ffffff !important;
+      border-color: rgba(99,102,241,.15) !important;
+      box-shadow: 0 2px 16px rgba(99,102,241,.08) !important;
+      backdrop-filter: none !important;
+    }
+    [data-theme="light"] .card:hover,
+    [data-theme="light"] .note-card:hover,
+    [data-theme="light"] .event-card:hover,
+    [data-theme="light"] .major-card:hover,
+    [data-theme="light"] .advisor-card:hover {
+      border-color: rgba(99,102,241,.35) !important;
+      box-shadow: 0 8px 32px rgba(99,102,241,.15) !important;
+    }
+    /* Typography */
+    [data-theme="light"] h1,[data-theme="light"] h2,[data-theme="light"] h3,
+    [data-theme="light"] .section-h2,[data-theme="light"] .section-title {
+      color: #0f172a !important;
+    }
+    [data-theme="light"] p,[data-theme="light"] .card p,
+    [data-theme="light"] .note-card p { color: #475569 !important; }
+    [data-theme="light"] .page-hero h1 {
+      background: linear-gradient(135deg,#1e1b4b,#4f46e5) !important;
+      -webkit-background-clip: text !important; background-clip: text !important; color: transparent !important;
+    }
+    [data-theme="light"] .page-badge {
+      background: rgba(99,102,241,.08) !important;
+      border-color: rgba(99,102,241,.25) !important;
+      color: #4f46e5 !important;
+    }
+    [data-theme="light"] .page-badge::before { background: #6366f1 !important; }
+    [data-theme="light"] .section-label { color: #4f46e5 !important; }
+    [data-theme="light"] .section-label::before { background: #6366f1 !important; }
+    /* Inputs */
+    [data-theme="light"] .input,
+    [data-theme="light"] .filter-input,
+    [data-theme="light"] .filter-select,
+    [data-theme="light"] .sched-input,
+    [data-theme="light"] .chat-input,
+    [data-theme="light"] .form-group input,
+    [data-theme="light"] .form-group select,
+    [data-theme="light"] .form-group textarea {
+      background: #f8fafc !important;
+      border-color: rgba(99,102,241,.2) !important;
+      color: #0f172a !important;
+    }
+    [data-theme="light"] .input:focus,
+    [data-theme="light"] .filter-input:focus,
+    [data-theme="light"] .sched-input:focus {
+      background: #fff !important;
+      border-color: #6366f1 !important;
+      box-shadow: 0 0 0 3px rgba(99,102,241,.1);
+    }
+    [data-theme="light"] .input::placeholder,
+    [data-theme="light"] .filter-input::placeholder,
+    [data-theme="light"] .sched-input::placeholder { color: #94a3b8 !important; }
+    /* Tags */
+    [data-theme="light"] .note-tag,
+    [data-theme="light"] .tag,
+    [data-theme="light"] .tag-blue {
+      background: rgba(99,102,241,.08) !important;
+      border-color: rgba(99,102,241,.2) !important;
+      color: #4f46e5 !important;
+    }
+    [data-theme="light"] .tag-green {
+      background: rgba(16,185,129,.08) !important;
+      border-color: rgba(16,185,129,.2) !important;
+      color: #059669 !important;
+    }
+    /* Buttons */
+    [data-theme="light"] .dl-btn {
+      background: rgba(99,102,241,.08) !important;
+      border-color: rgba(99,102,241,.2) !important;
+      color: #4f46e5 !important;
+    }
+    [data-theme="light"] .dl-btn:hover {
+      background: rgba(99,102,241,.15) !important;
+    }
+    [data-theme="light"] .back-btn,
+    [data-theme="light"] .btn-ghost {
+      background: #f8fafc !important;
+      border-color: rgba(99,102,241,.2) !important;
+      color: #475569 !important;
+    }
+    /* Hero stats */
+    [data-theme="light"] .stat-mini strong,
+    [data-theme="light"] .stat-card strong {
+      background: linear-gradient(135deg,#4f46e5,#6366f1) !important;
+      -webkit-background-clip: text !important; background-clip: text !important; color: transparent !important;
+    }
+    [data-theme="light"] .stat-mini span,
+    [data-theme="light"] .stat-card span { color: #64748b !important; }
+    /* Chat */
+    [data-theme="light"] .chat-wrap,
+    [data-theme="light"] .gpa-wrap,
+    [data-theme="light"] .schedule-builder,
+    [data-theme="light"] .pref-card,
+    [data-theme="light"] .news-card,
+    [data-theme="light"] .ann-card {
+      background: #ffffff !important;
+      border-color: rgba(99,102,241,.15) !important;
+      box-shadow: 0 2px 16px rgba(99,102,241,.08) !important;
+    }
+    [data-theme="light"] .chat-header,
+    [data-theme="light"] .quick-prompts {
+      border-color: rgba(99,102,241,.1) !important;
+    }
+    [data-theme="light"] .msg.bot {
+      background: rgba(99,102,241,.06) !important;
+      border-color: rgba(99,102,241,.15) !important;
+      color: #0f172a !important;
+    }
+    [data-theme="light"] .msg.user {
+      background: linear-gradient(135deg,rgba(99,102,241,.12),rgba(139,92,246,.08)) !important;
+      color: #1e1b4b !important;
+    }
+    [data-theme="light"] .qp-btn {
+      background: #f8fafc !important;
+      border-color: rgba(99,102,241,.15) !important;
+      color: #475569 !important;
+    }
+    [data-theme="light"] .qp-btn:hover { color: #4f46e5 !important; }
+    /* Tree */
+    [data-theme="light"] .tree-container,
+    [data-theme="light"] .prereq-tree-wrap {
+      background: #f8fafc !important;
+      border-color: rgba(99,102,241,.12) !important;
+    }
+    [data-theme="light"] .tree-legend { background: #fff !important; border-color: rgba(99,102,241,.1) !important; }
+    [data-theme="light"] .legend-item { color: #475569 !important; }
+    [data-theme="light"] .node-tooltip {
+      background: rgba(255,255,255,.98) !important;
+      border-color: rgba(99,102,241,.25) !important;
+    }
+    [data-theme="light"] .tt-code { color: #4f46e5 !important; }
+    [data-theme="light"] .tt-name { color: #0f172a !important; }
+    [data-theme="light"] .tt-hours,[data-theme="light"] .tt-prereq { color: #475569 !important; }
+    /* Footer */
+    [data-theme="light"] .footer {
+      background: rgba(248,250,252,.97) !important;
+      border-color: rgba(99,102,241,.12) !important;
+    }
+    [data-theme="light"] .footer-copy { color: #64748b !important; }
+    [data-theme="light"] .footer-copy strong { color: #0f172a !important; }
+    [data-theme="light"] .social-btn {
+      background: #f1f5f9 !important;
+      border-color: rgba(99,102,241,.15) !important;
+      color: #475569 !important;
+    }
+    [data-theme="light"] .social-btn:hover {
+      background: rgba(99,102,241,.1) !important;
+      color: #4f46e5 !important;
+    }
+    /* Service tabs */
+    [data-theme="light"] .service-tabs,
+    [data-theme="light"] .page-tabs {
+      background: #f8fafc !important;
+      border-color: rgba(99,102,241,.12) !important;
+    }
+    [data-theme="light"] .stab:not(.active),
+    [data-theme="light"] .ptab:not(.active) { color: #64748b !important; }
+    [data-theme="light"] .stab:hover:not(.active),
+    [data-theme="light"] .ptab:hover:not(.active) { background: rgba(99,102,241,.06) !important; color: #4f46e5 !important; }
+    /* Divider */
+    [data-theme="light"] .divider {
+      background: linear-gradient(90deg,transparent,rgba(99,102,241,.2),transparent) !important;
+    }
+    /* GPA grade display */
+    [data-theme="light"] .gpa-result {
+      background: linear-gradient(135deg,rgba(99,102,241,.06),rgba(139,92,246,.04)) !important;
+      border-color: rgba(99,102,241,.2) !important;
+    }
+    [data-theme="light"] .gpa-num {
+      background: linear-gradient(135deg,#4f46e5,#6366f1) !important;
+      -webkit-background-clip: text !important; background-clip: text !important; color: transparent !important;
+    }
+    /* Theme toggle button */
+@media(max-width:1280px){}
+    </style>
+
+  
+</head>
+<body>
+<div class="bg-canvas"></div><div class="bg-grid"></div>
+<div class="particle" style="left:15%;animation-duration:19s;animation-delay:0s">💬</div>
+<div class="particle" style="left:70%;animation-duration:22s;animation-delay:5s">🧬</div>
+
+<!-- ══════════════════════════════════
+     TOP BANNER
+════════════════════════════════════ -->
+<div class="top-banner" id="topBanner">
+  <div class="banner-inner">
+    <span class="banner-dot"></span>
+    <span class="banner-text" data-ar="نادي العلوم البيولوجية · جامعة الكويت · مجتمع علمي طلابي متميز" data-en="Biological Sciences Club · Kuwait University · A Distinguished Academic Community">نادي العلوم البيولوجية · جامعة الكويت · مجتمع علمي طلابي متميز</span>
+    <button class="banner-close" onclick="document.getElementById('topBanner').style.display='none'" aria-label="إغلاق">×</button>
+  </div>
+</div>
+</div>
+
+<header class="navbar" id="navbar">
+  <a class="brand" href="index.html">
+    <img src="logo.png" alt="BSC KU Logo">
+    <div class="brand-text">
+      <strong data-ar="نادي العلوم البيولوجية" data-en="Biological Sciences Club">نادي العلوم البيولوجية</strong>
+      <span data-ar="جامعة الكويت" data-en="Kuwait University">جامعة الكويت</span>
+    </div>
+  </a>
+
+  <nav class="nav-links" id="navLinks">
+    <a href="index.html" data-ar="الرئيسية" data-en="Home">الرئيسية</a>
+    <a href="majors.html" data-ar="التخصصات" data-en="Majors">التخصصات</a>
+    <a href="notes.html" data-ar="المراجعات" data-en="Study Resources">المراجعات</a>
+    <a href="events.html" data-ar="الفعاليات" data-en="Events">الفعاليات</a>
+    <a href="advisors.html" data-ar="المرشدون" data-en="Advisors">المرشدون</a>
+    <a href="services.html" data-ar="الخدمات" data-en="Services">الخدمات</a>
+    <a href="team.html" data-ar="عائلة النادي" data-en="Club Family">عائلة النادي</a>
+    <a href="about.html" data-ar="عن النادي" data-en="About">عن النادي</a>
+    <a href="ask.html" class="active" data-ar="اسأل النادي" data-en="Ask Us">اسأل النادي</a>
+  </nav>
+
+  <div class="nav-utils">
+    <div class="ku-dropdown">
+      <button class="ku-btn" id="kuBtn" onclick="toggleKuMenu()" title="روابط الجامعة">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span data-ar="الجامعة" data-en="KU">الجامعة</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="ku-menu" id="kuMenu">
+        <a href="https://moodle.ku.edu.kw/login/index.php" target="_blank" class="ku-item">
+          <span class="ku-item-icon">📚</span>
+          <div><strong data-ar="Moodle" data-en="Moodle">Moodle</strong><span data-ar="نظام التعلم الإلكتروني" data-en="E-Learning System">نظام التعلم الإلكتروني</span></div>
+        </a>
+        <a href="https://portal.ku.edu.kw/sisapp/faces/login.jspx?_afrWindowMode=0&_afrLoop=568619832527342&_adf.ctrl-state=11k7p38dec_4" target="_blank" class="ku-item">
+          <span class="ku-item-icon">🏛️</span>
+          <div><strong data-ar="سستم الجامعة" data-en="KU Portal">سستم الجامعة</strong><span data-ar="النظام الأكاديمي" data-en="Academic System">النظام الأكاديمي</span></div>
+        </a>
+      </div>
+    </div>
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()" title="Switch Language">
+      <span id="langLabel">EN</span>
+    </button>
+    <button id="themeToggle" onclick="toggleTheme()" title="الوضع الصباحي"></button>
+        <button id="installBtn" onclick="installPWA()" title="تثبيت التطبيق" style="display:none;align-items:center;gap:.35rem;padding:.35rem .7rem;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);border-radius:8px;color:#34d399;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;white-space:nowrap">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 16l-4-4h3V4h2v8h3l-4 4z"/><path d="M20 18H4v2h16v-2z"/></svg>
+      تثبيت
+    </button>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="القائمة">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <nav class="mobile-nav">
+    <a href="index.html" data-ar="🏠 الرئيسية" data-en="🏠 Home">🏠 الرئيسية</a>
+    <a href="majors.html" data-ar="🧬 التخصصات" data-en="🧬 Majors">🧬 التخصصات</a>
+    <a href="notes.html" data-ar="📚 المراجعات" data-en="📚 Study Resources">📚 المراجعات</a>
+    <a href="events.html" data-ar="🎉 الفعاليات" data-en="🎉 Events">🎉 الفعاليات</a>
+    <a href="advisors.html" data-ar="🎓 المرشدون" data-en="🎓 Advisors">🎓 المرشدون</a>
+    <a href="services.html" data-ar="⚙️ الخدمات" data-en="⚙️ Services">⚙️ الخدمات</a>
+    <a href="team.html" data-ar="👥 عائلة النادي" data-en="👥 Club Family">👥 عائلة النادي</a>
+    <a href="about.html" data-ar="ℹ️ عن النادي" data-en="ℹ️ About">ℹ️ عن النادي</a>
+    <a href="ask.html" class="active" data-ar="💬 اسأل النادي" data-en="💬 Ask Us">💬 اسأل النادي</a>
+    <div class="mobile-divider"></div>
+    <a href="https://moodle.ku.edu.kw/login/index.php" target="_blank">📖 Moodle</a>
+    <a href="https://portal.ku.edu.kw/sisapp/faces/login.jspx?_afrWindowMode=0&_afrLoop=568619832527342&_adf.ctrl-state=11k7p38dec_4" target="_blank" data-ar="🏛️ سستم الجامعة" data-en="🏛️ KU Portal">🏛️ سستم الجامعة</a>
+  </nav>
+</div>
+
+
+
+
+<div class="page-hero">
+  <div class="page-badge">المساعد الذكي</div>
+  <h1>اسأل النادي</h1>
+  <p>اسأل عن النوتات، الفعاليات، المرشدين الأكاديميين، أو أي شي يخص النادي</p>
+</div>
+
+<main class="main-content">
+  <div class="chat-wrap">
+    <div class="ai-status" id="aiStatus">🤖 جاري تحميل قاعدة المعرفة...</div>
+    <div class="chat-header">
+      <div class="chat-avatar">🤖</div>
+      <div><h3>مساعد BSC KU</h3><p>اسألني عن أي شي يخص النادي</p></div>
+    </div>
+    <div class="quick-prompts">
+      <button class="qp-btn" data-prompt="وين النوتات؟">📚 النوتات</button>
+      <button class="qp-btn" data-prompt="وش الفعاليات القادمة؟">🎤 الفعاليات</button>
+      <button class="qp-btn" data-prompt="من هم المرشدون الأكاديميون؟">🎓 المرشدون</button>
+      <button class="qp-btn" data-prompt="وش تخصصات القسم؟">🧬 التخصصات</button>
+      <button class="qp-btn" data-prompt="كيف أنضم للنادي؟">🤝 الانضمام</button>
+    </div>
+    <div class="chat-box" id="chatBox">
+      <div class="msg bot">أهلاً! أنا <strong>بايو</strong> 🧬 مساعدك الذكي في نادي العلوم البيولوجية. اسألني عن النوتات، الفعاليات، المرشدين، التخصصات، أو أي شي يخص النادي والدراسة!</div>
+    </div>
+    <form class="chat-form" id="chatForm" onsubmit="return false;">
+      <input class="chat-input" id="chatInput" type="text" placeholder="اكتب سؤالك هنا..." autocomplete="off">
+      <button class="send-btn" type="submit">إرسال ←</button>
+    </form>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-brand"><img src="logo.png" alt="BSC KU"><div class="footer-copy"><strong>BSC KU — نادي العلوم البيولوجية</strong>© 2025 جامعة الكويت · جميع الحقوق محفوظة</div></div>
+  <div class="footer-socials">
+    <a class="social-btn" href="https://instagram.com/biosci_club" target="_blank"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>Instagram</a>
+    <a class="social-btn" href="https://x.com/biosci_club" target="_blank"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>Twitter / X</a>
+  </div>
+</footer>
+
+<script src="theme.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs, query, orderBy, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"});
+const db=getFirestore(app);
+const mn={molecular:"البيولوجيا الجزيئية",micro:"علم الميكروبيولوجي",plant:"بيولوجيا النبات",animal:"بيولوجيا الحيوان",biochem:"الكيمياء الحيوية"};
+let notes=[],events=[],advisors=[],aiKnowledge=[],majorResources=[];
+const conversationHistory = []; // remember chat context
+async function get(col){try{const s=await getDocs(query(collection(db,col),orderBy("createdAt","desc")));return s.docs.map(d=>({id:d.id,...d.data()}))}catch{try{const s=await getDocs(collection(db,col));return s.docs.map(d=>({id:d.id,...d.data()}))}catch{return[]}}}
+function norm(v){return(v||"").toString().toLowerCase().replace(/[إأآا]/g,"ا").replace(/[ة]/g,"ه").replace(/[ىي]/g,"ي").replace(/[ؤئ]/g,"ء").replace(/[ًٌٍَُِّْ]/g,"").trim()}
+function addMsg(role,text){
+  const b=document.getElementById("chatBox");
+  const d=document.createElement("div");
+  d.className="msg "+role;
+  if(role==="bot"){
+    // Render basic markdown: bold, bullets, newlines
+    let html=text
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>")
+      .replace(/\*(.*?)\*/g,"<em>$1</em>")
+      .replace(/^[-•]\s(.+)$/gm,"<li>$1</li>")
+      .replace(/(<li>.*<\/li>)/gs,"<ul>$1</ul>")
+      .replace(/\n/g,"<br>");
+    d.innerHTML=html;
+  } else {
+    d.textContent=text;
+  }
+  b.appendChild(d);
+  b.scrollTop=b.scrollHeight;
+}
+function buildKB(){
+  const base=[];
+  aiKnowledge.forEach(k=>base.push({title:k.title||"معلومة",answer:k.answer||k.content||"",keywords:k.keywords||"",source:"aiKnowledge"}));
+  notes.forEach(n=>base.push({title:n.title||"نوتة",answer:`النوتة: ${n.title||""}\nالمادة: ${n.course||""}\nالتخصص: ${mn[n.major]||n.major||"عام"}\nالنوع: ${n.type||"Note"}\nالرابط: ${n.url||"غير متوفر"}`,keywords:`${n.title||""} ${n.course||""} ${mn[n.major]||""}`,source:"notes"}));
+  events.forEach(e=>base.push({title:e.title||"فعالية",answer:`الفعالية: ${e.title||""}\nالتاريخ: ${e.date||"يعلن لاحقاً"}\n${e.description||""}${e.url?"\nالرابط: "+e.url:""}`,keywords:`${e.title||""} ${e.date||""} فعاليات ورشة`,source:"events"}));
+  advisors.forEach(a=>base.push({title:a.name||"مرشد",answer:`المرشد: ${a.name||""}\nالتخصص: ${mn[a.major]||a.major||"عام"}\nالإيميل: ${a.email||""}`,keywords:`${a.name||""} ${mn[a.major]||""} مستشار مرشد`,source:"advisors"}));
+  return base.filter(x=>x.answer.trim());
+}
+function answer(question){
+  const q=norm(question);
+  if(!q)return"اكتب سؤالك عشان أقدر أساعدك.";
+  const base=buildKB();
+  const words=q.split(/\s+/).filter(w=>w.length>2);
+  const scored=base.map(item=>{const h=norm(`${item.title} ${item.answer} ${item.keywords}`);let s=0;words.forEach(w=>{if(h.includes(w))s+=Math.min(w.length+2,12)});if(h.includes(q))s+=35;return{item,s}}).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
+  if(scored.length)return scored.slice(0,2).map(x=>x.item.answer).join("\n\n---\n\n")+"\n\nإذا تبي جواب أدق، اكتب اسم المادة أو التخصص.";
+  if(q.includes("نوت")||q.includes("ملخص"))return notes.length?"النوتات موجودة في صفحة المراجعات. اكتب اسم المادة للبحث.":"لا توجد نوتات مضافة حتى الآن.";
+  if(q.includes("فعال")||q.includes("ورش"))return events.length?"الفعاليات موجودة في صفحة الفعاليات.":"لا توجد فعاليات حتى الآن.";
+  if(q.includes("مرشد")||q.includes("مستشار"))return advisors.length?"المرشدون الأكاديميون موجودون في صفحة المرشدين.":"لم يضف المرشدون بعد.";
+  if(q.includes("شلون")||q.includes("كيف حال")||q.includes("اهلا")||q.includes("مرحبا")||q.includes("هلا"))return"أهلاً وسهلاً! 🌿 أنا بايو، كيف أقدر أساعدك اليوم؟ اسألني عن النوتات، التخصصات، الفعاليات، أو أي شي يخص النادي.";
+  return"ما عندي معلومة كافية عن هذا الموضوع. جرب تسأل عن النوتات، التخصصات، الفعاليات، أو المرشدين الأكاديميين! 🧬";
+}
+(async()=>{
+  [notes,events,advisors,aiKnowledge,majorResources]=await Promise.all([get("notes"),get("events"),get("advisors"),get("aiKnowledge"),get("majorResources")]);
+  document.getElementById("aiStatus").textContent=`✨ بايو جاهز — ${buildKB().length} معلومة محملة`;
+  const form=document.getElementById("chatForm");
+  const inp=document.getElementById("chatInput");
+  async function handleSend(){
+    const q=inp.value.trim();if(!q)return;
+    inp.value="";inp.focus();addMsg("user",q);
+    // Show typing indicator
+    const typing=document.createElement("div");
+    typing.className="msg bot";typing.id="typing";typing.textContent="...";
+    document.getElementById("chatBox").appendChild(typing);
+    document.getElementById("chatBox").scrollTop=99999;
+    // Try ChatGPT first, fallback to local KB
+    let ans="";
+    try{
+      const kb=buildKB().slice(0,25).map(x=>x.answer).join("\n---\n");
+      const sysPrompt=`أنت "بايو" 🧬 — المساعد الذكي لنادي العلوم البيولوجية (BSC KU) في جامعة الكويت.
+
+شخصيتك: ودود، ذكي، متحمس للعلوم، تتكلم بالعربية الكويتية بشكل طبيعي.
+
+قدراتك:
+- تجاوب على أسئلة البيولوجيا والعلوم الطبيعية بتفصيل
+- تساعد في المواد الدراسية (الخلية، الجينات، الميكروبيولوجي، الكيمياء الحيوية...)
+- تعطي معلومات عن النادي والتخصصات والمرشدين والفعاليات
+- تساعد في فهم المناهج وتشرح المفاهيم الصعبة
+- تتفاعل بشكل طبيعي مع الأسئلة الشخصية والعامة
+
+معلومات النادي المتاحة:
+${kb}
+
+تعليمات:
+- اجب بالعربية دائماً، وبأسلوب واضح ومفيد
+- لو السؤال علمي اشرحه بتفصيل مع أمثلة
+- لو السؤال عن النادي استخدم المعلومات المتاحة
+- لو السؤال شخصي أو عام تفاعل معه بشكل ودي
+- اجعل ردودك منظمة ومقروءة`;
+
+      // Add current message to history
+      conversationHistory.push({role:"user", parts:[{text:q}]});
+      // Keep last 10 messages only
+      if(conversationHistory.length > 10) conversationHistory.splice(0, 2);
+
+      const GEMINI_KEY="AIzaSyDKjniWSp71z63TaW0LasP49xlrNAx6gJ4";
+      const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          system_instruction:{parts:[{text:sysPrompt}]},
+          contents: conversationHistory,
+          generationConfig:{maxOutputTokens:1000, temperature:0.8}
+        })
+      });
+      const data=await res.json();
+      ans=data.candidates?.[0]?.content?.parts?.[0]?.text||answer(q);
+      // Add assistant response to history
+      conversationHistory.push({role:"model", parts:[{text:ans}]});
+    }catch{ans=answer(q);}
+    typing.remove();
+    addMsg("bot",ans);
+    try{await addDoc(collection(db,"aiChats"),{question:q,answer:ans,createdAt:serverTimestamp()})}catch{}
+  }
+  form.addEventListener("submit", e=>{ e.preventDefault(); handleSend(); });
+  inp.addEventListener("keydown", e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); handleSend(); } });
+  document.querySelectorAll("[data-prompt]").forEach(b=>{
+    b.addEventListener("click",()=>{inp.value=b.dataset.prompt; handleSend();});
+  });
+})();
+</script>
+
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .catch(()=>{});
+  });
+}
+</script>
+</body></html>
