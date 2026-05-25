@@ -292,22 +292,30 @@ body { background: #04050a !important; color: #f0f2ff !important; }
   color: #f0f2ff !important;
 }
 
-/* ── Light mode: keep aurora dark ── */
-[data-theme="light"] body { background: #04050a !important; color: #f0f2ff !important; }
+/* ── Light mode ── */
+[data-theme="light"] body { background: #f8fafc !important; color: #0f172a !important; }
+[data-theme="light"] .bg-canvas { opacity: 0.2 !important; }
 [data-theme="light"] .bg-canvas::before {
-  background: radial-gradient(ellipse, rgba(129,140,248,.1) 0%, rgba(56,189,248,.06) 40%, transparent 70%) !important;
+  background: radial-gradient(ellipse, rgba(99,102,241,.12) 0%, rgba(56,189,248,.06) 40%, transparent 70%) !important;
 }
 [data-theme="light"] .bg-canvas::after {
   background: radial-gradient(ellipse, rgba(244,114,182,.07) 0%, rgba(52,211,153,.05) 50%, transparent 70%) !important;
 }
-[data-theme="light"] .navbar {
-  background: rgba(4,5,10,.92) !important;
-  border-bottom-color: rgba(129,140,248,.15) !important;
-  box-shadow: none !important;
+[data-theme="light"] .bg-grid {
+  background-image:
+    linear-gradient(rgba(99,102,241,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,.05) 1px, transparent 1px) !important;
+  opacity: 0.5 !important;
 }
-[data-theme="light"] .nav-links a { color: #5d6b98 !important; }
+[data-theme="light"] .navbar {
+  background: rgba(255,255,255,.93) !important;
+  border-bottom-color: rgba(99,102,241,.12) !important;
+  box-shadow: 0 1px 20px rgba(99,102,241,.07) !important;
+}
+[data-theme="light"] .nav-links a { color: #64748b !important; }
 [data-theme="light"] .nav-links a:hover,
 [data-theme="light"] .nav-links a.active { color: #fff !important; }
+[data-theme="light"] .brand-text span { color: #64748b !important; }
 [data-theme="light"] .card,
 [data-theme="light"] .note-card,
 [data-theme="light"] .event-card,
@@ -323,16 +331,41 @@ body { background: #04050a !important; color: #f0f2ff !important; }
 [data-theme="light"] .tree-container,
 [data-theme="light"] .pref-card,
 [data-theme="light"] .ann-card {
-  background: rgba(8,10,20,.78) !important;
-  border-color: rgba(129,140,248,.12) !important;
+  background: rgba(255,255,255,.95) !important;
+  border-color: rgba(99,102,241,.12) !important;
+  backdrop-filter: blur(16px) !important;
 }
+[data-theme="light"] .card h3 { color: #0f172a !important; }
+[data-theme="light"] .card p,
+[data-theme="light"] .major-card p { color: #64748b !important; }
 [data-theme="light"] h1,
 [data-theme="light"] h2,
-[data-theme="light"] h3 { color: #f0f2ff !important; }
-[data-theme="light"] .footer {
-  background: rgba(4,5,10,.9) !important;
-  border-color: rgba(129,140,248,.1) !important;
+[data-theme="light"] h3 { color: #0f172a !important; }
+[data-theme="light"] .hero-desc { color: #64748b !important; }
+[data-theme="light"] .hero h1 .grad {
+  background: linear-gradient(135deg, #0f172a 0%, #4f46e5 60%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
 }
+[data-theme="light"] .page-hero h1 {
+  background: linear-gradient(135deg, #0f172a 0%, #6366f1 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+[data-theme="light"] .footer {
+  background: rgba(248,250,252,.97) !important;
+  border-color: rgba(99,102,241,.1) !important;
+}
+[data-theme="light"] .footer-copy { color: #64748b !important; }
+[data-theme="light"] .footer-copy strong { color: #0f172a !important; }
+[data-theme="light"] .social-btn {
+  color: #64748b !important;
+  background: rgba(255,255,255,.8) !important;
+  border-color: rgba(99,102,241,.15) !important;
+}
+[data-theme="light"] .social-btn:hover { color: #fff !important; }
 [data-theme="light"] .filter-input,
 [data-theme="light"] .filter-select,
 [data-theme="light"] .chat-input,
@@ -340,11 +373,39 @@ body { background: #04050a !important; color: #f0f2ff !important; }
 [data-theme="light"] .form-group input,
 [data-theme="light"] .form-group select,
 [data-theme="light"] .form-group textarea {
-  background: rgba(8,10,20,.7) !important;
-  border-color: rgba(129,140,248,.15) !important;
-  color: #f0f2ff !important;
+  background: rgba(255,255,255,.9) !important;
+  border-color: rgba(99,102,241,.18) !important;
+  color: #0f172a !important;
 }
+[data-theme="light"] .see-all {
+  background: rgba(255,255,255,.85) !important;
+  border-color: rgba(99,102,241,.2) !important;
+  color: #6366f1 !important;
+}
+[data-theme="light"] .see-all:hover {
+  background: rgba(99,102,241,.1) !important;
+}
+[data-theme="light"] .about-visual { background: rgba(248,250,252,.9) !important; }
 [data-theme="light"] .particle { opacity: 0 !important; }
-[data-theme="light"] .ku-menu { background: rgba(4,5,10,.98) !important; }
-[data-theme="light"] .mobile-menu { background: rgba(4,5,10,.98) !important; }
-[data-theme="light"] .brand img { mix-blend-mode: screen !important; filter: drop-shadow(0 0 12px rgba(129,140,248,.6)) brightness(1.2) !important; }
+[data-theme="light"] .ku-menu {
+  background: rgba(255,255,255,.98) !important;
+  border-color: rgba(99,102,241,.12) !important;
+}
+[data-theme="light"] .ku-item strong { color: #0f172a !important; }
+[data-theme="light"] .ku-item span { color: #64748b !important; }
+[data-theme="light"] .ku-item:hover { background: rgba(99,102,241,.06) !important; }
+[data-theme="light"] .ku-btn {
+  color: #64748b !important;
+  background: rgba(255,255,255,.7) !important;
+  border-color: rgba(99,102,241,.15) !important;
+}
+[data-theme="light"] .ku-btn:hover {
+  color: #fff !important;
+  background: rgba(99,102,241,.12) !important;
+  border-color: rgba(99,102,241,.3) !important;
+}
+[data-theme="light"] .mobile-menu { background: rgba(255,255,255,.98) !important; }
+[data-theme="light"] .mobile-nav a { color: #0f172a !important; }
+[data-theme="light"] .mobile-nav a:hover,
+[data-theme="light"] .mobile-nav a.active { color: #fff !important; }
+[data-theme="light"] .brand img { mix-blend-mode: multiply !important; filter: drop-shadow(0 0 8px rgba(99,102,241,.3)) brightness(0.9) !important; }
