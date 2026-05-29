@@ -871,6 +871,20 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
+<!-- ══ UNIVERSAL EDIT MODAL ══ -->
+<div id="editModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.78);align-items:center;justify-content:center;padding:1rem">
+  <div style="background:#0f172a;border:1px solid rgba(99,102,241,.35);border-radius:20px;padding:2rem;max-width:500px;width:100%;max-height:88vh;overflow-y:auto;position:relative;box-shadow:0 32px 80px rgba(0,0,0,.7)">
+    <button onclick="closeEditModal()" style="position:absolute;top:1rem;left:1rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:var(--muted);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1.1rem;line-height:1;display:flex;align-items:center;justify-content:center">×</button>
+    <h3 id="editModalTitle" style="color:#fff;font-size:1rem;font-weight:800;margin-bottom:1.5rem;padding-left:2rem">تعديل</h3>
+    <div id="editModalBody"></div>
+    <div style="display:flex;gap:.75rem;margin-top:1.25rem;flex-wrap:wrap">
+      <button class="btn btn-primary" id="editModalSaveBtn">💾 حفظ التعديلات</button>
+      <button class="btn btn-ghost" onclick="closeEditModal()">إلغاء</button>
+    </div>
+    <div id="editModalStatus" style="margin-top:.6rem;font-size:.85rem;min-height:1.2em"></div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -930,6 +944,7 @@ window.goPanel=function(id){
 async function getItems(col){try{const s=await getDocs(query(collection(db,col),orderBy("createdAt","desc")));return s.docs.map(d=>({id:d.id,...d.data()}))}catch{const s=await getDocs(collection(db,col));return s.docs.map(d=>({id:d.id,...d.data()}))}}
 async function addItem(col,data){await addDoc(collection(db,col),{...data,createdAt:serverTimestamp()});loadAll()}
 async function delItem(col,id){if(confirm("متأكد من الحذف؟")){await deleteDoc(doc(db,col,id));loadAll()}}
+async function updateItem(col,id,data){await setDoc(doc(db,col,id),{...data,updatedAt:serverTimestamp()},{merge:true});loadAll()}
 
 // RENDER HELPERS
 function renderItems(elId,items,fields,col){
@@ -942,11 +957,13 @@ function renderItems(elId,items,fields,col){
         <p>${[fields[1]&&item[fields[1]],fields[2]&&item[fields[2]],item.major?MN[item.major]||item.major:""].filter(Boolean).join(" · ")}</p>
       </div>
       <div class="list-item-actions">
+        <button class="btn btn-sm" style="background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);color:#a5b4fc" onclick="openEditModal('${col}','${item.id}')">تعديل</button>
         <button class="btn btn-danger btn-sm" onclick="delItem_('${col}','${item.id}')">حذف</button>
       </div>
     </div>`).join("");
 }
 window.delItem_=delItem;
+window.updateItem_=updateItem;
 
 // ADD HANDLERS
 document.getElementById("addNote").onclick=async()=>{
@@ -1288,6 +1305,100 @@ window.addSuggToSheet=async function(id){
 };
 // expose for inline calls
 window.addItem=addItem;window.delItem=delItem;
+
+// ── UNIVERSAL EDIT MODAL ──
+const _MO=[
+  {v:'molecular',l:'الأحياء الجزيئية'},{v:'micro',l:'مايكروبيولوجي'},
+  {v:'plant',l:'أحياء النبات'},{v:'animal',l:'أحياء الحيوان'},
+  {v:'biochem',l:'الكيمياء الحيوية'},{v:'forensic',l:'الأدلة الجنائية'},
+  {v:'agri',l:'الزراعة'},{v:'biotech',l:'التقنية الحيوية'},
+];
+const EDIT_SCHEMA={
+  notes:[
+    {k:'title',l:'العنوان'},
+    {k:'course',l:'اسم المادة'},
+    {k:'major',l:'التخصص',t:'select',o:_MO},
+    {k:'type',l:'نوع الملف',t:'select',o:[{v:'Summary',l:'Summary'},{v:'Midterm',l:'Midterm'},{v:'Final',l:'Final'},{v:'Slides',l:'Slides'},{v:'Lab',l:'Lab'},{v:'Past Exam',l:'Past Exam'}]},
+    {k:'term',l:'الفصل الدراسي'},
+    {k:'url',l:'رابط الملف'},
+  ],
+  events:[
+    {k:'title',l:'اسم الفعالية'},
+    {k:'date',l:'التاريخ'},
+    {k:'location',l:'الموقع'},
+    {k:'description',l:'الوصف',t:'textarea'},
+    {k:'url',l:'رابط التسجيل'},
+  ],
+  news:[
+    {k:'title',l:'عنوان الخبر'},
+    {k:'type',l:'النوع',t:'select',o:[{v:'info',l:'📌 خبر عام'},{v:'event',l:'🎤 فعالية'},{v:'urgent',l:'🚨 عاجل'}]},
+    {k:'content',l:'المحتوى',t:'textarea'},
+  ],
+  announcements:[
+    {k:'title',l:'عنوان الإعلان'},
+    {k:'type',l:'النوع',t:'select',o:[{v:'info',l:'📌 عادي'},{v:'urgent',l:'🚨 عاجل'},{v:'event',l:'🎤 فعالية'}]},
+    {k:'content',l:'التفاصيل',t:'textarea'},
+  ],
+  advisors:[
+    {k:'name',l:'الاسم'},
+    {k:'email',l:'الإيميل'},
+    {k:'major',l:'التخصص',t:'select',o:_MO},
+    {k:'office',l:'المكتب / ساعات الاستقبال'},
+  ],
+  aiKnowledge:[
+    {k:'title',l:'عنوان المعلومة'},
+    {k:'keywords',l:'كلمات مفتاحية'},
+    {k:'answer',l:'الإجابة',t:'textarea'},
+  ],
+};
+let _emCol=null,_emId=null;
+const _INP='width:100%;padding:.7rem 1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#f1f5f9;font-family:Tajawal,system-ui;font-size:.9rem;outline:none;box-sizing:border-box;transition:border-color .2s';
+const _LBL='font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.04em';
+window.openEditModal=async function(col,id){
+  const schema=EDIT_SCHEMA[col];
+  if(!schema){return;}
+  const snap=await getDoc(doc(db,col,id)).catch(()=>null);
+  if(!snap||!snap.exists())return;
+  const data=snap.data();
+  document.getElementById('editModalTitle').textContent='تعديل — '+(data.title||data.name||data.code||id);
+  document.getElementById('editModalStatus').textContent='';
+  document.getElementById('editModalBody').innerHTML=schema.map(f=>{
+    const val=String(data[f.k]||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    if(f.t==='select') return `<label style="${_LBL}">${f.l}</label>
+      <select id="em-${f.k}" style="${_INP};background:#0f172a;margin-bottom:.85rem">
+        ${f.o.map(o=>`<option value="${o.v}"${o.v===data[f.k]?' selected':''}>${o.l}</option>`).join('')}
+      </select>`;
+    if(f.t==='textarea') return `<label style="${_LBL}">${f.l}</label>
+      <textarea id="em-${f.k}" style="${_INP};min-height:90px;resize:vertical;margin-bottom:.85rem">${data[f.k]||''}</textarea>`;
+    return `<label style="${_LBL}">${f.l}</label>
+      <input id="em-${f.k}" value="${val}" style="${_INP};margin-bottom:.85rem">`;
+  }).join('');
+  _emCol=col;_emId=id;
+  document.getElementById('editModal').style.display='flex';
+};
+window.closeEditModal=function(){
+  document.getElementById('editModal').style.display='none';
+  _emCol=null;_emId=null;
+};
+document.getElementById('editModalSaveBtn').onclick=async function(){
+  const schema=EDIT_SCHEMA[_emCol];if(!schema||!_emId)return;
+  const updated={};
+  schema.forEach(f=>{const el=document.getElementById('em-'+f.k);if(el)updated[f.k]=el.value.trim();});
+  const status=document.getElementById('editModalStatus');
+  this.disabled=true;this.textContent='⏳ جاري الحفظ...';
+  try{
+    await setDoc(doc(db,_emCol,_emId),{...updated,updatedAt:serverTimestamp()},{merge:true});
+    status.textContent='✅ تم الحفظ';status.style.color='#6ee7b7';
+    setTimeout(closeEditModal,700);
+    loadAll();
+  }catch(e){
+    status.textContent='❌ '+e.message;status.style.color='#f87171';
+  }
+  this.disabled=false;this.textContent='💾 حفظ التعديلات';
+};
+document.getElementById('editModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('editModal'))closeEditModal();
+});
 
 // ── SUPPORT SHEET LOGIC ──
 let currentSupportMajor="molecular";
