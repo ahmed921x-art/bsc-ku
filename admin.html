@@ -739,8 +739,8 @@ a{color:inherit;text-decoration:none}
               <label>الفئة</label>
               <select id="memberCategory">
                 <option value="board">الهيئة الإدارية</option>
-                <option value="academic">الفريق الأكاديمي</option>
-                <option value="media">فريق الإعلام</option>
+                <option value="academic">اللجنة الثقافية</option>
+                <option value="media">اللجنة الإعلامية</option>
                 <option value="events">فريق الفعاليات</option>
                 <option value="other">أخرى</option>
               </select>
@@ -1426,7 +1426,7 @@ document.addEventListener('click',e=>{
     if(!members.length){ list.innerHTML='<p style="color:var(--muted);padding:1rem">لا يوجد أعضاء بعد.</p>'; return; }
     // Sort by order
     members.sort((a,b)=>(+a.order||99)-(+b.order||99));
-    const catNames = {board:'الهيئة الإدارية',academic:'الفريق الأكاديمي',media:'فريق الإعلام',events:'فريق الفعاليات',other:'أخرى'};
+    const catNames = {board:'الهيئة الإدارية',academic:'اللجنة الثقافية',media:'اللجنة الإعلامية',events:'فريق الفعاليات',other:'أخرى'};
     list.innerHTML = members.map(m=>`
       <div class="list-item" id="mi-${m.id}">
         <div style="display:flex;align-items:center;gap:.85rem;flex:1;min-width:0">
