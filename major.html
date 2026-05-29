@@ -63,7 +63,11 @@ a{color:inherit;text-decoration:none}
 .dl-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.45rem .95rem;background:rgba(99,102,241,.14);border:1px solid rgba(99,102,241,.3);border-radius:999px;font-size:.8rem;font-weight:700;color:#a5b4fc;transition:all .25s}
 .dl-btn:hover{background:rgba(99,102,241,.28);transform:scale(1.05)}
 /* PREREQ TREE */
-.prereq-tree-wrap{position:relative;overflow-x:auto;overflow-y:auto;min-height:300px}
+.tree-container{background:rgba(22,22,22,.75);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;overflow:hidden}
+.tree-legend{display:flex;flex-wrap:wrap;gap:.55rem;margin-bottom:1.25rem;padding:.7rem 1rem;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px}
+.legend-item{display:flex;align-items:center;gap:.4rem;font-size:.75rem;color:var(--muted);font-weight:600}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.prereq-tree-wrap{position:relative;overflow-x:auto;overflow-y:auto;min-height:320px;max-height:680px}
 .prereq-canvas{position:relative;display:inline-block;min-width:100%}
 .prereq-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .tree-row{display:flex;gap:14px;justify-content:center;position:relative;margin-bottom:0;padding:0 20px}
@@ -300,12 +304,15 @@ a{color:inherit;text-decoration:none}
     }
     [data-theme="light"] .qp-btn:hover { color: #4f46e5 !important; }
     /* Tree */
-    [data-theme="light"] .tree-container,
-    [data-theme="light"] .prereq-tree-wrap {
+    [data-theme="light"] .tree-container {
       background: #f8fafc !important;
       border-color: rgba(99,102,241,.12) !important;
     }
-    [data-theme="light"] .tree-legend { background: #fff !important; border-color: rgba(99,102,241,.1) !important; }
+    [data-theme="light"] .prereq-tree-wrap {
+      background: #fff !important;
+      border-color: rgba(99,102,241,.08) !important;
+    }
+    [data-theme="light"] .tree-legend { background: #fff !important; border-color: rgba(99,102,241,.12) !important; }
     [data-theme="light"] .legend-item { color: #475569 !important; }
     [data-theme="light"] .node-tooltip {
       background: rgba(255,255,255,.98) !important;
@@ -476,7 +483,7 @@ a{color:inherit;text-decoration:none}
     <button class="ptab active" onclick="switchTab('notes')" data-ar="📚 النوتات" data-en="📚 Notes">📚 النوتات</button>
     <button class="ptab" onclick="switchTab('sheet')" data-ar="🗺️ صحيفة التخرج" data-en="🗺️ Graduation Sheet">🗺️ صحيفة التخرج</button>
     <button class="ptab" onclick="switchTab('schedule')" data-ar="📅 منشئ الجدول" data-en="📅 Schedule Builder">📅 منشئ الجدول</button>
-    <button class="ptab" onclick="switchTab('graduate')" data-ar="🎓 صحيفة التخرج المساند" data-en="🎓 Supporting Major Sheet">🎓 صحيفة التخرج المساند</button>
+    <button class="ptab" onclick="switchTab('suggest')" data-ar="🎓 صحيفة التخرج المساند" data-en="🎓 Supporting Major Sheet">🎓 صحيفة التخرج المساند</button>
   </div>
 
   <!-- NOTES -->
@@ -500,6 +507,10 @@ a{color:inherit;text-decoration:none}
   <div class="tab-panel" id="tab-sheet">
     <div class="section-label">خريطة المسار</div>
     <div class="section-h2">صحيفة التخرج التفاعلية</div>
+    <div id="batchSelector" style="display:none;margin-bottom:1.25rem">
+      <div style="font-size:.82rem;color:var(--muted);margin-bottom:.6rem;font-weight:600">اختر الدفعة:</div>
+      <div id="batchBtns" style="display:flex;flex-wrap:wrap;gap:.5rem"></div>
+    </div>
     <p style="font-size:.875rem;color:var(--muted);margin-bottom:1.5rem">اضغط على أي مادة لتعليمها كمكتملة. المواد المقفلة تحتاج مسبقاتها أولاً.</p>
     <div class="tree-container reveal">
       <div class="tree-legend">
@@ -582,7 +593,9 @@ document.getElementById("heroEn").textContent=m.en;
 document.title=m.ar+" | BSC KU";
 
 let sheetCourses=[];
-let completedCodes=new Set(JSON.parse(localStorage.getItem("bscku_done_"+major)||"[]"));
+let completedCodes=new Set();
+let currentBatch=null;
+let allBatches={};
 const typeClass={required:"tn-required",dept:"tn-dept",major:"tn-major",support:"tn-support",elective:"tn-elective"};
 
 // NOTES
@@ -604,46 +617,91 @@ const typeClass={required:"tn-required",dept:"tn-dept",major:"tn-major",support:
 (async()=>{
   try{
     const d=await getDoc(doc(db,"majorSheets",major));
-    sheetCourses=d.exists()?(d.data().courses||[]):[];
+    if(d.exists()){
+      const data=d.data();
+      if(data.batches&&Object.keys(data.batches).length>0){
+        allBatches=data.batches;
+        const sorted=Object.keys(allBatches).sort((a,b)=>b.localeCompare(a,undefined,{numeric:true}));
+        currentBatch=sorted[0];
+        sheetCourses=(allBatches[currentBatch]&&allBatches[currentBatch].courses)||[];
+        renderBatchSelector(sorted);
+      }else{
+        sheetCourses=data.courses||[];
+      }
+    }
   }catch{sheetCourses=[]}
+  completedCodes=new Set(JSON.parse(localStorage.getItem("bscku_done_"+major+(currentBatch?"_"+currentBatch:""))||"[]"));
   renderTree();setupScheduleSearch();
 })();
 
-// Submit course suggestion to Firebase
-window.submitSuggestion = async function(){
-  const code    = document.getElementById('sg-code').value.trim();
-  const nameAr  = document.getElementById('sg-nameAr').value.trim();
-  const nameEn  = document.getElementById('sg-nameEn').value.trim();
-  const hours   = parseInt(document.getElementById('sg-hours').value)||3;
-  const prereqs = document.getElementById('sg-prereqs').value.split(/[,،]/).map(s=>s.trim()).filter(Boolean);
-  const notes   = document.getElementById('sg-notes').value.trim();
-  const status  = document.getElementById('sgStatus');
-  const btn     = document.getElementById('sgBtn');
-
-  if(!code||!nameAr){status.textContent='⚠️ رمز المادة والاسم مطلوبان';status.style.color='#f87171';return;}
-
-  btn.disabled=true;btn.textContent='⏳ جاري الإرسال...';
+// SUPPORT SHEET
+(async()=>{
+  const container=document.getElementById("graduateSheetContainer");
   try{
-    await addDoc(collection(db,'suggestions'),{
-      code,nameAr,nameEn,hours,prereqs,notes,major,
-      createdAt:serverTimestamp()
-    });
-    status.textContent='✅ تم إرسال الاقتراح — سيراجعه الأدمن قريباً';
-    status.style.color='#6ee7b7';
-    ['sg-code','sg-nameAr','sg-nameEn','sg-notes','sg-prereqs'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('sg-hours').value=3;
-  }catch(e){
-    status.textContent='❌ خطأ: '+e.message;
-    status.style.color='#f87171';
+    const d=await getDoc(doc(db,"supportSheets",major));
+    const courses=d.exists()?(d.data().courses||[]):[];
+    if(!courses.length){
+      container.innerHTML='<div class="empty-state" style="padding:2.5rem 1rem"><div style="font-size:2rem;margin-bottom:.75rem">📋</div><p>لم تُضف صحيفة التخرج المساند بعد.</p></div>';
+      return;
+    }
+    const typeColor={required:"rgba(16,185,129,.15)",dept:"rgba(59,130,246,.15)",major:"rgba(245,158,11,.15)",support:"rgba(239,68,68,.12)",elective:"rgba(139,92,246,.15)"};
+    const typeText={required:"#6ee7b7",dept:"#93c5fd",major:"#fcd34d",support:"#fca5a5",elective:"#c4b5fd"};
+    const typeLabel={required:"إلزامي",dept:"قسم",major:"تخصص",support:"مساند",elective:"اختياري"};
+    const total=courses.reduce((s,c)=>s+(c.hours||0),0);
+    container.innerHTML=`
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.25rem">
+        <div style="padding:.45rem 1rem;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);border-radius:12px;font-size:.82rem;font-weight:700;color:#a5b4fc">${courses.length} مادة</div>
+        <div style="padding:.45rem 1rem;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);border-radius:12px;font-size:.82rem;font-weight:700;color:#6ee7b7">${total} ساعة</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.5rem">
+        ${courses.map((c,i)=>`
+          <div style="display:flex;align-items:center;gap:.75rem;padding:.65rem 1rem;
+            background:${typeColor[c.type]||'rgba(255,255,255,.04)'};border:1px solid var(--border);
+            border-radius:10px;animation:fu .35s ease ${i*.04}s both">
+            <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:.78rem;font-weight:900;
+              color:${typeText[c.type]||'#a5b4fc'};min-width:82px;flex-shrink:0">${c.code}</span>
+            <span style="font-size:.88rem;font-weight:600;flex:1;line-height:1.3">${c.nameAr}</span>
+            ${c.nameEn?`<span style="font-size:.72rem;color:var(--muted);flex-shrink:0">${c.nameEn}</span>`:''}
+            <span style="font-size:.72rem;color:var(--muted);white-space:nowrap;flex-shrink:0">${c.hours||3} ساعات</span>
+            <span style="font-size:.68rem;font-weight:700;border-radius:999px;padding:.15rem .5rem;flex-shrink:0;
+              background:${typeColor[c.type]||'rgba(255,255,255,.08)'};color:${typeText[c.type]||'#a5b4fc'}">${typeLabel[c.type]||''}</span>
+          </div>`).join('')}
+      </div>`;
+  }catch{
+    container.innerHTML='<div class="empty-state" style="padding:2.5rem 1rem"><div style="font-size:2rem;margin-bottom:.75rem">📋</div><p>لم تُضف صحيفة التخرج المساند بعد.</p></div>';
   }
-  btn.disabled=false;btn.textContent='إرسال الاقتراح ←';
+})();
+
+function renderBatchSelector(batches){
+  const sel=document.getElementById('batchSelector');
+  const btns=document.getElementById('batchBtns');
+  sel.style.display='block';
+  btns.innerHTML=batches.map(b=>`<button onclick="selectBatch('${b}')" id="bbtn-${b}"
+    style="padding:.45rem 1.1rem;border-radius:999px;font-size:.85rem;font-weight:700;
+    cursor:pointer;transition:all .25s;font-family:'Tajawal',sans-serif;
+    ${b===currentBatch?'background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:1px solid #6366f1'
+    :'background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--border)'}"
+    >دفعة ${b}</button>`).join('');
+}
+
+window.selectBatch=function(batch){
+  currentBatch=batch;
+  sheetCourses=(allBatches[batch]&&allBatches[batch].courses)||[];
+  completedCodes=new Set(JSON.parse(localStorage.getItem("bscku_done_"+major+"_"+batch)||"[]"));
+  document.querySelectorAll('[id^="bbtn-"]').forEach(b=>{
+    const active=b.id==="bbtn-"+batch;
+    b.style.background=active?'linear-gradient(135deg,#6366f1,#8b5cf6)':'rgba(255,255,255,.06)';
+    b.style.color=active?'#fff':'var(--muted)';
+    b.style.borderColor=active?'#6366f1':'var(--border)';
+  });
+  renderTree();
 };
 
 function isUnlocked(course){
   if(!course.prereqs||!course.prereqs.length)return true;
   return course.prereqs.every(p=>completedCodes.has(p.trim()));
 }
-function saveCompleted(){localStorage.setItem("bscku_done_"+major,JSON.stringify([...completedCodes]))}
+function saveCompleted(){localStorage.setItem("bscku_done_"+major+(currentBatch?"_"+currentBatch:""),JSON.stringify([...completedCodes]))}
 
 function renderTree(){
   const container=document.getElementById("treeContainer");
@@ -725,10 +783,10 @@ function renderTree(){
   }
 
   /* ── PIXEL POSITIONS ── */
-  const NW=118, NH=58, HG=20, VG=104;
+  const NW=140, NH=66, HG=30, VG=120;
   const maxN=Math.max(...layerKeys.map(r=>rows[r].length));
-  const CW=Math.max(1100,maxN*(NW+HG)+80);
-  const CH=layerKeys.length*(NH+VG)+60;
+  const CW=Math.max(1200,maxN*(NW+HG)+100);
+  const CH=layerKeys.length*(NH+VG)+80;
 
   const pos={};
   layerKeys.forEach((r,ri)=>{
@@ -767,18 +825,19 @@ function renderTree(){
       data-prereqs="${(c.prereqs||[]).filter(q=>by[q]).join('، ')}"
       style="position:absolute;left:${Math.round(p.x)}px;top:${p.y}px;
              width:${NW}px;height:${NH}px;
-             background:${col.bg};border:1.5px solid ${col.border};border-radius:10px;
-             display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-             cursor:${locked?'not-allowed':'pointer'};opacity:${locked?'.32':done?'.5':'1'};
-             transition:transform .18s,box-shadow .18s;box-sizing:border-box;user-select:none"
+             background:${col.bg};border:1.5px solid ${col.border};border-radius:12px;
+             display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+             cursor:${locked?'not-allowed':'pointer'};opacity:${locked?'.28':done?'.48':'1'};
+             transition:transform .2s,box-shadow .2s;box-sizing:border-box;user-select:none;
+             box-shadow:0 2px 10px rgba(0,0,0,.25)"
       class="tree-node${done?' completed':''}${locked?' locked':''}">
-      ${done?`<span style="position:absolute;top:-7px;right:-7px;width:18px;height:18px;
+      ${done?`<span style="position:absolute;top:-8px;right:-8px;width:20px;height:20px;
         background:#10b981;border-radius:50%;display:flex;align-items:center;
-        justify-content:center;font-size:.65rem;color:#fff">✓</span>`:''}
-      <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:.78rem;
-        font-weight:900;color:${col.text}">${c.code}</span>
-      <span style="font-size:.59rem;text-align:center;line-height:1.3;padding:0 6px;
-        color:rgba(255,255,255,.78);display:-webkit-box;-webkit-line-clamp:2;
+        justify-content:center;font-size:.68rem;color:#fff;box-shadow:0 2px 6px rgba(16,185,129,.4)">✓</span>`:''}
+      <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:.84rem;
+        font-weight:900;color:${col.text};letter-spacing:.01em">${c.code}</span>
+      <span style="font-size:.65rem;text-align:center;line-height:1.35;padding:0 8px;
+        color:rgba(255,255,255,.82);display:-webkit-box;-webkit-line-clamp:2;
         -webkit-box-orient:vertical;overflow:hidden">${c.nameAr}</span>
     </div>`;
   });
@@ -790,8 +849,8 @@ function renderTree(){
   svg.setAttribute("viewBox",`0 0 ${CW} ${CH}`);
 
   const markers=Object.entries(EC).map(([t,col])=>
-    `<marker id="ah-${t}" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-      <polygon points="0 0,8 3,0 6" fill="${col}"/></marker>`).join('');
+    `<marker id="ah-${t}" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0,7 2.5,0 5" fill="${col}"/></marker>`).join('');
 
   let svgH=`<defs>${markers}</defs>`;
 
@@ -801,24 +860,17 @@ function renderTree(){
     if(!prs.length)return;
     const col=EC[child.type]||EC.dept;
     const mid=`ah-${child.type||'dept'}`;
-    const busY=pC.top-VG*0.46;
 
     prs.forEach(pcode=>{
       const pP=pos[pcode];if(!pP)return;
       const x1=pP.cx, y1=pP.bot, x2=pC.cx, y2=pC.top;
-      // Only draw if parent is actually in a higher layer
       if(LY[pcode]>=LY[child.code])return;
-      if(Math.abs(x1-x2)<4){
-        // Straight vertical
-        svgH+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
-          stroke="${col}" stroke-width="1.7" stroke-opacity=".85"
-          marker-end="url(#${mid})" fill="none"/>`;
-      } else {
-        // Orthogonal L-route
-        svgH+=`<path d="M${x1},${y1} L${x1},${busY} L${x2},${busY} L${x2},${y2}"
-          fill="none" stroke="${col}" stroke-width="1.7" stroke-opacity=".85"
-          stroke-linejoin="round" marker-end="url(#${mid})"/>`;
-      }
+      const dy=y2-y1;
+      const cp1y=y1+dy*0.48;
+      const cp2y=y2-dy*0.48;
+      svgH+=`<path d="M${x1},${y1} C${x1},${cp1y} ${x2},${cp2y} ${x2},${y2}"
+        fill="none" stroke="${col}" stroke-width="1.6" stroke-opacity=".7"
+        marker-end="url(#${mid})"/>`;
     });
   });
   svg.innerHTML=svgH;
@@ -906,7 +958,10 @@ function setupScheduleSearch(){
 function switchTab(id){
   document.querySelectorAll(".ptab").forEach((t,i)=>t.classList.toggle("active",["notes","sheet","schedule","suggest"][i]===id));
   document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
-  document.getElementById("tab-"+id).classList.add("active");
+  const panel=document.getElementById("tab-"+id);
+  if(!panel)return;
+  panel.classList.add("active");
+  panel.querySelectorAll(".reveal").forEach(el=>el.classList.add("visible"));
 }
 const nav=document.getElementById("navbar");
 window.addEventListener("scroll",()=>{nav.style.background=window.scrollY>60?"rgba(16,16,16,.97)":"rgba(16,16,16,.88)";nav.style.height=window.scrollY>60?"58px":"70px"},{passive:true});

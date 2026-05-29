@@ -405,7 +405,8 @@ a{color:inherit;text-decoration:none}
       <button class="nav-item" data-panel="events"><span class="ni">🎤</span>الفعاليات</button>
       <div class="sidebar-label">التخصصات</div>
       <button class="nav-item" data-panel="majorsheet"><span class="ni">🗺️</span>الميجرشيت</button>
-      <button class="nav-item" data-panel="advisors"><span class="ni">🎓</span>المرشدون</button>
+      <button class="nav-item" data-panel="supportsheet"><span class="ni">🎓</span>صحيفة المساند</button>
+      <button class="nav-item" data-panel="advisors"><span class="ni">👨‍🏫</span>المرشدون</button>
       <button class="nav-item" data-panel="resources"><span class="ni">📁</span>ملفات التخصصات</button>
       <button class="nav-item" data-panel="team"><span class="ni">👥</span>عائلة النادي</button>
       <div class="sidebar-label">الذكاء الاصطناعي</div>
@@ -543,7 +544,22 @@ a{color:inherit;text-decoration:none}
             <button class="btn btn-ghost" onclick="selectSheetMajor('biotech')">🧪 التقنية الحيوية</button>
           </div>
         </div>
-        <div class="card"><h3>➕ إضافة مادة — <span id="sheetMajorLabel" style="color:#a5b4fc">الأحياء الجزيئية</span></h3>
+        <!-- BATCH MANAGEMENT -->
+        <div class="card" style="border-color:rgba(245,158,11,.3)">
+          <h3>📅 الدفعات — <span id="sheetBatchLabel" style="color:#fcd34d">لا توجد دفعات</span></h3>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;min-height:36px" id="batchTabsBtns">
+            <span style="font-size:.82rem;color:var(--muted)">لا توجد دفعات — أضف دفعة جديدة أدناه</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
+            <input id="newBatchYear" placeholder="مثال: 2024" maxlength="4"
+              style="padding:.55rem .9rem;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.9rem;outline:none;width:130px;transition:border-color .2s"
+              onfocus="this.style.borderColor='rgba(245,158,11,.5)'" onblur="this.style.borderColor=''">
+            <button class="btn btn-gold" id="addBatchBtn">+ إضافة دفعة</button>
+            <button class="btn btn-danger btn-sm" id="deleteBatchBtn" style="display:none">🗑️ حذف الدفعة الحالية</button>
+          </div>
+          <div id="batchStatus" style="margin-top:.6rem;font-size:.82rem;min-height:1.2em"></div>
+        </div>
+        <div class="card"><h3>➕ إضافة مادة — <span id="sheetMajorLabel" style="color:#a5b4fc">الأحياء الجزيئية</span> · دفعة <span id="sheetBatchLabel2" style="color:#fcd34d">—</span></h3>
           <div class="form-grid">
             <div class="form-group"><label>رمز المادة</label><input id="cCode" placeholder="ب 281"></div>
             <div class="form-group"><label>اسم المادة عربي</label><input id="cNameAr" placeholder="علم الوراثة"></div>
@@ -578,6 +594,58 @@ a{color:inherit;text-decoration:none}
         <!-- Tree preview -->
         <div class="card"><h3>👁️ معاينة الخريطة</h3>
           <div class="tree-wrap" id="treePreview"><p style="color:var(--muted);text-align:center;padding:2rem">أضف مواد لمعاينة الخريطة</p></div>
+        </div>
+      </div>
+
+      <!-- SUPPORT SHEET -->
+      <div class="panel" id="panel-supportsheet">
+        <div class="panel-header">
+          <h2>🎓 صحيفة التخرج المساند</h2>
+          <p>المواد المطلوبة لإتمام التخصص المساند — تظهر في تاب "صحيفة التخرج المساند" لكل تخصص</p>
+        </div>
+        <div class="card"><h3>اختر التخصص</h3>
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap" id="supportMajorBtns">
+            <button class="btn btn-primary" onclick="selectSupportMajor('molecular')">🧬 الأحياء الجزيئية</button>
+            <button class="btn btn-ghost" onclick="selectSupportMajor('micro')">🦠 مايكروبيولوجي</button>
+            <button class="btn btn-ghost" onclick="selectSupportMajor('plant')">🌱 أحياء النبات</button>
+            <button class="btn btn-ghost" onclick="selectSupportMajor('animal')">🐾 أحياء الحيوان</button>
+            <button class="btn btn-ghost" onclick="selectSupportMajor('biochem')">⚗️ الكيمياء الحيوية</button>
+            <button class="btn btn-ghost" onclick="selectSupportMajor('forensic')">🔍 الأدلة الجنائية</button>
+            <button class="btn btn-ghost" onclick="selectSupportMajor('agri')">🌾 الزراعة</button>
+            <button class="btn btn-ghost" onclick="selectSupportMajor('biotech')">🧪 التقنية الحيوية</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>➕ إضافة مادة — <span id="supportMajorLabel" style="color:#a5b4fc">الأحياء الجزيئية</span></h3>
+          <div class="form-grid">
+            <div class="form-group"><label>رمز المادة</label><input id="spCode" placeholder="ب 281"></div>
+            <div class="form-group"><label>اسم المادة عربي</label><input id="spNameAr" placeholder="علم الوراثة"></div>
+            <div class="form-group"><label>اسم المادة إنجليزي</label><input id="spNameEn" placeholder="Genetics"></div>
+            <div class="form-group"><label>عدد الساعات</label><input id="spHours" type="number" value="3" min="1" max="6"></div>
+            <div class="form-group"><label>نوع المادة</label>
+              <select id="spType">
+                <option value="required">متطلب إلزامي (أخضر)</option>
+                <option value="dept">متطلب القسم (أزرق)</option>
+                <option value="major">متطلب التخصص (أصفر)</option>
+                <option value="support">متطلب مساند (وردي)</option>
+                <option value="elective">اختياري (بنفسجي)</option>
+              </select>
+            </div>
+            <div class="form-group form-full"><label>المسبقات (رموز مفصولة بفاصلة)</label><input id="spPrereqs" placeholder="ب 101، ب 102 أو فاضي"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="addSupportCourse">+ إضافة المادة</button>
+            <button class="btn btn-green" id="saveSupportSheet">💾 حفظ صحيفة المساند</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>📋 مواد التخصص المساند</h3>
+          <div id="supportCoursesList" style="max-height:520px;overflow-y:auto">
+            <p style="color:var(--muted);padding:1rem">اختر التخصص أولاً ثم أضف المواد.</p>
+          </div>
+          <div class="btn-row" style="margin-top:1rem">
+            <button class="btn btn-green" id="saveSupportSheet2">💾 حفظ التعديلات</button>
+          </div>
         </div>
       </div>
 
@@ -993,6 +1061,10 @@ document.getElementById("seedAllSheets").onclick=async()=>{
 // MAJORSHEET LOGIC
 let currentSheetMajor="molecular";
 let sheetCourses=[];
+let currentSheetBatch=null;
+let allSheetBatches={};
+let sheetBatchMode=false;
+
 window.selectSheetMajor=function(major){
   currentSheetMajor=major;
   document.getElementById("sheetMajorLabel").textContent=MN[major]||major;
@@ -1001,22 +1073,102 @@ window.selectSheetMajor=function(major){
 async function loadSheetCourses(major){
   try{
     const d=await getDoc(doc(db,"majorSheets",major));
-    sheetCourses=d.exists()?(d.data().courses||[]):[];
-  }catch{sheetCourses=[]}
-  renderSheetCourses();renderTreePreview();
+    if(d.exists()){
+      const data=d.data();
+      if(data.batches&&Object.keys(data.batches).length>0){
+        sheetBatchMode=true;
+        allSheetBatches=data.batches;
+        const sorted=Object.keys(allSheetBatches).sort((a,b)=>b.localeCompare(a,undefined,{numeric:true}));
+        currentSheetBatch=sorted[0];
+        sheetCourses=(allSheetBatches[currentSheetBatch]&&allSheetBatches[currentSheetBatch].courses)||[];
+      }else{
+        sheetBatchMode=false;allSheetBatches={};currentSheetBatch=null;
+        sheetCourses=data.courses||[];
+      }
+    }else{
+      sheetBatchMode=false;allSheetBatches={};currentSheetBatch=null;sheetCourses=[];
+    }
+  }catch{sheetCourses=[];}
+  renderBatchTabs();renderSheetCourses();renderTreePreview();
   document.getElementById("ds-courses").textContent=sheetCourses.length;
 }
+
+function renderBatchTabs(){
+  const container=document.getElementById("batchTabsBtns");
+  const label=document.getElementById("sheetBatchLabel");
+  const label2=document.getElementById("sheetBatchLabel2");
+  const delBtn=document.getElementById("deleteBatchBtn");
+  if(!sheetBatchMode||!Object.keys(allSheetBatches).length){
+    container.innerHTML='<span style="font-size:.82rem;color:var(--muted)">لا توجد دفعات — أضف دفعة جديدة أدناه</span>';
+    label.textContent="لا توجد دفعات";label2.textContent="—";delBtn.style.display="none";return;
+  }
+  const sorted=Object.keys(allSheetBatches).sort((a,b)=>b.localeCompare(a,undefined,{numeric:true}));
+  container.innerHTML=sorted.map(b=>`<button onclick="selectSheetBatch('${b}')" id="sbtn-${b}"
+    style="padding:.42rem .95rem;border-radius:999px;font-size:.85rem;font-weight:700;cursor:pointer;
+    transition:all .2s;font-family:'Tajawal',sans-serif;
+    ${b===currentSheetBatch?'background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;border:1px solid #f59e0b':'background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--border)'}">دفعة ${b}</button>`).join('');
+  label.textContent=currentSheetBatch?`دفعة ${currentSheetBatch}`:"—";
+  label2.textContent=currentSheetBatch||"—";
+  delBtn.style.display="";
+}
+window.selectSheetBatch=function(batch){
+  currentSheetBatch=batch;
+  sheetCourses=(allSheetBatches[batch]&&allSheetBatches[batch].courses)||[];
+  document.querySelectorAll('[id^="sbtn-"]').forEach(b=>{
+    const active=b.id==="sbtn-"+batch;
+    b.style.background=active?'linear-gradient(135deg,#f59e0b,#f97316)':'rgba(255,255,255,.06)';
+    b.style.color=active?'#fff':'var(--muted)';
+    b.style.borderColor=active?'#f59e0b':'var(--border)';
+  });
+  document.getElementById("sheetBatchLabel").textContent=`دفعة ${batch}`;
+  document.getElementById("sheetBatchLabel2").textContent=batch;
+  renderSheetCourses();renderTreePreview();
+};
+
+document.getElementById("addBatchBtn").onclick=async()=>{
+  const year=document.getElementById("newBatchYear").value.trim();
+  const status=document.getElementById("batchStatus");
+  if(!year||!/^\d{4}$/.test(year)){status.textContent="⚠️ أدخل سنة صحيحة (4 أرقام)";status.style.color="#f87171";return;}
+  if(allSheetBatches[year]){status.textContent=`⚠️ دفعة ${year} موجودة مسبقاً`;status.style.color="#f87171";return;}
+  const initialCourses=!sheetBatchMode?[...sheetCourses]:[];
+  allSheetBatches[year]={courses:initialCourses};
+  sheetBatchMode=true;currentSheetBatch=year;sheetCourses=initialCourses;
+  await setDoc(doc(db,"majorSheets",currentSheetMajor),{major:currentSheetMajor,batches:allSheetBatches,updatedAt:serverTimestamp()});
+  document.getElementById("newBatchYear").value="";
+  status.textContent=`✅ تم إضافة دفعة ${year}`;status.style.color="#6ee7b7";
+  renderBatchTabs();renderSheetCourses();renderTreePreview();
+};
+document.getElementById("deleteBatchBtn").onclick=async()=>{
+  if(!currentSheetBatch)return;
+  if(!confirm(`هل أنت متأكد من حذف دفعة ${currentSheetBatch}؟ لا يمكن التراجع.`))return;
+  delete allSheetBatches[currentSheetBatch];
+  const remaining=Object.keys(allSheetBatches).sort((a,b)=>b.localeCompare(a,undefined,{numeric:true}));
+  if(remaining.length){currentSheetBatch=remaining[0];sheetCourses=allSheetBatches[currentSheetBatch]?.courses||[];}
+  else{sheetBatchMode=false;currentSheetBatch=null;sheetCourses=[];}
+  await setDoc(doc(db,"majorSheets",currentSheetMajor),{major:currentSheetMajor,batches:allSheetBatches,updatedAt:serverTimestamp()});
+  document.getElementById("batchStatus").textContent="✅ تم حذف الدفعة";
+  document.getElementById("batchStatus").style.color="#6ee7b7";
+  renderBatchTabs();renderSheetCourses();renderTreePreview();
+};
+
 document.getElementById("addCourse").onclick=()=>{
   const code=cCode.value.trim(),nameAr=cNameAr.value.trim(),nameEn=cNameEn.value.trim();
   if(!code||!nameAr)return alert("عبّي رمز المادة واسمها");
+  if(sheetBatchMode&&!currentSheetBatch)return alert("اختر دفعة أولاً أو أنشئ دفعة جديدة");
   sheetCourses.push({code,nameAr,nameEn,hours:parseInt(cHours.value)||3,level:parseInt(cLevel.value)||1,type:cType.value,prereqs:cPrereqs.value.trim().split(/[,،]/).map(s=>s.trim()).filter(Boolean)});
   cCode.value=cNameAr.value=cNameEn.value=cPrereqs.value="";
   renderSheetCourses();renderTreePreview();
 };
-document.getElementById("saveSheet").onclick=async()=>{
-  await setDoc(doc(db,"majorSheets",currentSheetMajor),{major:currentSheetMajor,courses:sheetCourses,updatedAt:serverTimestamp()});
-  alert("✅ تم حفظ الميجرشيت");
-};
+document.querySelectorAll("#saveSheet").forEach(btn=>btn.onclick=async()=>{
+  if(sheetBatchMode&&!currentSheetBatch)return alert("اختر دفعة أولاً");
+  if(sheetBatchMode){
+    allSheetBatches[currentSheetBatch]={courses:sheetCourses};
+    await setDoc(doc(db,"majorSheets",currentSheetMajor),{major:currentSheetMajor,batches:allSheetBatches,updatedAt:serverTimestamp()});
+  }else{
+    await setDoc(doc(db,"majorSheets",currentSheetMajor),{major:currentSheetMajor,courses:sheetCourses,updatedAt:serverTimestamp()});
+  }
+  alert("✅ تم حفظ الميجرشيت"+(currentSheetBatch?` — دفعة ${currentSheetBatch}`:""));
+});
 function renderSheetCourses(){
   const el=document.getElementById("sheetCoursesList");
   if(!sheetCourses.length){el.innerHTML='<p style="color:var(--muted);padding:1rem">اضغط "استيراد" أولاً ثم عدّل المسبقات.</p>';return}
@@ -1078,7 +1230,7 @@ function renderTreePreview(){
 // LOAD ALL
 async function loadAll(){
   try{
-    const[notes,events,advisors,ann,resources,ai,chats,news]=await Promise.all([
+    const[notes,events,advisors,ann,resources,ai,chats,news,suggestions]=await Promise.all([
       getItems("notes"),getItems("events"),getItems("advisors"),getItems("announcements"),
       getItems("majorResources"),getItems("aiKnowledge"),getItems("aiChats"),getItems("news"),getItems("suggestions")
     ]);
@@ -1136,6 +1288,91 @@ window.addSuggToSheet=async function(id){
 };
 // expose for inline calls
 window.addItem=addItem;window.delItem=delItem;
+
+// ── SUPPORT SHEET LOGIC ──
+let currentSupportMajor="molecular";
+let supportCourses=[];
+
+window.selectSupportMajor=function(major){
+  currentSupportMajor=major;
+  document.getElementById("supportMajorLabel").textContent=MN[major]||major;
+  // update button styles
+  document.querySelectorAll("#supportMajorBtns .btn").forEach(b=>{
+    const isCurrent=b.getAttribute("onclick")===`selectSupportMajor('${major}')`;
+    b.className=isCurrent?"btn btn-primary":"btn btn-ghost";
+  });
+  loadSupportCourses(major);
+};
+
+async function loadSupportCourses(major){
+  try{
+    const d=await getDoc(doc(db,"supportSheets",major));
+    supportCourses=d.exists()?(d.data().courses||[]):[];
+  }catch{supportCourses=[];}
+  renderSupportCourses();
+}
+
+async function saveSupportSheetNow(){
+  await setDoc(doc(db,"supportSheets",currentSupportMajor),{major:currentSupportMajor,courses:supportCourses,updatedAt:serverTimestamp()});
+  alert("✅ تم حفظ صحيفة المساند — "+( MN[currentSupportMajor]||currentSupportMajor));
+}
+
+document.getElementById("addSupportCourse").onclick=()=>{
+  const code=spCode.value.trim(),nameAr=spNameAr.value.trim(),nameEn=spNameEn.value.trim();
+  if(!code||!nameAr)return alert("عبّي رمز المادة واسمها");
+  supportCourses.push({code,nameAr,nameEn,hours:parseInt(spHours.value)||3,type:spType.value,
+    prereqs:spPrereqs.value.trim().split(/[,،]/).map(s=>s.trim()).filter(Boolean)});
+  spCode.value=spNameAr.value=spNameEn.value=spPrereqs.value="";
+  renderSupportCourses();
+};
+document.getElementById("saveSupportSheet").onclick=saveSupportSheetNow;
+document.getElementById("saveSupportSheet2").onclick=saveSupportSheetNow;
+
+window.updateSupportCourse=function(i,field,val){supportCourses[i][field]=val;};
+window.removeSupportCourse=function(i){
+  if(confirm("حذف "+supportCourses[i].code+"؟")){supportCourses.splice(i,1);renderSupportCourses();}
+};
+
+function renderSupportCourses(){
+  const el=document.getElementById("supportCoursesList");
+  if(!supportCourses.length){
+    el.innerHTML='<p style="color:var(--muted);padding:1rem">لا توجد مواد بعد — أضف من النموذج أعلاه.</p>';return;
+  }
+  const typeColors={required:"rgba(16,185,129,.15)",dept:"rgba(59,130,246,.15)",major:"rgba(245,158,11,.15)",support:"rgba(239,68,68,.12)",elective:"rgba(139,92,246,.15)"};
+  el.innerHTML=`
+  <style>
+  .sp-row{display:grid;grid-template-columns:90px 1fr 70px 80px 1fr 36px;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;margin-bottom:6px;border:1px solid var(--border)}
+  .sp-row:hover{border-color:rgba(99,102,241,.3)}
+  .sp-row input,.sp-row select{padding:5px 8px;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:Tajawal,system-ui;font-size:.82rem;width:100%;outline:none}
+  .sp-row input:focus,.sp-row select:focus{border-color:rgba(99,102,241,.5)}
+  .sp-row select option{background:#0f172a}
+  .sp-head{display:grid;grid-template-columns:90px 1fr 70px 80px 1fr 36px;gap:8px;padding:4px 10px;margin-bottom:4px}
+  .sp-head span{font-size:.68rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  </style>
+  <div class="sp-head"><span>رمز المادة</span><span>اسم المادة</span><span>ساعات</span><span>النوع</span><span>المسبقات</span><span></span></div>
+  `+supportCourses.map((c,i)=>`
+    <div class="sp-row" style="background:${typeColors[c.type]||'rgba(255,255,255,.03)'}">
+      <input value="${c.code}" onchange="updateSupportCourse(${i},'code',this.value)" placeholder="رمز">
+      <input value="${c.nameAr}" onchange="updateSupportCourse(${i},'nameAr',this.value)" placeholder="اسم المادة">
+      <input type="number" value="${c.hours||3}" min="1" max="9" onchange="updateSupportCourse(${i},'hours',parseInt(this.value))" style="text-align:center">
+      <select onchange="updateSupportCourse(${i},'type',this.value)">
+        <option value="required" ${c.type==='required'?'selected':''}>إلزامي</option>
+        <option value="dept"     ${c.type==='dept'    ?'selected':''}>قسم</option>
+        <option value="major"    ${c.type==='major'   ?'selected':''}>تخصص</option>
+        <option value="support"  ${c.type==='support' ?'selected':''}>مساند</option>
+        <option value="elective" ${c.type==='elective'?'selected':''}>اختياري</option>
+      </select>
+      <input value="${(c.prereqs||[]).join('، ')}"
+        onchange="updateSupportCourse(${i},'prereqs',this.value.split(/[,،]/).map(s=>s.trim()).filter(Boolean))"
+        placeholder="ب 101، E 161">
+      <button onclick="removeSupportCourse(${i})" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:7px;padding:4px 8px;cursor:pointer;font-size:.85rem">×</button>
+    </div>`).join('');
+}
+
+// reload support courses when panel opens
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-panel="supportsheet"]'))setTimeout(()=>loadSupportCourses(currentSupportMajor),100);
+});
 
 // ── PHOTO UPLOAD (Base64) ──
 (function(){
