@@ -532,6 +532,29 @@ a{color:inherit;text-decoration:none}
           <p style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">استيراد بيانات المسبقات الكاملة لكل التخصصات من دليل الطالب مباشرة</p>
           <div class="btn-row"><button class="btn btn-gold" id="seedAllSheets">📥 استيراد مسبقات كل التخصصات</button></div>
         </div>
+        <!-- SHEET IMAGE -->
+        <div class="card" style="border-color:rgba(16,185,129,.25)">
+          <h3>🖼️ صورة صحيفة التخصص — <span id="imgMajorLabel" style="color:#a5b4fc">الأحياء الجزيئية</span></h3>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">صورة أو PDF من صحيفة التخصص الرسمية — تظهر فوق الشجرة التفاعلية للطلبة</p>
+          <div style="display:flex;gap:.75rem;align-items:flex-end;flex-wrap:wrap">
+            <div class="form-group" style="flex:1;min-width:200px">
+              <label>رابط الصورة / PDF</label>
+              <input id="sheetImageUrl" placeholder="https://drive.google.com/... أو رابط مباشر للصورة">
+            </div>
+            <div style="flex-shrink:0;padding-bottom:.05rem">
+              <button class="btn btn-green" id="saveSheetImage">💾 حفظ الصورة</button>
+            </div>
+          </div>
+          <div id="sheetImagePreview" style="display:none;margin-top:1rem">
+            <p style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem">معاينة:</p>
+            <img id="sheetImgEl" style="max-width:100%;border-radius:12px;border:1px solid var(--border);max-height:300px;object-fit:contain" alt="صحيفة التخصص">
+            <div style="margin-top:.5rem;display:flex;gap:.5rem">
+              <a id="sheetImgLink" href="#" target="_blank" class="btn btn-ghost btn-sm">🔗 فتح في تاب جديد</a>
+              <button class="btn btn-danger btn-sm" id="removeSheetImage">🗑️ حذف الصورة</button>
+            </div>
+          </div>
+          <div id="sheetImageStatus" style="margin-top:.5rem;font-size:.82rem;min-height:1.2em"></div>
+        </div>
         <div class="card"><h3>اختر التخصص</h3>
           <div style="display:flex;gap:.75rem;flex-wrap:wrap" id="majorTabsBtns">
             <button class="btn btn-primary" onclick="selectSheetMajor('molecular')">🧬 الأحياء الجزيئية</button>
@@ -600,8 +623,8 @@ a{color:inherit;text-decoration:none}
       <!-- SUPPORT SHEET -->
       <div class="panel" id="panel-supportsheet">
         <div class="panel-header">
-          <h2>🎓 صحيفة التخرج المساند</h2>
-          <p>المواد المطلوبة لإتمام التخصص المساند — تظهر في تاب "صحيفة التخرج المساند" لكل تخصص</p>
+          <h2>🎓 صحيفة التخصص المساند</h2>
+          <p>المواد المطلوبة لإتمام التخصص المساند — تظهر في تاب "صحيفة التخصص المساند" لكل تخصص</p>
         </div>
         <div class="card"><h3>اختر التخصص</h3>
           <div style="display:flex;gap:.75rem;flex-wrap:wrap" id="supportMajorBtns">
@@ -1085,7 +1108,52 @@ let sheetBatchMode=false;
 window.selectSheetMajor=function(major){
   currentSheetMajor=major;
   document.getElementById("sheetMajorLabel").textContent=MN[major]||major;
+  document.getElementById("imgMajorLabel").textContent=MN[major]||major;
   loadSheetCourses(major);
+  loadSheetImage(major);
+};
+
+async function loadSheetImage(major){
+  const urlInp=document.getElementById("sheetImageUrl");
+  const preview=document.getElementById("sheetImagePreview");
+  const imgEl=document.getElementById("sheetImgEl");
+  const linkEl=document.getElementById("sheetImgLink");
+  const status=document.getElementById("sheetImageStatus");
+  try{
+    const d=await getDoc(doc(db,"majorSheets",major));
+    const url=d.exists()?(d.data().sheetImage||""):"";
+    urlInp.value=url;
+    if(url){
+      imgEl.src=url;
+      linkEl.href=url;
+      preview.style.display="block";
+      status.textContent="";
+    }else{
+      preview.style.display="none";
+    }
+  }catch{preview.style.display="none";}
+}
+document.getElementById("saveSheetImage").onclick=async()=>{
+  const url=document.getElementById("sheetImageUrl").value.trim();
+  const status=document.getElementById("sheetImageStatus");
+  const preview=document.getElementById("sheetImagePreview");
+  try{
+    await setDoc(doc(db,"majorSheets",currentSheetMajor),{sheetImage:url,updatedAt:serverTimestamp()},{merge:true});
+    status.textContent="✅ تم حفظ الصورة";status.style.color="#6ee7b7";
+    if(url){
+      document.getElementById("sheetImgEl").src=url;
+      document.getElementById("sheetImgLink").href=url;
+      preview.style.display="block";
+    }else{preview.style.display="none";}
+  }catch(e){status.textContent="❌ "+e.message;status.style.color="#f87171";}
+};
+document.getElementById("removeSheetImage").onclick=async()=>{
+  if(!confirm("حذف صورة صحيفة التخصص؟"))return;
+  await setDoc(doc(db,"majorSheets",currentSheetMajor),{sheetImage:"",updatedAt:serverTimestamp()},{merge:true});
+  document.getElementById("sheetImageUrl").value="";
+  document.getElementById("sheetImagePreview").style.display="none";
+  document.getElementById("sheetImageStatus").textContent="✅ تم الحذف";
+  document.getElementById("sheetImageStatus").style.color="#6ee7b7";
 };
 async function loadSheetCourses(major){
   try{
