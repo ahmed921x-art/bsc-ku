@@ -739,15 +739,22 @@ function renderTree(){
   sheetCourses.forEach(c=>{const r=LY[c.code]||0;(rows[r]||(rows[r]=[])).push(c)});
   const layerKeys=Object.keys(rows).map(Number).sort((a,b)=>a-b);
 
-  /* ── SORT each row optimally using Weighted Median heuristic ──
-     Run 4 alternating passes (down then up) to minimize crossings */
+  /* ── SORT each row — Barycenter heuristic, 14 passes ── */
   const tempX={};
 
-  // Initial order: row 0 sorted by code, rest by median parent index
+  // Layer 0: sort by avg layer-depth of children (nodes with shallow children → left)
   layerKeys.forEach((r,ri)=>{
     if(ri===0){
-      rows[r].sort((a,b)=>a.code.localeCompare(b.code));
-    } else {
+      rows[r].sort((a,b)=>{
+        const avgCL=c=>{
+          const ch=sheetCourses.filter(x=>(x.prereqs||[]).includes(c.code));
+          if(!ch.length)return 99;
+          return ch.reduce((s,x)=>s+(LY[x.code]||0),0)/ch.length;
+        };
+        const diff=avgCL(a)-avgCL(b);
+        return Math.abs(diff)<0.4?a.code.localeCompare(b.code):diff;
+      });
+    }else{
       rows[r].sort((a,b)=>{
         const med=c=>{
           const prs=(c.prereqs||[]).filter(p=>by[p]&&tempX[p]!=null);
@@ -761,29 +768,39 @@ function renderTree(){
     rows[r].forEach((c,i)=>{tempX[c.code]=i;});
   });
 
-  // 4 refinement passes alternating direction
-  for(let pass=0;pass<4;pass++){
+  // 14 alternating passes
+  for(let pass=0;pass<14;pass++){
     const keys=pass%2===0?layerKeys.slice(1):[...layerKeys.slice(0,-1)].reverse();
     keys.forEach(r=>{
-      const row=rows[r];
-      row.sort((a,b)=>{
+      rows[r].sort((a,b)=>{
         const med=c=>{
-          // For downward pass: use parent positions; upward: use child positions
-          const neighbors=pass%2===0
+          const nb=pass%2===0
             ?(c.prereqs||[]).filter(p=>by[p]&&tempX[p]!=null)
             :sheetCourses.filter(ch=>(ch.prereqs||[]).includes(c.code)&&tempX[ch.code]!=null).map(ch=>ch.code);
-          if(!neighbors.length)return tempX[c.code]??9999;
-          const xs=neighbors.map(p=>tempX[p]).sort((x,y)=>x-y);
+          if(!nb.length)return tempX[c.code]??9999;
+          const xs=nb.map(p=>tempX[p]).sort((x,y)=>x-y);
           return xs[Math.floor(xs.length/2)];
         };
         return med(a)-med(b);
       });
-      row.forEach((c,i)=>{tempX[c.code]=i;});
+      rows[r].forEach((c,i)=>{tempX[c.code]=i;});
     });
   }
 
+  // Final pass: re-sort layer 0 by actual child positions
+  rows[layerKeys[0]].sort((a,b)=>{
+    const med=c=>{
+      const ch=sheetCourses.filter(x=>(x.prereqs||[]).includes(c.code)&&tempX[x.code]!=null);
+      if(!ch.length)return tempX[c.code]??99;
+      const xs=ch.map(x=>tempX[x.code]).sort((p,q)=>p-q);
+      return xs[Math.floor(xs.length/2)];
+    };
+    return med(a)-med(b);
+  });
+  rows[layerKeys[0]].forEach((c,i)=>{tempX[c.code]=i;});
+
   /* ── PIXEL POSITIONS ── */
-  const NW=140, NH=66, HG=30, VG=120;
+  const NW=140, NH=66, HG=30, VG=130;
   const maxN=Math.max(...layerKeys.map(r=>rows[r].length));
   const CW=Math.max(1200,maxN*(NW+HG)+100);
   const CH=layerKeys.length*(NH+VG)+80;
@@ -849,8 +866,8 @@ function renderTree(){
   svg.setAttribute("viewBox",`0 0 ${CW} ${CH}`);
 
   const markers=Object.entries(EC).map(([t,col])=>
-    `<marker id="ah-${t}" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
-      <polygon points="0 0,7 2.5,0 5" fill="${col}"/></marker>`).join('');
+    `<marker id="ah-${t}" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
+      <polygon points="0 0,6 2.5,0 5" fill="${col}"/></marker>`).join('');
 
   let svgH=`<defs>${markers}</defs>`;
 
@@ -865,12 +882,18 @@ function renderTree(){
       const pP=pos[pcode];if(!pP)return;
       const x1=pP.cx, y1=pP.bot, x2=pC.cx, y2=pC.top;
       if(LY[pcode]>=LY[child.code])return;
-      const dy=y2-y1;
-      const cp1y=y1+dy*0.48;
-      const cp2y=y2-dy*0.48;
-      svgH+=`<path d="M${x1},${y1} C${x1},${cp1y} ${x2},${cp2y} ${x2},${y2}"
-        fill="none" stroke="${col}" stroke-width="1.6" stroke-opacity=".7"
-        marker-end="url(#${mid})"/>`;
+      const midY=Math.round((y1+y2)/2);
+      if(Math.abs(x1-x2)<6){
+        // straight vertical
+        svgH+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
+          stroke="${col}" stroke-width="1.5" stroke-opacity=".65"
+          marker-end="url(#${mid})"/>`;
+      }else{
+        // elbow: down → horizontal → down
+        svgH+=`<path d="M${x1},${y1} L${x1},${midY} L${x2},${midY} L${x2},${y2}"
+          fill="none" stroke="${col}" stroke-width="1.5" stroke-opacity=".65"
+          stroke-linejoin="round" marker-end="url(#${mid})"/>`;
+      }
     });
   });
   svg.innerHTML=svgH;
