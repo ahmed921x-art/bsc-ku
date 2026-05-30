@@ -617,13 +617,15 @@ const typeClass={required:"tn-required",dept:"tn-dept",major:"tn-major",support:
 
 // MAJORSHEET
 let sheetImageUrl="";
+let sheetImages=[];
 (async()=>{
   let sheetDoc=null;
   try{
     sheetDoc=await getDoc(doc(db,"majorSheets",major));
     if(sheetDoc.exists()){
       const data=sheetDoc.data();
-      sheetImageUrl=data.sheetImage||"";
+      sheetImages=data.sheetImages||(data.sheetImage?[data.sheetImage]:[]);
+      sheetImageUrl=sheetImages[0]||"";
       if(data.batches&&Object.keys(data.batches).length>0){
         allBatches=data.batches;
         const sorted=Object.keys(allBatches).sort((a,b)=>b.localeCompare(a,undefined,{numeric:true}));
@@ -640,21 +642,38 @@ let sheetImageUrl="";
   renderTree();setupScheduleSearch();
 })();
 
+let _siIdx=0;
 function renderSheetImage(){
   const wrap=document.getElementById("sheetImageWrap");
   if(!wrap)return;
-  if(!sheetImageUrl){wrap.style.display="none";wrap.innerHTML="";return;}
+  const imgs=sheetImages.length?sheetImages:(sheetImageUrl?[sheetImageUrl]:[]);
+  if(!imgs.length){wrap.style.display="none";wrap.innerHTML="";return;}
+  _siIdx=0;
+  const multi=imgs.length>1;
   wrap.style.display="block";
   wrap.innerHTML=`
     <div style="margin-bottom:1.5rem;border-radius:16px;overflow:hidden;border:1px solid var(--border);background:rgba(22,22,22,.6)">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.1rem;border-bottom:1px solid var(--border)">
-        <span style="font-size:.82rem;font-weight:700;color:var(--muted)">📄 صحيفة التخصص الرسمية</span>
-        <a href="${sheetImageUrl}" target="_blank" style="font-size:.78rem;color:#a5b4fc;font-weight:700;display:flex;align-items:center;gap:.3rem">فتح كاملاً ↗</a>
+        <span style="font-size:.82rem;font-weight:700;color:var(--muted)">📄 صحيفة التخصص الرسمية${multi?` (${imgs.length} صفحات)`:""}</span>
+        <a id="siLink" href="${imgs[0]}" target="_blank" style="font-size:.78rem;color:#a5b4fc;font-weight:700;display:flex;align-items:center;gap:.3rem">فتح كاملاً ↗</a>
       </div>
-      <img src="${sheetImageUrl}" alt="صحيفة التخصص"
-        style="width:100%;max-height:420px;object-fit:contain;display:block;padding:.75rem"
-        onerror="this.closest('div').style.display='none'">
+      <div style="position:relative">
+        <img id="siMain" src="${imgs[0]}" alt="صحيفة التخصص" style="width:100%;max-height:420px;object-fit:contain;display:block;padding:.75rem" onerror="this.style.opacity='.3'">
+        ${multi?`
+        <button onclick="_siNav(-1)" style="position:absolute;top:50%;left:.75rem;transform:translateY(-50%);width:36px;height:36px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.2);border-radius:50%;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center" id="siPrev">&#8249;</button>
+        <button onclick="_siNav(1)" style="position:absolute;top:50%;right:.75rem;transform:translateY(-50%);width:36px;height:36px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.2);border-radius:50%;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center" id="siNext">&#8250;</button>
+        <div id="siCount" style="position:absolute;bottom:.6rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;font-size:.75rem;font-weight:700;padding:.2rem .7rem;border-radius:999px">1 / ${imgs.length}</div>`:""}
+      </div>
     </div>`;
+  window._siAll=imgs;
+  window._siNav=function(dir){
+    _siIdx=Math.max(0,Math.min(imgs.length-1,_siIdx+dir));
+    document.getElementById("siMain").src=imgs[_siIdx];
+    document.getElementById("siLink").href=imgs[_siIdx];
+    if(document.getElementById("siCount"))document.getElementById("siCount").textContent=`${_siIdx+1} / ${imgs.length}`;
+    if(document.getElementById("siPrev"))document.getElementById("siPrev").style.opacity=_siIdx===0?".3":"1";
+    if(document.getElementById("siNext"))document.getElementById("siNext").style.opacity=_siIdx===imgs.length-1?".3":"1";
+  };
 }
 
 // SUPPORT SHEET
@@ -662,21 +681,34 @@ function renderSheetImage(){
   const container=document.getElementById("graduateSheetContainer");
   try{
     const d=await getDoc(doc(db,"supportSheets",major));
-    // show support sheet image if exists
-    const spImg=d.exists()?(d.data().sheetImage||""):"";
+    // show support sheet images if exist
+    const spData=d.exists()?d.data():{};
+    const spImgs=spData.sheetImages||(spData.sheetImage?[spData.sheetImage]:[]);
     const spWrap=document.getElementById("supportSheetImageWrap");
-    if(spImg&&spWrap){
+    if(spImgs.length&&spWrap){
+      const spMulti=spImgs.length>1;
+      let spIdx=0;
       spWrap.style.display="block";
       spWrap.innerHTML=`
         <div style="border-radius:16px;overflow:hidden;border:1px solid var(--border);background:rgba(22,22,22,.6)">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.1rem;border-bottom:1px solid var(--border)">
-            <span style="font-size:.82rem;font-weight:700;color:var(--muted)">📄 صحيفة التخصص المساند الرسمية</span>
-            <a href="${spImg}" target="_blank" style="font-size:.78rem;color:#a5b4fc;font-weight:700;display:flex;align-items:center;gap:.3rem">فتح كاملاً ↗</a>
+            <span style="font-size:.82rem;font-weight:700;color:var(--muted)">📄 صحيفة التخصص المساند الرسمية${spMulti?` (${spImgs.length} صفحات)`:""}</span>
+            <a id="spLink" href="${spImgs[0]}" target="_blank" style="font-size:.78rem;color:#a5b4fc;font-weight:700;display:flex;align-items:center;gap:.3rem">فتح كاملاً ↗</a>
           </div>
-          <img src="${spImg}" alt="صحيفة التخصص المساند"
-            style="width:100%;max-height:420px;object-fit:contain;display:block;padding:.75rem"
-            onerror="this.closest('div').style.display='none'">
+          <div style="position:relative">
+            <img id="spMain" src="${spImgs[0]}" alt="صحيفة التخصص المساند" style="width:100%;max-height:420px;object-fit:contain;display:block;padding:.75rem" onerror="this.style.opacity='.3'">
+            ${spMulti?`
+            <button onclick="_spNav(-1)" style="position:absolute;top:50%;left:.75rem;transform:translateY(-50%);width:36px;height:36px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.2);border-radius:50%;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">&#8249;</button>
+            <button onclick="_spNav(1)" style="position:absolute;top:50%;right:.75rem;transform:translateY(-50%);width:36px;height:36px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.2);border-radius:50%;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">&#8250;</button>
+            <div id="spCount" style="position:absolute;bottom:.6rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;font-size:.75rem;font-weight:700;padding:.2rem .7rem;border-radius:999px">1 / ${spImgs.length}</div>`:""}
+          </div>
         </div>`;
+      window._spNav=function(dir){
+        spIdx=Math.max(0,Math.min(spImgs.length-1,spIdx+dir));
+        document.getElementById("spMain").src=spImgs[spIdx];
+        document.getElementById("spLink").href=spImgs[spIdx];
+        if(document.getElementById("spCount"))document.getElementById("spCount").textContent=`${spIdx+1} / ${spImgs.length}`;
+      };
     }
     const courses=d.exists()?(d.data().courses||[]):[];
     if(!courses.length){

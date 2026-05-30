@@ -653,18 +653,14 @@ a{color:inherit;text-decoration:none}
         </div>
         <!-- SHEET IMAGE -->
         <div class="card" style="border-color:rgba(16,185,129,.25)">
-          <h3>🖼️ صورة صحيفة التخصص — <span id="imgMajorLabel" style="color:#a5b4fc">الأحياء الجزيئية</span></h3>
-          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">صورة أو PDF من صحيفة التخصص الرسمية — تظهر فوق الشجرة التفاعلية للطلبة</p>
-          <div style="display:flex;gap:.75rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:.75rem">
-            <label for="sheetImgFile" style="display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.1rem;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.35);border-radius:10px;color:#a5b4fc;font-size:.85rem;font-weight:700;cursor:pointer;flex-shrink:0">
-              📎 ارفع صورة / PDF
-            </label>
-            <input type="file" id="sheetImgFile" accept="image/*,.pdf" style="display:none">
-            <span style="font-size:.8rem;color:var(--muted)">أو</span>
-            <div class="form-group" style="flex:1;min-width:160px;margin:0">
-              <input id="sheetImageUrl" placeholder="رابط مباشر للصورة">
-            </div>
-            <button class="btn btn-green" id="saveSheetImage" style="flex-shrink:0">💾 حفظ</button>
+          <h3>🖼️ صور صحيفة التخصص — <span id="imgMajorLabel" style="color:#a5b4fc">الأحياء الجزيئية</span></h3>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">ارفع صورة أو أكثر من صحيفة التخصص — تظهر بالترتيب مع أسهم تنقل في صفحة التخصص</p>
+          <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-bottom:.75rem">
+            <label for="sheetImgFile" style="display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.1rem;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.35);border-radius:10px;color:#a5b4fc;font-size:.85rem;font-weight:700;cursor:pointer;flex-shrink:0">📎 ارفع صور</label>
+            <input type="file" id="sheetImgFile" accept="image/*" multiple style="display:none">
+            <span id="sheetImgCount" style="font-size:.8rem;color:var(--muted)"></span>
+            <button class="btn btn-green" id="saveSheetImage" style="flex-shrink:0;margin-right:auto">💾 حفظ الصور</button>
+            <button class="btn btn-danger btn-sm" id="removeSheetImage">🗑️ حذف الكل</button>
           </div>
           <div id="sheetImgUploadBar" style="display:none;margin-bottom:.5rem">
             <div style="background:rgba(255,255,255,.08);border-radius:8px;overflow:hidden;height:6px">
@@ -672,15 +668,8 @@ a{color:inherit;text-decoration:none}
             </div>
             <div id="sheetImgBarTxt" style="font-size:.72rem;color:#a5b4fc;margin-top:.3rem">0%</div>
           </div>
-          <div id="sheetImagePreview" style="display:none;margin-top:1rem">
-            <p style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem">معاينة:</p>
-            <img id="sheetImgEl" style="max-width:100%;border-radius:12px;border:1px solid var(--border);max-height:300px;object-fit:contain" alt="صحيفة التخصص">
-            <div style="margin-top:.5rem;display:flex;gap:.5rem">
-              <a id="sheetImgLink" href="#" target="_blank" class="btn btn-ghost btn-sm">🔗 فتح في تاب جديد</a>
-              <button class="btn btn-danger btn-sm" id="removeSheetImage">🗑️ حذف الصورة</button>
-            </div>
-          </div>
-          <div id="sheetImageStatus" style="margin-top:.5rem;font-size:.82rem;min-height:1.2em"></div>
+          <div id="sheetImgsGrid" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.5rem"></div>
+          <div id="sheetImageStatus" style="font-size:.82rem;min-height:1.2em"></div>
         </div>
         <div class="card"><h3>اختر التخصص</h3>
           <div style="display:flex;gap:.75rem;flex-wrap:wrap" id="majorTabsBtns">
@@ -777,18 +766,14 @@ a{color:inherit;text-decoration:none}
         </div>
         <!-- SUPPORT SHEET IMAGE -->
         <div class="card" style="border-color:rgba(16,185,129,.25)">
-          <h3>🖼️ صورة صحيفة التخصص المساند — <span id="spImgMajorLabel" style="color:#a5b4fc">الأحياء الجزيئية</span></h3>
-          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">صورة أو PDF رسمية لصحيفة التخصص المساند — تظهر فوق قائمة المواد للطلبة</p>
-          <div style="display:flex;gap:.75rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:.75rem">
-            <label for="supportSheetImgFile" style="display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.1rem;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);border-radius:10px;color:#6ee7b7;font-size:.85rem;font-weight:700;cursor:pointer;flex-shrink:0">
-              📎 ارفع صورة / PDF
-            </label>
-            <input type="file" id="supportSheetImgFile" accept="image/*,.pdf" style="display:none">
-            <span style="font-size:.8rem;color:var(--muted)">أو</span>
-            <div class="form-group" style="flex:1;min-width:160px;margin:0">
-              <input id="supportSheetImageUrl" placeholder="رابط مباشر للصورة">
-            </div>
-            <button class="btn btn-green" id="saveSupportSheetImage" style="flex-shrink:0">💾 حفظ</button>
+          <h3>🖼️ صور صحيفة التخصص المساند — <span id="spImgMajorLabel" style="color:#a5b4fc">الأحياء الجزيئية</span></h3>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">ارفع صورة أو أكثر من صحيفة التخصص المساند</p>
+          <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-bottom:.75rem">
+            <label for="supportSheetImgFile" style="display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.1rem;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);border-radius:10px;color:#6ee7b7;font-size:.85rem;font-weight:700;cursor:pointer;flex-shrink:0">📎 ارفع صور</label>
+            <input type="file" id="supportSheetImgFile" accept="image/*" multiple style="display:none">
+            <span id="spImgCount" style="font-size:.8rem;color:var(--muted)"></span>
+            <button class="btn btn-green" id="saveSupportSheetImage" style="flex-shrink:0;margin-right:auto">💾 حفظ الصور</button>
+            <button class="btn btn-danger btn-sm" id="removeSupportSheetImage">🗑️ حذف الكل</button>
           </div>
           <div id="spImgUploadBar" style="display:none;margin-bottom:.5rem">
             <div style="background:rgba(255,255,255,.08);border-radius:8px;overflow:hidden;height:6px">
@@ -796,15 +781,8 @@ a{color:inherit;text-decoration:none}
             </div>
             <div id="spImgBarTxt" style="font-size:.72rem;color:#6ee7b7;margin-top:.3rem">0%</div>
           </div>
-          <div id="supportSheetImagePreview" style="display:none;margin-top:1rem">
-            <p style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem">معاينة:</p>
-            <img id="supportSheetImgEl" style="max-width:100%;border-radius:12px;border:1px solid var(--border);max-height:300px;object-fit:contain" alt="صحيفة التخصص المساند">
-            <div style="margin-top:.5rem;display:flex;gap:.5rem">
-              <a id="supportSheetImgLink" href="#" target="_blank" class="btn btn-ghost btn-sm">🔗 فتح في تاب جديد</a>
-              <button class="btn btn-danger btn-sm" id="removeSupportSheetImage">🗑️ حذف الصورة</button>
-            </div>
-          </div>
-          <div id="supportSheetImageStatus" style="margin-top:.5rem;font-size:.82rem;min-height:1.2em"></div>
+          <div id="spImgsGrid" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.5rem"></div>
+          <div id="supportSheetImageStatus" style="font-size:.82rem;min-height:1.2em"></div>
         </div>
         <div class="card">
           <h3>➕ إضافة مادة — <span id="supportMajorLabel" style="color:#a5b4fc">الأحياء الجزيئية</span></h3>
@@ -1336,49 +1314,49 @@ window.selectSheetMajor=function(major){
   currentSheetMajor=major;
   document.getElementById("sheetMajorLabel").textContent=MN[major]||major;
   document.getElementById("imgMajorLabel").textContent=MN[major]||major;
+  _sheetImgsArr=[];_renderSheetThumbs();
   loadSheetCourses(major);
   loadSheetImage(major);
 };
 
+// ── صور صحيفة التخصص (متعددة) ──
+let _sheetImgsArr=[];
+function _renderSheetThumbs(){
+  const grid=document.getElementById("sheetImgsGrid");
+  const count=document.getElementById("sheetImgCount");
+  if(count)count.textContent=_sheetImgsArr.length?`(${_sheetImgsArr.length} صورة)`:"";
+  if(!grid)return;
+  grid.innerHTML=_sheetImgsArr.map((url,i)=>`
+    <div style="position:relative;display:inline-block">
+      <img src="${url}" style="width:90px;height:68px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+      <button onclick="removeSheetImg(${i})" style="position:absolute;top:-5px;left:-5px;width:18px;height:18px;background:#ef4444;border:none;border-radius:50%;color:#fff;font-size:.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+    </div>`).join("");
+}
+window.removeSheetImg=function(i){_sheetImgsArr.splice(i,1);_renderSheetThumbs();};
+
 async function loadSheetImage(major){
-  const urlInp=document.getElementById("sheetImageUrl");
-  const preview=document.getElementById("sheetImagePreview");
-  const imgEl=document.getElementById("sheetImgEl");
-  const linkEl=document.getElementById("sheetImgLink");
   const status=document.getElementById("sheetImageStatus");
   try{
     const d=await getDoc(doc(db,"majorSheets",major));
-    const url=d.exists()?(d.data().sheetImage||""):"";
-    urlInp.value=url;
-    if(url){
-      imgEl.src=url;
-      linkEl.href=url;
-      preview.style.display="block";
-      status.textContent="";
-    }else{
-      preview.style.display="none";
-    }
-  }catch{preview.style.display="none";}
+    if(d.exists()){
+      const data=d.data();
+      _sheetImgsArr=data.sheetImages||(data.sheetImage?[data.sheetImage]:[]);
+    }else{_sheetImgsArr=[];}
+  }catch{_sheetImgsArr=[];}
+  _renderSheetThumbs();
+  if(status)status.textContent="";
 }
 document.getElementById("saveSheetImage").onclick=async()=>{
-  const url=document.getElementById("sheetImageUrl").value.trim();
   const status=document.getElementById("sheetImageStatus");
-  const preview=document.getElementById("sheetImagePreview");
   try{
-    await setDoc(doc(db,"majorSheets",currentSheetMajor),{sheetImage:url,updatedAt:serverTimestamp()},{merge:true});
-    status.textContent="✅ تم حفظ الصورة";status.style.color="#6ee7b7";
-    if(url){
-      document.getElementById("sheetImgEl").src=url;
-      document.getElementById("sheetImgLink").href=url;
-      preview.style.display="block";
-    }else{preview.style.display="none";}
+    await setDoc(doc(db,"majorSheets",currentSheetMajor),{sheetImages:_sheetImgsArr,sheetImage:_sheetImgsArr[0]||"",updatedAt:serverTimestamp()},{merge:true});
+    status.textContent="✅ تم حفظ الصور";status.style.color="#6ee7b7";
   }catch(e){status.textContent="❌ "+e.message;status.style.color="#f87171";}
 };
 document.getElementById("removeSheetImage").onclick=async()=>{
-  if(!confirm("حذف صورة صحيفة التخصص؟"))return;
-  await setDoc(doc(db,"majorSheets",currentSheetMajor),{sheetImage:"",updatedAt:serverTimestamp()},{merge:true});
-  document.getElementById("sheetImageUrl").value="";
-  document.getElementById("sheetImagePreview").style.display="none";
+  if(!confirm("حذف كل صور صحيفة التخصص؟"))return;
+  _sheetImgsArr=[];_renderSheetThumbs();
+  await setDoc(doc(db,"majorSheets",currentSheetMajor),{sheetImages:[],sheetImage:"",updatedAt:serverTimestamp()},{merge:true});
   document.getElementById("sheetImageStatus").textContent="✅ تم الحذف";
   document.getElementById("sheetImageStatus").style.color="#6ee7b7";
 };
@@ -1489,53 +1467,67 @@ async function uploadImgSimple(file, _path, barFill, barTxt, barWrap){
   return json.data.url;
 }
 
-// Main sheet image upload
+// Main sheet image upload (multiple)
 document.getElementById("sheetImgFile").onchange=async function(){
-  const file=this.files[0];if(!file)return;
+  const files=[...this.files];if(!files.length)return;
   const status=document.getElementById("sheetImageStatus");
-  status.textContent='⏳ جاري الرفع...';status.style.color='#a5b4fc';
-  try{
-    const url=await uploadImgSimple(file,
-      `resources/sheetImages/${currentSheetMajor}_${Date.now()}`,
-      document.getElementById("sheetImgBarFill"),
-      document.getElementById("sheetImgBarTxt"),
-      document.getElementById("sheetImgUploadBar")
-    );
-    document.getElementById("sheetImageUrl").value=url;
-    await setDoc(doc(db,"majorSheets",currentSheetMajor),{sheetImage:url,updatedAt:serverTimestamp()},{merge:true});
-    document.getElementById("sheetImgEl").src=url;
-    document.getElementById("sheetImgLink").href=url;
-    document.getElementById("sheetImagePreview").style.display="block";
-    status.textContent='✅ تم رفع الصورة وحفظها';status.style.color='#6ee7b7';
-  }catch(e){
-    document.getElementById("sheetImgUploadBar").style.display='none';
-    status.textContent='❌ '+e.code+': '+e.message;status.style.color='#f87171';
+  const barFill=document.getElementById("sheetImgBarFill");
+  const barTxt=document.getElementById("sheetImgBarTxt");
+  const barWrap=document.getElementById("sheetImgUploadBar");
+  status.textContent=`⏳ جاري رفع ${files.length} صورة...`;status.style.color='#a5b4fc';
+  let done=0;
+  for(const file of files){
+    try{
+      barTxt.textContent=`${done+1} / ${files.length}`;
+      const url=await uploadImgSimple(file,`sheetImages/${currentSheetMajor}_${Date.now()}`,barFill,barTxt,barWrap);
+      _sheetImgsArr.push(url);done++;_renderSheetThumbs();
+    }catch(e){
+      barWrap.style.display='none';
+      status.textContent='❌ '+e.message;status.style.color='#f87171';
+      this.value='';return;
+    }
   }
+  barWrap.style.display='none';
+  status.textContent=`✅ تم رفع ${done} صورة — اضغط "حفظ الصور"`;status.style.color='#6ee7b7';
   this.value='';
 };
 
-// Support sheet image upload
+// ── صور صحيفة المساند (متعددة) ──
+let _spImgsArr=[];
+function _renderSpThumbs(){
+  const grid=document.getElementById("spImgsGrid");
+  const count=document.getElementById("spImgCount");
+  if(count)count.textContent=_spImgsArr.length?`(${_spImgsArr.length} صورة)`:"";
+  if(!grid)return;
+  grid.innerHTML=_spImgsArr.map((url,i)=>`
+    <div style="position:relative;display:inline-block">
+      <img src="${url}" style="width:90px;height:68px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+      <button onclick="removeSpImg(${i})" style="position:absolute;top:-5px;left:-5px;width:18px;height:18px;background:#ef4444;border:none;border-radius:50%;color:#fff;font-size:.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+    </div>`).join("");
+}
+window.removeSpImg=function(i){_spImgsArr.splice(i,1);_renderSpThumbs();};
+
 document.getElementById("supportSheetImgFile").onchange=async function(){
-  const file=this.files[0];if(!file)return;
+  const files=[...this.files];if(!files.length)return;
   const status=document.getElementById("supportSheetImageStatus");
-  status.textContent='⏳ جاري الرفع...';status.style.color='#a5b4fc';
-  try{
-    const url=await uploadImgSimple(file,
-      `resources/supportSheetImages/${currentSupportMajor}_${Date.now()}`,
-      document.getElementById("spImgBarFill"),
-      document.getElementById("spImgBarTxt"),
-      document.getElementById("spImgUploadBar")
-    );
-    document.getElementById("supportSheetImageUrl").value=url;
-    await setDoc(doc(db,"supportSheets",currentSupportMajor),{sheetImage:url,updatedAt:serverTimestamp()},{merge:true});
-    document.getElementById("supportSheetImgEl").src=url;
-    document.getElementById("supportSheetImgLink").href=url;
-    document.getElementById("supportSheetImagePreview").style.display="block";
-    status.textContent='✅ تم رفع الصورة وحفظها';status.style.color='#6ee7b7';
-  }catch(e){
-    document.getElementById("spImgUploadBar").style.display='none';
-    status.textContent='❌ '+e.code+': '+e.message;status.style.color='#f87171';
+  const barFill=document.getElementById("spImgBarFill");
+  const barTxt=document.getElementById("spImgBarTxt");
+  const barWrap=document.getElementById("spImgUploadBar");
+  status.textContent=`⏳ جاري رفع ${files.length} صورة...`;status.style.color='#a5b4fc';
+  let done=0;
+  for(const file of files){
+    try{
+      barTxt.textContent=`${done+1} / ${files.length}`;
+      const url=await uploadImgSimple(file,`supportSheetImages/${currentSupportMajor}_${Date.now()}`,barFill,barTxt,barWrap);
+      _spImgsArr.push(url);done++;_renderSpThumbs();
+    }catch(e){
+      barWrap.style.display='none';
+      status.textContent='❌ '+e.message;status.style.color='#f87171';
+      this.value='';return;
+    }
   }
+  barWrap.style.display='none';
+  status.textContent=`✅ تم رفع ${done} صورة — اضغط "حفظ الصور"`;status.style.color='#6ee7b7';
   this.value='';
 };
 async function loadSheetCourses(major){
@@ -2096,42 +2088,28 @@ async function loadSupportCourses(major){
 }
 
 async function loadSupportSheetImage(major){
-  const urlInp=document.getElementById("supportSheetImageUrl");
-  const preview=document.getElementById("supportSheetImagePreview");
   const status=document.getElementById("supportSheetImageStatus");
   try{
     const d=await getDoc(doc(db,"supportSheets",major));
-    const url=d.exists()?(d.data().sheetImage||""):"";
-    urlInp.value=url;
-    if(url){
-      document.getElementById("supportSheetImgEl").src=url;
-      document.getElementById("supportSheetImgLink").href=url;
-      preview.style.display="block";
-    }else{
-      preview.style.display="none";
-    }
-    status.textContent="";
-  }catch{preview.style.display="none";}
+    if(d.exists()){
+      const data=d.data();
+      _spImgsArr=data.sheetImages||(data.sheetImage?[data.sheetImage]:[]);
+    }else{_spImgsArr=[];}
+  }catch{_spImgsArr=[];}
+  _renderSpThumbs();
+  if(status)status.textContent="";
 }
 document.getElementById("saveSupportSheetImage").onclick=async()=>{
-  const url=document.getElementById("supportSheetImageUrl").value.trim();
   const status=document.getElementById("supportSheetImageStatus");
-  const preview=document.getElementById("supportSheetImagePreview");
   try{
-    await setDoc(doc(db,"supportSheets",currentSupportMajor),{sheetImage:url,updatedAt:serverTimestamp()},{merge:true});
-    status.textContent="✅ تم حفظ الصورة";status.style.color="#6ee7b7";
-    if(url){
-      document.getElementById("supportSheetImgEl").src=url;
-      document.getElementById("supportSheetImgLink").href=url;
-      preview.style.display="block";
-    }else{preview.style.display="none";}
+    await setDoc(doc(db,"supportSheets",currentSupportMajor),{sheetImages:_spImgsArr,sheetImage:_spImgsArr[0]||"",updatedAt:serverTimestamp()},{merge:true});
+    status.textContent="✅ تم حفظ الصور";status.style.color="#6ee7b7";
   }catch(e){status.textContent="❌ "+e.message;status.style.color="#f87171";}
 };
 document.getElementById("removeSupportSheetImage").onclick=async()=>{
-  if(!confirm("حذف صورة صحيفة التخصص المساند؟"))return;
-  await setDoc(doc(db,"supportSheets",currentSupportMajor),{sheetImage:"",updatedAt:serverTimestamp()},{merge:true});
-  document.getElementById("supportSheetImageUrl").value="";
-  document.getElementById("supportSheetImagePreview").style.display="none";
+  if(!confirm("حذف كل صور صحيفة التخصص المساند؟"))return;
+  _spImgsArr=[];_renderSpThumbs();
+  await setDoc(doc(db,"supportSheets",currentSupportMajor),{sheetImages:[],sheetImage:"",updatedAt:serverTimestamp()},{merge:true});
   document.getElementById("supportSheetImageStatus").textContent="✅ تم الحذف";
   document.getElementById("supportSheetImageStatus").style.color="#6ee7b7";
 };
