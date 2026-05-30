@@ -1282,13 +1282,28 @@ async function uploadImgSimple(file, storagePath, barFill, barTxt, barWrap){
   const ext=file.name.split('.').pop().replace(/[^a-zA-Z0-9]/g,'');
   const safePath=storagePath+'.'+ext;
   barWrap.style.display='block';
-  barFill.style.width='30%';barTxt.textContent='جاري الرفع...';
-  const sRef=ref(storage,safePath);
-  await uploadBytes(sRef,file);
-  barFill.style.width='100%';barTxt.textContent='✅ اكتمل';
-  const url=await getDownloadURL(sRef);
-  setTimeout(()=>{barWrap.style.display='none';barFill.style.width='0%';},1500);
-  return url;
+  barFill.style.transition='width .4s';
+  barFill.style.width='15%';barTxt.textContent='جاري الرفع...';
+  // fake gradual progress while waiting
+  let fake=15;
+  const timer=setInterval(()=>{
+    fake=Math.min(fake+3,88);
+    barFill.style.width=fake+'%';
+    barTxt.textContent=fake+'%';
+  },400);
+  try{
+    const sRef=ref(storage,safePath);
+    await uploadBytes(sRef,file);
+    clearInterval(timer);
+    barFill.style.width='100%';barTxt.textContent='✅ اكتمل';
+    const url=await getDownloadURL(sRef);
+    setTimeout(()=>{barWrap.style.display='none';barFill.style.width='0%';},1500);
+    return url;
+  }catch(e){
+    clearInterval(timer);
+    barWrap.style.display='none';barFill.style.width='0%';
+    throw e;
+  }
 }
 
 // Main sheet image upload
