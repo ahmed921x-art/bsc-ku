@@ -466,6 +466,7 @@ a{color:inherit;text-decoration:none}
             </div>
             <div class="form-group"><label>الفصل</label><input id="noteTerm" placeholder="2025 - الفصل الثاني"></div>
             <div class="form-group"><label>رابط الملف</label><input id="noteUrl" placeholder="https://drive.google.com/..."></div>
+            <div class="form-group form-full" id="mu-note"></div>
           </div>
           <div class="btn-row"><button class="btn btn-primary" id="addNote">+ إضافة النوتة</button></div>
         </div>
@@ -486,6 +487,7 @@ a{color:inherit;text-decoration:none}
               </select>
             </div>
             <div class="form-group form-full"><label>محتوى الخبر</label><textarea id="newsContent" placeholder="اكتب تفاصيل الخبر هنا..."></textarea></div>
+            <div class="form-group form-full" id="mu-news"></div>
           </div>
           <div class="btn-row"><button class="btn btn-primary" id="addNews">+ نشر الخبر</button></div>
         </div>
@@ -506,6 +508,7 @@ a{color:inherit;text-decoration:none}
               </select>
             </div>
             <div class="form-group form-full"><label>تفاصيل (اختياري)</label><textarea id="annContent" placeholder="اكتب التفاصيل هنا..."></textarea></div>
+            <div class="form-group form-full" id="mu-ann"></div>
           </div>
           <div class="btn-row"><button class="btn btn-primary" id="addAnn">+ نشر الإعلان</button></div>
         </div>
@@ -522,6 +525,7 @@ a{color:inherit;text-decoration:none}
             <div class="form-group"><label>الموقع</label><input id="eventLoc" placeholder="قاعة 101 - كلية العلوم"></div>
             <div class="form-group"><label>رابط التسجيل</label><input id="eventUrl" placeholder="https://..."></div>
             <div class="form-group form-full"><label>وصف الفعالية</label><textarea id="eventDesc" placeholder="وصف مختصر..."></textarea></div>
+            <div class="form-group form-full" id="mu-event"></div>
           </div>
           <div class="btn-row"><button class="btn btn-primary" id="addEvent">+ إضافة الفعالية</button></div>
         </div>
@@ -1095,9 +1099,10 @@ function renderItems(elId,items,fields,col){
   if(!items.length){el.innerHTML='<p style="color:var(--muted);padding:1rem">لا توجد عناصر حالياً.</p>';return}
   el.innerHTML=items.map(item=>`
     <div class="list-item">
+      ${item.imageUrl?`<img src="${item.imageUrl}" style="width:64px;height:48px;object-fit:cover;border-radius:8px;flex-shrink:0;border:1px solid var(--border)" onerror="this.style.display='none'">`:''}
       <div class="list-item-body">
         <h4>${item[fields[0]]||item.title||item.name||"—"}</h4>
-        <p>${[fields[1]&&item[fields[1]],fields[2]&&item[fields[2]],item.major?MN[item.major]||item.major:""].filter(Boolean).join(" · ")}</p>
+        <p>${[fields[1]&&item[fields[1]],fields[2]&&item[fields[2]],item.major?MN[item.major]||item.major:"",item.images?.length>1?`🖼 ${item.images.length} صور`:""].filter(Boolean).join(" · ")}</p>
       </div>
       <div class="list-item-actions">
         <button class="btn btn-sm" style="background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);color:#a5b4fc" onclick="openEditModal('${col}','${item.id}')">تعديل</button>
@@ -1112,22 +1117,26 @@ window.updateItem_=updateItem;
 document.getElementById("addNote").onclick=async()=>{
   const d={title:noteTitle.value.trim(),course:noteCourse.value.trim(),major:noteMajor.value,type:noteType.value,term:noteTerm.value.trim()||"General",url:noteUrl.value.trim()};
   if(!d.title||!d.url)return alert("عبّي العنوان والرابط");
-  await addItem("notes",d);noteTitle.value=noteCourse.value=noteTerm.value=noteUrl.value="";alert("✅ تمت إضافة النوتة");
+  const imgs=window._mu['note']?.get()||[];if(imgs.length){d.images=imgs;d.imageUrl=imgs[0];}
+  await addItem("notes",d);noteTitle.value=noteCourse.value=noteTerm.value=noteUrl.value="";window._mu['note']?.reset();alert("✅ تمت إضافة النوتة");
 };
 document.getElementById("addNews").onclick=async()=>{
   const d={title:newsTitle.value.trim(),type:newsType.value,content:newsContent.value.trim()};
   if(!d.title)return alert("اكتب عنوان الخبر");
-  await addItem("news",d);newsTitle.value=newsContent.value="";alert("✅ تم نشر الخبر");
+  const imgs=window._mu['news']?.get()||[];if(imgs.length){d.images=imgs;d.imageUrl=imgs[0];}
+  await addItem("news",d);newsTitle.value=newsContent.value="";window._mu['news']?.reset();alert("✅ تم نشر الخبر");
 };
 document.getElementById("addAnn").onclick=async()=>{
   const d={title:annTitle.value.trim(),type:annType.value,content:annContent.value.trim()};
   if(!d.title)return alert("اكتب عنوان الإعلان");
-  await addItem("announcements",d);annTitle.value=annContent.value="";alert("✅ تم نشر الإعلان");
+  const imgs=window._mu['ann']?.get()||[];if(imgs.length){d.images=imgs;d.imageUrl=imgs[0];}
+  await addItem("announcements",d);annTitle.value=annContent.value="";window._mu['ann']?.reset();alert("✅ تم نشر الإعلان");
 };
 document.getElementById("addEvent").onclick=async()=>{
   const d={title:eventTitle.value.trim(),date:eventDate.value.trim(),location:eventLoc.value.trim(),description:eventDesc.value.trim(),url:eventUrl.value.trim()};
   if(!d.title)return alert("اكتب اسم الفعالية");
-  await addItem("events",d);eventTitle.value=eventDate.value=eventLoc.value=eventDesc.value=eventUrl.value="";alert("✅ تمت إضافة الفعالية");
+  const imgs=window._mu['event']?.get()||[];if(imgs.length){d.images=imgs;d.imageUrl=imgs[0];}
+  await addItem("events",d);eventTitle.value=eventDate.value=eventLoc.value=eventDesc.value=eventUrl.value="";window._mu['event']?.reset();alert("✅ تمت إضافة الفعالية");
 };
 document.getElementById("addAdvisor").onclick=async()=>{
   const d={name:advisorName.value.trim(),email:advisorEmail.value.trim(),major:advisorMajor.value,office:advisorOffice.value.trim()};
@@ -1331,6 +1340,66 @@ document.getElementById("removeSheetImage").onclick=async()=>{
 
 // ── SHEET IMAGE FILE UPLOAD ──────────────────────────────────
 const IMGBB_KEY='56b908bfee150ecba3b90e9e626cfae6';
+
+// ── رفع صورة واحدة لـ ImgBB (بدون شريط تقدم) ──
+async function uploadImgMin(file){
+  if(file.size>32*1024*1024)throw new Error('الملف كبير جداً (الحد 32MB)');
+  const base64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});
+  const form=new FormData();form.append('key',IMGBB_KEY);form.append('image',base64);
+  const resp=await fetch('https://api.imgbb.com/1/upload',{method:'POST',body:form});
+  if(!resp.ok)throw new Error(`خطأ ${resp.status}`);
+  const json=await resp.json();
+  if(!json.success)throw new Error(json.error?.message||'فشل الرفع');
+  return json.data.url;
+}
+
+// ── مدير رفع صور متعدد قابل لإعادة الاستخدام ──
+class MultiUploader{
+  constructor(prefix,label='صور (اختياري)'){
+    this.prefix=prefix;this.imgs=[];
+    const wrap=document.getElementById('mu-'+prefix);
+    if(!wrap)return;
+    wrap.innerHTML=`
+      <label style="font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:.4rem">${label} <span id="${prefix}-mu-count" style="color:#a5b4fc;font-weight:400;text-transform:none"></span></label>
+      <div style="display:flex;align-items:center;gap:.65rem;flex-wrap:wrap">
+        <label for="${prefix}-mu-file" style="display:inline-flex;align-items:center;gap:.4rem;padding:.45rem .95rem;background:rgba(99,102,241,.13);border:1px solid rgba(99,102,241,.3);border-radius:10px;color:#a5b4fc;font-size:.8rem;font-weight:700;cursor:pointer">📎 ارفع صور</label>
+        <input type="file" id="${prefix}-mu-file" accept="image/*" multiple style="display:none">
+        <span id="${prefix}-mu-status" style="font-size:.8rem;min-height:1em"></span>
+      </div>
+      <div id="${prefix}-mu-grid" style="display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.55rem"></div>`;
+    document.getElementById(`${prefix}-mu-file`).onchange=e=>this._upload(e);
+  }
+  async _upload(e){
+    const files=[...e.target.files];if(!files.length)return;
+    const status=document.getElementById(`${this.prefix}-mu-status`);
+    status.textContent=`⏳ جاري رفع ${files.length} صورة...`;status.style.color='#a5b4fc';
+    let done=0;
+    for(const f of files){
+      try{const url=await uploadImgMin(f);this.imgs.push(url);done++;this._render();}
+      catch(err){status.textContent='❌ '+err.message;status.style.color='#f87171';e.target.value='';return;}
+    }
+    status.textContent=`✅ ${done} صورة جاهزة`;status.style.color='#6ee7b7';
+    e.target.value='';
+  }
+  _render(){
+    const grid=document.getElementById(`${this.prefix}-mu-grid`);
+    const count=document.getElementById(`${this.prefix}-mu-count`);
+    if(count)count.textContent=this.imgs.length?`(${this.imgs.length} صورة)`:'';
+    if(!grid)return;
+    grid.innerHTML=this.imgs.map((url,i)=>`
+      <div style="position:relative;display:inline-block">
+        <img src="${url}" style="width:72px;height:54px;object-fit:cover;border-radius:7px;border:1px solid var(--border)">
+        <button onclick="window._mu['${this.prefix}'].del(${i})" style="position:absolute;top:-5px;left:-5px;width:17px;height:17px;background:#ef4444;border:none;border-radius:50%;color:#fff;font-size:.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+      </div>`).join('');
+  }
+  del(i){this.imgs.splice(i,1);this._render();}
+  reset(){this.imgs=[];this._render();const s=document.getElementById(`${this.prefix}-mu-status`);if(s)s.textContent='';const c=document.getElementById(`${this.prefix}-mu-count`);if(c)c.textContent='';}
+  get(){return[...this.imgs];}
+}
+
+// تهيئة المرافعين لكل قسم
+window._mu={};
+['note','news','ann','event'].forEach(p=>{window._mu[p]=new MultiUploader(p,'صور (اختياري)');});
 
 async function uploadImgSimple(file, _path, barFill, barTxt, barWrap){
   const mb=(file.size/1024/1024).toFixed(1);
