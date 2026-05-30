@@ -201,3 +201,69 @@ export const CATALOG_SEED={
   biochem:  {major:'biochem',  courses:build(RAW_BIOCHEM)},
   molecular:{major:'molecular',courses:build(RAW_MOLECULAR)},
 };
+
+// ── Support Sheet Catalogs ──────────────────────────────────────
+// Normalize dash-codes like "0490-101" → "0490101"
+function nd(code){return code.replace(/-/g,'');}
+function buildSupport(raw){
+  return raw.map(c=>({
+    ...c,
+    code: nd(c.code),
+    level: c.level||lv(nd(c.code)),
+    prereqs: c.prereqs.map(p=>nd(p)),
+  }));
+}
+
+const RAW_SUPPORT_FORENSIC=[
+  {code:'0490-101',nameAr:'بيولوجيا 1',nameEn:'Biology 1',hours:3,type:'major',prereqs:[]},
+  {code:'0490-102',nameAr:'بيولوجيا 2',nameEn:'Biology 2',hours:3,type:'major',prereqs:[]},
+  {code:'0490-103',nameAr:'بيولوجيا 3',nameEn:'Biology 3',hours:3,type:'major',prereqs:[]},
+  {code:'0490-105',nameAr:'علم الكائنات الدقيقة',nameEn:'Microbiology',hours:3,type:'major',prereqs:[]},
+  {code:'0493-201',nameAr:'بيولوجيا الحبليات',nameEn:'Chordate Biology',hours:4,type:'major',prereqs:[]},
+  {code:'0493-203',nameAr:'بيولوجيا الخلية',nameEn:'Cell Biology',hours:4,type:'major',prereqs:[]},
+  {code:'0493-205',nameAr:'بيولوجيا اللافقاريات 1',nameEn:'Invertebrate Biology 1',hours:4,type:'major',prereqs:[]},
+  {code:'0493-305',nameAr:'علم الأجنة',nameEn:'Embryology',hours:4,type:'major',prereqs:[]},
+  {code:'0494-141',nameAr:'الزراعة والمجتمع الكويتي',nameEn:'Agriculture and Kuwaiti Society',hours:3,type:'major',prereqs:[]},
+  {code:'0494-142',nameAr:'علم النبات الزراعي',nameEn:'Agricultural Botany',hours:3,type:'major',prereqs:[]},
+  {code:'0494-241',nameAr:'علم النبات الاقتصادي',nameEn:'Economic Botany',hours:3,type:'elective',prereqs:[]},
+  {code:'0494-245',nameAr:'بستنة 1',nameEn:'Horticulture 1',hours:3,type:'elective',prereqs:[]},
+  {code:'0494-266',nameAr:'الزراعة والتربة',nameEn:'Agriculture and Soil',hours:3,type:'elective',prereqs:[]},
+  {code:'0494-337',nameAr:'زراعة الأنسجة في النبات',nameEn:'Plant Tissue Culture',hours:3,type:'elective',prereqs:[]},
+  {code:'0494-345',nameAr:'بستنة 2',nameEn:'Horticulture 2',hours:3,type:'elective',prereqs:[]},
+  {code:'0494-363',nameAr:'الإنتاج النباتي في بيئة قاحلة',nameEn:'Plant Production in Arid Environment',hours:3,type:'elective',prereqs:[]},
+  {code:'0494-372',nameAr:'فسيولوجيا نبات متقدم',nameEn:'Advanced Plant Physiology',hours:4,type:'elective',prereqs:[]},
+  {code:'0494-381',nameAr:'وقاية نبات',nameEn:'Plant Protection',hours:3,type:'elective',prereqs:[]},
+  {code:'0494-434',nameAr:'تربية نبات',nameEn:'Plant Breeding',hours:3,type:'elective',prereqs:[]},
+  {code:'0494-437',nameAr:'التقنيات الحيوية الزراعية',nameEn:'Agricultural Biotechnology',hours:3,type:'elective',prereqs:[]},
+  {code:'0494-466',nameAr:'علم البيئة الزراعية',nameEn:'Agricultural Ecology',hours:3,type:'elective',prereqs:[]},
+  {code:'0494-474',nameAr:'الإكثار النباتي',nameEn:'Plant Propagation',hours:3,type:'elective',prereqs:[]},
+  {code:'0496-217',nameAr:'الكيمياء البيولوجية',nameEn:'Biological Chemistry',hours:4,type:'major',prereqs:[]},
+  {code:'0496-300',nameAr:'مختبر الكيمياء الحيوية 1',nameEn:'Biochemistry Lab 1',hours:2,type:'major',prereqs:[]},
+  {code:'0496-315',nameAr:'الكيمياء الحيوية 1',nameEn:'Biochemistry 1',hours:3,type:'major',prereqs:[]},
+  {code:'0496-337',nameAr:'الإنزيمات',nameEn:'Enzymology',hours:3,type:'major',prereqs:[]},
+  {code:'0496-372',nameAr:'مقدمة في الوراثة الجزيئية',nameEn:'Intro to Molecular Genetics',hours:3,type:'major',prereqs:[]},
+  {code:'0496-415',nameAr:'الكيمياء الحيوية 2',nameEn:'Biochemistry 2',hours:3,type:'major',prereqs:[]},
+  {code:'0490-271',nameAr:'مقدمة في الكيمياء الحيوية',nameEn:'Intro to Biochemistry',hours:4,type:'support',prereqs:[]},
+  {code:'0497-291',nameAr:'تقنيات في الكيمياء الحيوية',nameEn:'Techniques in Biochemistry',hours:4,type:'major',prereqs:[]},
+  {code:'0497-371',nameAr:'مقدمة في الهندسة الوراثية',nameEn:'Intro to Genetic Engineering',hours:3,type:'major',prereqs:[]},
+  {code:'0497-482',nameAr:'مقدمة في الهندسة الوراثية',nameEn:'Intro to Genetic Engineering',hours:3,type:'major',prereqs:[]},
+  {code:'0497-483',nameAr:'مختبر البيولوجيا الجزيئية',nameEn:'Molecular Biology Lab',hours:2,type:'major',prereqs:[]},
+  {code:'0409-166',nameAr:'الثقافة الجنائية',nameEn:'Forensic Culture',hours:3,type:'required',prereqs:[]},
+  {code:'0409-201',nameAr:'مقدمة في علم الأدلة الجنائية',nameEn:'Intro to Forensic Science',hours:3,type:'required',prereqs:['0490-101','0420-101','0420-105','0420-110','0420-111']},
+  {code:'0409-238',nameAr:'الكيمياء التحليلية',nameEn:'Analytical Chemistry',hours:3,type:'major',prereqs:['0420-102','0420-106','0420-114']},
+  {code:'0409-259',nameAr:'تطبيقات المجهر في الأدلة الجنائية',nameEn:'Microscopy Applications in Forensic Evidence',hours:2,type:'major',prereqs:['0490-101']},
+  {code:'0409-301',nameAr:'التحليل الجنائي للأدلة البيولوجية',nameEn:'Forensic Analysis of Biological Evidence',hours:4,type:'major',prereqs:['0409-201']},
+  {code:'0409-305',nameAr:'الكيمياء الجنائية وتحليل الأدلة المادية',nameEn:'Forensic Chemistry and Physical Evidence Analysis',hours:4,type:'major',prereqs:['0497-201','0420-259']},
+  {code:'0409-310',nameAr:'فحص مسرح الجريمة وتقنيات جمع الأدلة',nameEn:'Crime Scene Examination and Evidence Collection',hours:2,type:'major',prereqs:['0409-201']},
+  {code:'0496-402',nameAr:'علم السميات الجنائي',nameEn:'Forensic Toxicology',hours:2,type:'major',prereqs:['0490-271','0420-255','0409-301']},
+  {code:'0409-207',nameAr:'الطب الشرعي الجنائي',nameEn:'Forensic Legal Medicine',hours:2,type:'elective',prereqs:['0490-101','0420-101','0420-110']},
+  {code:'0409-400',nameAr:'مبادئ الإجراءات والمحاكمات الجزائية',nameEn:'Principles of Criminal Procedures and Trials',hours:3,type:'elective',prereqs:['0497-201','0420-166']},
+  {code:'0420-406',nameAr:'علم المخدرات الجنائي',nameEn:'Forensic Drug Science',hours:2,type:'elective',prereqs:['0409-301','0490-271','0420-255']},
+  {code:'0409-486',nameAr:'الأخلاقيات المهنية لعلم الأدلة الجنائية',nameEn:'Professional Ethics in Forensic Science',hours:2,type:'elective',prereqs:['0409-301']},
+  {code:'0409-496',nameAr:'كتابة التقرير الجنائي',nameEn:'Forensic Report Writing',hours:1,type:'elective',prereqs:['0409-301']},
+  {code:'0409-498',nameAr:'مشروع بحث في الأدلة الجنائية',nameEn:'Research Project in Forensic Evidence',hours:3,type:'elective',prereqs:['0409-301']},
+];
+
+export const SUPPORT_CATALOG_SEED={
+  forensic:{major:'forensic',courses:buildSupport(RAW_SUPPORT_FORENSIC)},
+};
