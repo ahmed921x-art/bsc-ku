@@ -1336,30 +1336,45 @@ document.getElementById("removeSheetImage").onclick=async()=>{
 
 // ── SHEET IMAGE FILE UPLOAD ──────────────────────────────────
 async function uploadImgSimple(file, storagePath, barFill, barTxt, barWrap){
-  // size warning
   const mb=(file.size/1024/1024).toFixed(1);
-  if(file.size>8*1024*1024)throw new Error(`الملف ${mb}MB — كبير جداً. قلّل الحجم لأقل من 8MB`);
+  if(file.size>20*1024*1024)throw new Error(`الملف ${mb}MB — كبير جداً (الحد 20MB)`);
   const ext=file.name.split('.').pop().replace(/[^a-zA-Z0-9]/g,'')||'jpg';
   const safePath=storagePath+'.'+ext;
   barWrap.style.display='block';
-  barFill.style.transition='width .4s';
-  barFill.style.width='15%';barTxt.textContent=`جاري الرفع (${mb}MB)...`;
-  let fake=15;
-  const timer=setInterval(()=>{fake=Math.min(fake+2,88);barFill.style.width=fake+'%';barTxt.textContent=fake+'%';},500);
-  const reset=()=>{clearInterval(timer);barWrap.style.display='none';barFill.style.width='0%';};
-  try{
-    const sRef=ref(storage,safePath);
-    // 90-second timeout
-    await Promise.race([
-      uploadBytes(sRef,file),
-      new Promise((_,rej)=>setTimeout(()=>rej(new Error('انتهت مهلة الرفع (90 ثانية) — حاول بملف أصغر')),90000))
-    ]);
-    clearInterval(timer);
-    barFill.style.width='100%';barTxt.textContent='✅ اكتمل';
-    const url=await getDownloadURL(sRef);
-    setTimeout(()=>{barWrap.style.display='none';barFill.style.width='0%';},1500);
-    return url;
-  }catch(e){reset();throw e;}
+  barFill.style.width='3%';
+  barTxt.textContent=`جاري الرفع (${mb}MB)...`;
+
+  const sRef=ref(storage,safePath);
+  const task=uploadBytesResumable(sRef,file);
+
+  return new Promise((resolve,reject)=>{
+    task.on('state_changed',
+      snap=>{
+        const p=Math.round(snap.bytesTransferred/snap.totalBytes*100);
+        barFill.style.width=p+'%';
+        barTxt.textContent=p+'%';
+      },
+      err=>{
+        barWrap.style.display='none';
+        barFill.style.width='0%';
+        // أظهر كود الخطأ بوضوح
+        const msg=err.code||err.message||'خطأ غير معروف';
+        reject(new Error(`فشل الرفع: ${msg}`));
+      },
+      async()=>{
+        try{
+          barFill.style.width='100%';
+          barTxt.textContent='✅ اكتمل';
+          const url=await getDownloadURL(task.snapshot.ref);
+          setTimeout(()=>{barWrap.style.display='none';barFill.style.width='0%';},1500);
+          resolve(url);
+        }catch(e){
+          barWrap.style.display='none';
+          reject(e);
+        }
+      }
+    );
+  });
 }
 
 // Main sheet image upload
