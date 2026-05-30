@@ -532,6 +532,24 @@ a{color:inherit;text-decoration:none}
           <p style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">استيراد بيانات المسبقات الكاملة لكل التخصصات من دليل الطالب مباشرة</p>
           <div class="btn-row"><button class="btn btn-gold" id="seedAllSheets">📥 استيراد مسبقات كل التخصصات</button></div>
         </div>
+        <!-- CATALOG IMPORT -->
+        <div class="card" style="border-color:rgba(99,102,241,.3)">
+          <h3>📚 استيراد كتالوج المواد الكامل</h3>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">
+            يستورد مواد جميع التخصصات الخمسة من بيانات دليل الطالب (حيوان، نبات، ميكرو، كيمياء حيوية، جزيئي).<br>
+            <span style="color:#fcd34d">يُحدّث حقل courses الافتراضي فقط — لا يؤثر على الدفعات المحفوظة.</span>
+          </p>
+          <div id="catalogImportProgress" style="display:none;margin-bottom:1rem">
+            <div style="background:rgba(255,255,255,.06);border-radius:8px;overflow:hidden;height:8px;margin-bottom:.5rem">
+              <div id="catalogImportBar" style="height:100%;background:linear-gradient(90deg,#6366f1,#10b981);width:0%;transition:width .4s;border-radius:8px"></div>
+            </div>
+            <div id="catalogImportLog" style="font-size:.78rem;color:var(--muted);max-height:120px;overflow-y:auto;line-height:1.9"></div>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-primary" id="importCatalogBtn">📥 استيراد الكتالوج الكامل</button>
+            <span id="catalogImportStatus" style="font-size:.82rem;color:var(--muted)"></span>
+          </div>
+        </div>
         <!-- SHEET IMAGE -->
         <div class="card" style="border-color:rgba(16,185,129,.25)">
           <h3>🖼️ صورة صحيفة التخصص — <span id="imgMajorLabel" style="color:#a5b4fc">الأحياء الجزيئية</span></h3>
@@ -937,6 +955,7 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPasswor
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, query, orderBy, serverTimestamp, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import { MAJOR_SHEETS_SEED } from "./majorsheets-seed.js";
+import { CATALOG_SEED } from "./catalog-seed.js";
 
 const FB = {apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"};
 const app=initializeApp(FB);
@@ -1119,6 +1138,33 @@ document.getElementById("seedAllSheets").onclick=async()=>{
     await loadSheetCourses(currentSheetMajor);
   }catch(e){alert("خطأ: "+e.message);}
   finally{btn.disabled=false;btn.textContent="📥 استيراد مسبقات كل التخصصات";}
+};
+
+// CATALOG IMPORT
+document.getElementById("importCatalogBtn").onclick=async()=>{
+  if(!confirm("سيتم استيراد مواد كل التخصصات الخمسة من الكتالوج. المتابعة؟"))return;
+  const btn=document.getElementById("importCatalogBtn");
+  const status=document.getElementById("catalogImportStatus");
+  const bar=document.getElementById("catalogImportBar");
+  const log=document.getElementById("catalogImportLog");
+  const prog=document.getElementById("catalogImportProgress");
+  btn.disabled=true;btn.textContent="⏳ جاري الاستيراد...";
+  prog.style.display="block";log.innerHTML="";
+  const majors=Object.keys(CATALOG_SEED);
+  let done=0;
+  for(const [majorKey,data] of Object.entries(CATALOG_SEED)){
+    try{
+      await setDoc(doc(db,"majorSheets",majorKey),{...data,updatedAt:serverTimestamp()},{merge:true});
+      done++;
+      bar.style.width=(done/majors.length*100)+'%';
+      log.innerHTML+=`<span style="color:#10b981">✓ ${MN[majorKey]||majorKey} — ${data.courses.length} مادة</span><br>`;
+      log.scrollTop=log.scrollHeight;
+    }catch(e){
+      log.innerHTML+=`<span style="color:#ef4444">✗ ${majorKey}: ${e.message}</span><br>`;
+    }
+  }
+  status.textContent=`✅ تم استيراد ${done} تخصص`;status.style.color="#10b981";
+  btn.disabled=false;btn.textContent="📥 استيراد الكتالوج الكامل";
 };
 
 // MAJORSHEET LOGIC
