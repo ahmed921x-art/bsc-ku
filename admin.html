@@ -1278,17 +1278,17 @@ document.getElementById("removeSheetImage").onclick=async()=>{
 };
 
 // ── SHEET IMAGE FILE UPLOAD ──────────────────────────────────
-async function uploadImgToStorage(file, storagePath, barFill, barTxt, barWrap){
+async function uploadImgSimple(file, storagePath, barFill, barTxt, barWrap){
+  const ext=file.name.split('.').pop().replace(/[^a-zA-Z0-9]/g,'');
+  const safePath=storagePath+'.'+ext;
   barWrap.style.display='block';
-  const sRef = ref(storage, storagePath);
-  const task = uploadBytesResumable(sRef, file);
-  return new Promise((res,rej)=>{
-    task.on('state_changed',
-      snap=>{const p=Math.round(snap.bytesTransferred/snap.totalBytes*100);barFill.style.width=p+'%';barTxt.textContent=p+'%';},
-      err=>{barWrap.style.display='none';rej(err);},
-      async()=>{const url=await getDownloadURL(task.snapshot.ref);barFill.style.width='100%';barTxt.textContent='✅ اكتمل';setTimeout(()=>barWrap.style.display='none',1500);res(url);}
-    );
-  });
+  barFill.style.width='30%';barTxt.textContent='جاري الرفع...';
+  const sRef=ref(storage,safePath);
+  await uploadBytes(sRef,file);
+  barFill.style.width='100%';barTxt.textContent='✅ اكتمل';
+  const url=await getDownloadURL(sRef);
+  setTimeout(()=>{barWrap.style.display='none';barFill.style.width='0%';},1500);
+  return url;
 }
 
 // Main sheet image upload
@@ -1297,8 +1297,8 @@ document.getElementById("sheetImgFile").onchange=async function(){
   const status=document.getElementById("sheetImageStatus");
   status.textContent='⏳ جاري الرفع...';status.style.color='#a5b4fc';
   try{
-    const url=await uploadImgToStorage(file,
-      `sheetImages/${currentSheetMajor}_${Date.now()}_${file.name}`,
+    const url=await uploadImgSimple(file,
+      `resources/sheetImages/${currentSheetMajor}_${Date.now()}`,
       document.getElementById("sheetImgBarFill"),
       document.getElementById("sheetImgBarTxt"),
       document.getElementById("sheetImgUploadBar")
@@ -1309,7 +1309,10 @@ document.getElementById("sheetImgFile").onchange=async function(){
     document.getElementById("sheetImgLink").href=url;
     document.getElementById("sheetImagePreview").style.display="block";
     status.textContent='✅ تم رفع الصورة وحفظها';status.style.color='#6ee7b7';
-  }catch(e){status.textContent='❌ '+e.message;status.style.color='#f87171';}
+  }catch(e){
+    document.getElementById("sheetImgUploadBar").style.display='none';
+    status.textContent='❌ '+e.code+': '+e.message;status.style.color='#f87171';
+  }
   this.value='';
 };
 
@@ -1319,8 +1322,8 @@ document.getElementById("supportSheetImgFile").onchange=async function(){
   const status=document.getElementById("supportSheetImageStatus");
   status.textContent='⏳ جاري الرفع...';status.style.color='#a5b4fc';
   try{
-    const url=await uploadImgToStorage(file,
-      `supportSheetImages/${currentSupportMajor}_${Date.now()}_${file.name}`,
+    const url=await uploadImgSimple(file,
+      `resources/supportSheetImages/${currentSupportMajor}_${Date.now()}`,
       document.getElementById("spImgBarFill"),
       document.getElementById("spImgBarTxt"),
       document.getElementById("spImgUploadBar")
@@ -1331,7 +1334,10 @@ document.getElementById("supportSheetImgFile").onchange=async function(){
     document.getElementById("supportSheetImgLink").href=url;
     document.getElementById("supportSheetImagePreview").style.display="block";
     status.textContent='✅ تم رفع الصورة وحفظها';status.style.color='#6ee7b7';
-  }catch(e){status.textContent='❌ '+e.message;status.style.color='#f87171';}
+  }catch(e){
+    document.getElementById("spImgUploadBar").style.display='none';
+    status.textContent='❌ '+e.code+': '+e.message;status.style.color='#f87171';
+  }
   this.value='';
 };
 async function loadSheetCourses(major){
