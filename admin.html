@@ -1279,31 +1279,30 @@ document.getElementById("removeSheetImage").onclick=async()=>{
 
 // ── SHEET IMAGE FILE UPLOAD ──────────────────────────────────
 async function uploadImgSimple(file, storagePath, barFill, barTxt, barWrap){
-  const ext=file.name.split('.').pop().replace(/[^a-zA-Z0-9]/g,'');
+  // size warning
+  const mb=(file.size/1024/1024).toFixed(1);
+  if(file.size>8*1024*1024)throw new Error(`الملف ${mb}MB — كبير جداً. قلّل الحجم لأقل من 8MB`);
+  const ext=file.name.split('.').pop().replace(/[^a-zA-Z0-9]/g,'')||'jpg';
   const safePath=storagePath+'.'+ext;
   barWrap.style.display='block';
   barFill.style.transition='width .4s';
-  barFill.style.width='15%';barTxt.textContent='جاري الرفع...';
-  // fake gradual progress while waiting
+  barFill.style.width='15%';barTxt.textContent=`جاري الرفع (${mb}MB)...`;
   let fake=15;
-  const timer=setInterval(()=>{
-    fake=Math.min(fake+3,88);
-    barFill.style.width=fake+'%';
-    barTxt.textContent=fake+'%';
-  },400);
+  const timer=setInterval(()=>{fake=Math.min(fake+2,88);barFill.style.width=fake+'%';barTxt.textContent=fake+'%';},500);
+  const reset=()=>{clearInterval(timer);barWrap.style.display='none';barFill.style.width='0%';};
   try{
     const sRef=ref(storage,safePath);
-    await uploadBytes(sRef,file);
+    // 90-second timeout
+    await Promise.race([
+      uploadBytes(sRef,file),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('انتهت مهلة الرفع (90 ثانية) — حاول بملف أصغر')),90000))
+    ]);
     clearInterval(timer);
     barFill.style.width='100%';barTxt.textContent='✅ اكتمل';
     const url=await getDownloadURL(sRef);
     setTimeout(()=>{barWrap.style.display='none';barFill.style.width='0%';},1500);
     return url;
-  }catch(e){
-    clearInterval(timer);
-    barWrap.style.display='none';barFill.style.width='0%';
-    throw e;
-  }
+  }catch(e){reset();throw e;}
 }
 
 // Main sheet image upload
