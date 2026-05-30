@@ -162,6 +162,33 @@ a{color:inherit;text-decoration:none}
 .shortcut .sh-icon{font-size:1.8rem;display:block;margin-bottom:.5rem}
 .shortcut span{font-size:.82rem;font-weight:700;color:var(--muted)}
 
+/* ====== SCHEDULES ====== */
+.sched-filter{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem}
+.sf-btn{padding:.48rem 1.1rem;border-radius:999px;font-size:.82rem;font-weight:700;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s}
+.sf-btn.active{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(99,102,241,.35)}
+.sf-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,.07)}
+.sched-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.25rem}
+.sched-card{background:rgba(22,22,22,.75);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .35s var(--ease);animation:fu .5s ease both}
+.sched-card:hover{transform:translateY(-6px);border-color:rgba(99,102,241,.4);box-shadow:0 16px 48px rgba(0,0,0,.45)}
+.sched-img-wrap{overflow:hidden;aspect-ratio:4/3;background:rgba(99,102,241,.06);display:flex;align-items:center;justify-content:center}
+.sched-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .45s var(--ease)}
+.sched-card:hover .sched-img{transform:scale(1.06)}
+.sched-info{padding:1rem 1.15rem 1.15rem}
+.sched-tag{display:inline-flex;align-items:center;font-size:.7rem;font-weight:700;padding:.2rem .65rem;border-radius:999px;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);color:#a5b4fc;margin-bottom:.5rem}
+.sched-info h3{font-size:.95rem;font-weight:700;color:#f1f5f9;margin-bottom:.25rem;line-height:1.4}
+.sched-info p{font-size:.8rem;color:var(--muted);line-height:1.5}
+.sched-empty{grid-column:1/-1;text-align:center;padding:5rem 2rem;color:var(--muted)}
+.sched-empty span{font-size:3.5rem;display:block;margin-bottom:1rem}
+.sched-empty p{font-size:.9rem}
+/* Lightbox */
+.lb-overlay{position:fixed;inset:0;z-index:9500;background:rgba(4,5,10,.93);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(6px)}
+.lb-overlay.open{opacity:1;pointer-events:all}
+.lb-img{max-width:92vw;max-height:86vh;border-radius:14px;box-shadow:0 40px 100px rgba(0,0,0,.7);transition:transform .3s var(--bounce)}
+.lb-close{position:absolute;top:1.25rem;left:1.25rem;width:42px;height:42px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:50%;color:#f1f5f9;font-size:1.15rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;z-index:1}
+.lb-close:hover{background:rgba(239,68,68,.25);border-color:rgba(239,68,68,.4);color:#f87171}
+.lb-caption{position:absolute;bottom:1.75rem;left:50%;transform:translateX(-50%);background:rgba(4,5,10,.75);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:.5rem 1.5rem;color:#f1f5f9;font-size:.88rem;font-weight:700;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:768px){.sched-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem}}
+
 /* Shared */
 .section-label{display:inline-flex;align-items:center;gap:.5rem;font-size:.72rem;font-weight:800;color:#818cf8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem}
 .section-label::before{content:'';display:block;width:16px;height:2px;background:#6366f1;border-radius:2px}
@@ -393,6 +420,25 @@ a{color:inherit;text-decoration:none}
       background: linear-gradient(135deg,#4f46e5,#6366f1) !important;
       -webkit-background-clip: text !important; background-clip: text !important; color: transparent !important;
     }
+    /* Schedules */
+    [data-theme="light"] .sched-card {
+      background: #ffffff !important;
+      border-color: rgba(99,102,241,.15) !important;
+      box-shadow: 0 2px 16px rgba(99,102,241,.08) !important;
+    }
+    [data-theme="light"] .sched-card:hover {
+      border-color: rgba(99,102,241,.35) !important;
+      box-shadow: 0 12px 40px rgba(99,102,241,.15) !important;
+    }
+    [data-theme="light"] .sched-info h3 { color: #161616 !important; }
+    [data-theme="light"] .sf-btn:not(.active) {
+      border-color: rgba(99,102,241,.2) !important;
+      color: #64748b !important;
+    }
+    [data-theme="light"] .sf-btn:hover:not(.active) {
+      background: rgba(99,102,241,.06) !important;
+      color: #4f46e5 !important;
+    }
     /* Theme toggle button */
 @media(max-width:1280px){}
     </style>
@@ -504,6 +550,7 @@ a{color:inherit;text-decoration:none}
     <button class="stab" onclick="switchTab('news')" data-ar="📰 الأخبار" data-en="📰 News">📰 الأخبار</button>
     <button class="stab" onclick="switchTab('ann')" data-ar="📢 الإعلانات" data-en="📢 Announcements">📢 الإعلانات</button>
     <button class="stab" onclick="switchTab('pref')" data-ar="⭐ الوضع المفضل" data-en="⭐ Favorites">⭐ الوضع المفضل</button>
+    <button class="stab" onclick="switchTab('sched')" data-ar="📅 الجداول المقترحة" data-en="📅 Suggested Schedules">📅 الجداول المقترحة</button>
   </div>
 
   <!-- ===== GPA ===== -->
@@ -659,6 +706,16 @@ a{color:inherit;text-decoration:none}
     </div>
   </div>
 
+  <!-- ===== SCHEDULES ===== -->
+  <div class="service-panel" id="panel-sched">
+    <div class="section-label">الجداول المقترحة</div>
+    <div class="section-h2">جداول دراسية مقترحة</div>
+    <div class="sched-filter" id="schedFilter">
+      <button class="sf-btn active" onclick="filterSched('all',this)">🗂️ الكل</button>
+    </div>
+    <div class="sched-grid" id="schedGrid"></div>
+  </div>
+
   <!-- ===== PREFERRED ===== -->
   <div class="service-panel" id="panel-pref">
     <div class="section-label">الوضع المفضل</div>
@@ -709,6 +766,13 @@ a{color:inherit;text-decoration:none}
     <a class="social-btn" href="https://x.com/biosci_club" target="_blank"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>Twitter / X</a>
   </div>
 </footer>
+
+<!-- Lightbox -->
+<div class="lb-overlay" id="lbOverlay" onclick="closeLbBg(event)">
+  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <img class="lb-img" id="lbImg" src="" alt="">
+  <div class="lb-caption" id="lbCaption"></div>
+</div>
 
 <script src="theme.js"></script>
 <script type="module">
@@ -763,12 +827,24 @@ function fmtDate(ts){if(!ts)return{d:"—",m:""};const dt=ts.toDate?ts.toDate():
     trigReveal();
   }catch(e){document.getElementById("newsGrid").innerHTML='<div class="news-empty"><span>📰</span>لا توجد أخبار حالياً.</div>'}
 })();
+
+// Load schedules from Firestore
+(async()=>{
+  try{
+    const snap=await getDocs(collection(db,"schedules"));
+    const items=snap.docs.map(d=>({id:d.id,...d.data()}));
+    items.sort((a,b)=>(+a.order||99)-(+b.order||99));
+    window._schedData=items;
+    if(typeof buildSchedFilters==="function")buildSchedFilters();
+    if(typeof renderScheds==="function")renderScheds("all");
+  }catch(e){console.warn("schedules load:",e);}
+})();
 </script>
 
 <script>
 /* ===== TABS ===== */
 function switchTab(id){
-  document.querySelectorAll(".stab").forEach((t,i)=>{t.classList.toggle("active",["gpa","news","ann","pref"][i]===id)});
+  document.querySelectorAll(".stab").forEach((t,i)=>{t.classList.toggle("active",["gpa","news","ann","pref","sched"][i]===id)});
   document.querySelectorAll(".service-panel").forEach(p=>p.classList.remove("active"));
   document.getElementById("panel-"+id).classList.add("active");
   trigReveal();
@@ -1045,6 +1121,81 @@ function loadPref(){
     showPrefSaved(saved);
   }
 }
+
+/* ===== SCHEDULES ===== */
+// البيانات تُحمَّل من Firebase — لا تعدّل هنا
+window._schedData=window._schedData||[];
+
+const SCHED_CATS={
+  molecular:"🧬 الأحياء الجزيئية",
+  micro:"🦠 مايكروبيولوجي",
+  plant:"🌱 أحياء النبات",
+  animal:"🐾 أحياء الحيوان",
+  biochem:"⚗️ الكيمياء الحيوية",
+};
+
+function buildSchedFilters(){
+  const bar=document.getElementById("schedFilter");
+  while(bar.children.length>1)bar.removeChild(bar.lastChild);
+  const cats=[...new Set((window._schedData||[]).map(s=>s.cat).filter(Boolean))];
+  cats.forEach(c=>{
+    const b=document.createElement("button");
+    b.className="sf-btn";
+    b.textContent=SCHED_CATS[c]||c;
+    b.onclick=function(){filterSched(c,this);};
+    bar.appendChild(b);
+  });
+}
+
+function renderScheds(filter){
+  const grid=document.getElementById("schedGrid");
+  const data=window._schedData||[];
+  const list=(!filter||filter==="all")?data:data.filter(s=>s.cat===filter);
+  if(!list.length){
+    grid.innerHTML=`<div class="sched-empty"><span>📅</span><p>لا توجد جداول بعد — ستُضاف قريباً</p></div>`;
+    return;
+  }
+  grid.innerHTML=list.map((s,i)=>{
+    const url=(s.imageUrl||"").replace(/"/g,"&quot;");
+    const title=(s.title||"جدول").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+    const tag=(s.tag||"جدول").replace(/</g,"&lt;");
+    const desc=(s.desc||"").replace(/</g,"&lt;");
+    return`<div class="sched-card reveal" style="animation-delay:${i*.07}s" data-url="${url}" data-title="${title}">
+      <div class="sched-img-wrap"><img class="sched-img" src="${url}" alt="${title}" loading="lazy"></div>
+      <div class="sched-info">
+        <div class="sched-tag">${tag}</div>
+        <h3>${title}</h3>
+        ${desc?`<p>${desc}</p>`:""}
+      </div>
+    </div>`;
+  }).join("");
+  document.querySelectorAll("#schedGrid .sched-card").forEach(card=>{
+    card.onclick=()=>openLightbox(card.dataset.url,card.dataset.title);
+  });
+  trigReveal();
+}
+
+function filterSched(cat,btn){
+  document.querySelectorAll(".sf-btn").forEach(b=>b.classList.remove("active"));
+  if(btn)btn.classList.add("active");
+  renderScheds(cat);
+}
+
+function openLightbox(src,caption){
+  document.getElementById("lbImg").src=src;
+  document.getElementById("lbCaption").textContent=caption;
+  document.getElementById("lbOverlay").classList.add("open");
+  document.body.style.overflow="hidden";
+}
+function closeLightbox(){
+  document.getElementById("lbOverlay").classList.remove("open");
+  document.body.style.overflow="";
+}
+function closeLbBg(e){if(e.target===document.getElementById("lbOverlay"))closeLightbox();}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeLightbox();});
+
+buildSchedFilters();
+renderScheds("all");
 
 /* ===== REVEAL ===== */
 function trigReveal(){
