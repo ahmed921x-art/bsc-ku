@@ -555,6 +555,7 @@ a{color:inherit;text-decoration:none}
     <button class="stab" onclick="switchTab('ann')" data-ar="📢 الإعلانات" data-en="📢 Announcements">📢 الإعلانات</button>
     <button class="stab" onclick="switchTab('pref')" data-ar="⭐ الوضع المفضل" data-en="⭐ Favorites">⭐ الوضع المفضل</button>
     <button class="stab" onclick="switchTab('sched')" data-ar="📅 الجداول المقترحة" data-en="📅 Suggested Schedules">📅 الجداول المقترحة</button>
+    <button class="stab" onclick="switchTab('guide')" data-ar="📖 دليل الطالب" data-en="📖 Student Guide">📖 دليل الطالب</button>
   </div>
 
   <!-- ===== GPA ===== -->
@@ -720,6 +721,16 @@ a{color:inherit;text-decoration:none}
     <div class="sched-grid" id="schedGrid"></div>
   </div>
 
+  <!-- ===== GUIDE ===== -->
+  <div class="service-panel" id="panel-guide">
+    <div class="section-label">دليل الطالب</div>
+    <div class="section-h2">دليل الطالب — قسم العلوم البيولوجية</div>
+    <div class="sched-filter" id="guideFilter">
+      <button class="sf-btn active" onclick="filterGuide('all',this)">🗂️ الكل</button>
+    </div>
+    <div class="sched-grid" id="guideGrid"></div>
+  </div>
+
   <!-- ===== PREFERRED ===== -->
   <div class="service-panel" id="panel-pref">
     <div class="section-label">الوضع المفضل</div>
@@ -846,12 +857,24 @@ function fmtDate(ts){if(!ts)return{d:"—",m:""};const dt=ts.toDate?ts.toDate():
     if(typeof renderScheds==="function")renderScheds("all");
   }catch(e){console.warn("schedules load:",e);}
 })();
+
+// Load student guide from Firestore
+(async()=>{
+  try{
+    const snap=await getDocs(collection(db,"studentGuide"));
+    const items=snap.docs.map(d=>({id:d.id,...d.data()}));
+    items.sort((a,b)=>(+a.order||99)-(+b.order||99));
+    window._guideData=items;
+    if(typeof buildGuideFilters==="function")buildGuideFilters();
+    if(typeof renderGuide==="function")renderGuide("all");
+  }catch(e){console.warn("guide load:",e);}
+})();
 </script>
 
 <script>
 /* ===== TABS ===== */
 function switchTab(id){
-  document.querySelectorAll(".stab").forEach((t,i)=>{t.classList.toggle("active",["gpa","news","ann","pref","sched"][i]===id)});
+  document.querySelectorAll(".stab").forEach((t,i)=>{t.classList.toggle("active",["gpa","news","ann","pref","sched","guide"][i]===id)});
   document.querySelectorAll(".service-panel").forEach(p=>p.classList.remove("active"));
   document.getElementById("panel-"+id).classList.add("active");
   trigReveal();
@@ -1226,6 +1249,66 @@ document.addEventListener("keydown",e=>{
 
 buildSchedFilters();
 renderScheds("all");
+
+/* ===== STUDENT GUIDE ===== */
+window._guideData=window._guideData||[];
+
+const GUIDE_SECTIONS={
+  major:"التخصصات",plan:"الخطة الدراسية",reg:"التسجيل",rules:"اللوائح",other:"أخرى"
+};
+
+function buildGuideFilters(){
+  const bar=document.getElementById("guideFilter");
+  while(bar.children.length>1)bar.removeChild(bar.lastChild);
+  const secs=[...new Set((window._guideData||[]).map(s=>s.section).filter(Boolean))];
+  secs.forEach(c=>{
+    const b=document.createElement("button");
+    b.className="sf-btn";
+    b.textContent=GUIDE_SECTIONS[c]||c;
+    b.onclick=function(){filterGuide(c,this);};
+    bar.appendChild(b);
+  });
+}
+
+function renderGuide(filter){
+  const grid=document.getElementById("guideGrid");
+  const data=window._guideData||[];
+  const list=(!filter||filter==="all")?data:data.filter(s=>s.section===filter);
+  if(!list.length){
+    grid.innerHTML=`<div class="sched-empty"><span>📖</span><p>لا يوجد محتوى بعد — ستُضاف قريباً</p></div>`;
+    return;
+  }
+  grid.innerHTML=list.map((s,i)=>{
+    const imgs=s.images&&s.images.length?s.images:[s.imageUrl||""];
+    const url=imgs[0].replace(/"/g,"&quot;");
+    const imgsJson=JSON.stringify(imgs).replace(/"/g,"&quot;");
+    const title=(s.title||"").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+    const tag=(s.section?GUIDE_SECTIONS[s.section]||s.section:"دليل").replace(/</g,"&lt;");
+    const desc=(s.desc||"").replace(/</g,"&lt;");
+    return`<div class="sched-card reveal" style="animation-delay:${i*.07}s" data-url="${url}" data-imgs="${imgsJson}" data-title="${title}">
+      <div class="sched-img-wrap" style="position:relative"><img class="sched-img" src="${url}" alt="${title}" loading="lazy">${imgs.length>1?`<span style="position:absolute;bottom:.4rem;left:.5rem;background:rgba(0,0,0,.65);color:#fff;font-size:.7rem;font-weight:700;padding:.18rem .55rem;border-radius:999px">🖼 ${imgs.length}</span>`:""}</div>
+      <div class="sched-info">
+        <div class="sched-tag">${tag}</div>
+        <h3>${title}</h3>
+        ${desc?`<p>${desc}</p>`:""}
+      </div>
+    </div>`;
+  }).join("");
+  document.querySelectorAll("#guideGrid .sched-card").forEach(card=>{
+    const imgs=card.dataset.imgs?JSON.parse(card.dataset.imgs):[card.dataset.url];
+    card.onclick=()=>openLightbox(imgs,card.dataset.title);
+  });
+  trigReveal();
+}
+
+function filterGuide(sec,btn){
+  document.querySelectorAll("#guideFilter .sf-btn").forEach(b=>b.classList.remove("active"));
+  if(btn)btn.classList.add("active");
+  renderGuide(sec);
+}
+
+buildGuideFilters();
+renderGuide("all");
 
 /* ===== REVEAL ===== */
 function trigReveal(){
