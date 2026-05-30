@@ -264,6 +264,78 @@ const RAW_SUPPORT_FORENSIC=[
   {code:'0409-498',nameAr:'مشروع بحث في الأدلة الجنائية',nameEn:'Research Project in Forensic Evidence',hours:3,type:'elective',prereqs:['0409-301']},
 ];
 
+// ── بيولوجيا الحيوان المساند ──────────────────────────────────
+// (لغير طلبة العلوم البيولوجية — يشمل الإلزامي + الاختياري)
+const RAW_SUPPORT_ANIMAL=[
+  // إلزامي
+  {code:'0490-101',nameAr:'بيولوجيا 1',nameEn:'Biology 1',hours:3,type:'required',prereqs:[]},
+  {code:'0490-103',nameAr:'بيولوجيا 3',nameEn:'Biology 3',hours:3,type:'required',prereqs:['0490-101']},
+  {code:'0493-201',nameAr:'بيولوجيا الحبليات',nameEn:'Chordate Biology',hours:4,type:'major',prereqs:['0490-101']},
+  {code:'0493-203',nameAr:'بيولوجيا الخلية',nameEn:'Cell Biology',hours:4,type:'major',prereqs:['0490-101']},
+  {code:'0493-205',nameAr:'بيولوجيا اللافقاريات 1',nameEn:'Invertebrate Biology 1',hours:4,type:'major',prereqs:['0490-101']},
+  {code:'0493-305',nameAr:'علم الأجنة',nameEn:'Embryology',hours:4,type:'major',prereqs:['0493-201']},
+  // اختياري — من مقررات بيولوجيا الحيوان مستوى 200+
+  {code:'0493-206',nameAr:'التنوع الحيواني II: الحبليات',nameEn:'Animal Diversity II: Chordates',hours:3,type:'elective',prereqs:['0490-101']},
+  {code:'0493-306',nameAr:'علم البيئة',nameEn:'Ecology',hours:4,type:'elective',prereqs:['0493-205']},
+  {code:'0493-307',nameAr:'علم الحيوان الاقتصادي',nameEn:'Economic Zoology',hours:3,type:'elective',prereqs:['0493-205']},
+  {code:'0493-308',nameAr:'علم وظائف الجهاز العصبي',nameEn:'Neuroscience',hours:3,type:'elective',prereqs:['0493-205']},
+  {code:'0493-311',nameAr:'علم وظائف أعضاء الجسم',nameEn:'Animal Physiology',hours:3,type:'elective',prereqs:['0490-103']},
+  {code:'0493-312',nameAr:'علم وظائف الحيوانات المقارن',nameEn:'Comparative Animal Physiology',hours:3,type:'elective',prereqs:['0493-205']},
+  {code:'0493-320',nameAr:'تطور الحيوان ونظم تصنيفه',nameEn:'Animal Evolution and Taxonomy',hours:3,type:'elective',prereqs:['0490-103']},
+  {code:'0493-330',nameAr:'سلوك الحيوان',nameEn:'Animal Behavior',hours:3,type:'elective',prereqs:['0493-320']},
+  {code:'0493-401',nameAr:'النظم الحيوانية',nameEn:'Animal Systems',hours:3,type:'elective',prereqs:['0493-311']},
+  {code:'0493-408',nameAr:'التطور',nameEn:'Evolution',hours:2,type:'elective',prereqs:['0493-320']},
+  {code:'0493-409',nameAr:'علم المناعة',nameEn:'Immunology',hours:3,type:'elective',prereqs:['0490-103']},
+];
+
+// ── بيولوجيا النبات المساند ────────────────────────────────────
+// (لغير طلبة العلوم البيولوجية)
+const RAW_SUPPORT_PLANT=[
+  // إلزامي
+  {code:'0490-101',nameAr:'بيولوجيا 1',nameEn:'Biology 1',hours:3,type:'required',prereqs:[]},
+  {code:'0490-102',nameAr:'بيولوجيا 2',nameEn:'Biology 2',hours:3,type:'required',prereqs:['0490-101']},
+  // اختياري — من مقررات بيولوجيا النبات (6 وحدات على الأقل من مستوى 300 أو 400)
+  {code:'0494-102',nameAr:'التركيب والوظيفة في النبات',nameEn:'Plant Structure and Function',hours:3,type:'elective',prereqs:['0490-101']},
+  {code:'0494-211',nameAr:'مبادئ علم تصنيف النبات',nameEn:'Plant Taxonomy Principles',hours:3,type:'elective',prereqs:['0494-102']},
+  {code:'0494-221',nameAr:'مبادئ علم الطحالب',nameEn:'Principles of Algology',hours:3,type:'elective',prereqs:['0490-101']},
+  {code:'0494-231',nameAr:'مبادئ علم الوراثة',nameEn:'Principles of Genetics',hours:3,type:'elective',prereqs:['0490-101']},
+  {code:'0494-241',nameAr:'علم النبات الاقتصادي',nameEn:'Economic Botany',hours:3,type:'elective',prereqs:['0494-102']},
+  {code:'0494-261',nameAr:'مبادئ علم البيئة النباتية',nameEn:'Plant Ecology Principles',hours:3,type:'elective',prereqs:['0494-102']},
+  {code:'0494-271',nameAr:'مقدمة فسيولوجيا النبات',nameEn:'Intro to Plant Physiology',hours:3,type:'elective',prereqs:['0494-102']},
+  {code:'0494-313',nameAr:'علم النبات القديم والتطور',nameEn:'Paleobotany and Evolution',hours:3,type:'elective',prereqs:['0490-102']},
+  {code:'0494-322',nameAr:'علم النبات البحري',nameEn:'Marine Botany',hours:3,type:'elective',prereqs:['0494-221']},
+  {code:'0494-332',nameAr:'علم الوراثة الخلوية',nameEn:'Cytogenetics',hours:3,type:'elective',prereqs:['0494-231']},
+  {code:'0494-352',nameAr:'علم تصنيف النبات المتقدم',nameEn:'Advanced Plant Taxonomy',hours:3,type:'elective',prereqs:['0494-211']},
+  {code:'0494-362',nameAr:'علم التربة',nameEn:'Soil Science',hours:3,type:'elective',prereqs:['0494-261']},
+  {code:'0494-372',nameAr:'فسيولوجيا نبات متقدم',nameEn:'Advanced Plant Physiology',hours:4,type:'elective',prereqs:['0494-271']},
+  {code:'0494-381',nameAr:'وقاية نبات',nameEn:'Plant Protection',hours:3,type:'elective',prereqs:['0494-102']},
+  {code:'0494-390',nameAr:'المعلوماتية الحيوية',nameEn:'Bioinformatics',hours:4,type:'elective',prereqs:['0494-102']},
+];
+
+// ── علم النبات الزراعي المساند ─────────────────────────────────
+// (لغير طلبة بيولوجيا النبات)
+const RAW_SUPPORT_AGRI=[
+  // إلزامي
+  {code:'0494-141',nameAr:'الزراعة والمجتمع الكويتي',nameEn:'Agriculture and Kuwaiti Society',hours:3,type:'required',prereqs:[]},
+  {code:'0494-142',nameAr:'علم النبات الزراعي',nameEn:'Agricultural Botany',hours:3,type:'required',prereqs:[]},
+  // اختياري (6 وحدات على الأقل من مستوى 300 أو 400)
+  {code:'0494-241',nameAr:'علم النبات الاقتصادي',nameEn:'Economic Botany',hours:3,type:'elective',prereqs:['0494-142']},
+  {code:'0494-245',nameAr:'بستنة 1',nameEn:'Horticulture 1',hours:3,type:'elective',prereqs:['0494-142']},
+  {code:'0494-266',nameAr:'الزراعة والتربة',nameEn:'Agriculture and Soil',hours:3,type:'elective',prereqs:['0494-142']},
+  {code:'0494-337',nameAr:'الزراعة النسيجية في النبات',nameEn:'Plant Tissue Culture',hours:3,type:'elective',prereqs:['0494-142']},
+  {code:'0494-345',nameAr:'بستنة 2',nameEn:'Horticulture 2',hours:3,type:'elective',prereqs:['0494-245']},
+  {code:'0494-363',nameAr:'الإنتاج النباتي في بيئة قاحلة',nameEn:'Plant Production in Arid Environment',hours:3,type:'elective',prereqs:['0494-142']},
+  {code:'0494-372',nameAr:'فسيولوجيا نبات متقدم',nameEn:'Advanced Plant Physiology',hours:4,type:'elective',prereqs:['0494-142']},
+  {code:'0494-381',nameAr:'وقاية نبات',nameEn:'Plant Protection',hours:3,type:'elective',prereqs:['0494-142']},
+  {code:'0494-434',nameAr:'تربية نبات',nameEn:'Plant Breeding',hours:3,type:'elective',prereqs:['0494-142']},
+  {code:'0494-437',nameAr:'التقنيات الحيوية الزراعية',nameEn:'Agricultural Biotechnology',hours:3,type:'elective',prereqs:['0494-142']},
+  {code:'0494-466',nameAr:'علم البيئة الزراعية',nameEn:'Agricultural Ecology',hours:3,type:'elective',prereqs:['0494-142']},
+  {code:'0494-474',nameAr:'الإكثار النباتي',nameEn:'Plant Propagation',hours:3,type:'elective',prereqs:['0494-142']},
+];
+
 export const SUPPORT_CATALOG_SEED={
   forensic:{major:'forensic',courses:buildSupport(RAW_SUPPORT_FORENSIC)},
+  animal:  {major:'animal',  courses:buildSupport(RAW_SUPPORT_ANIMAL)},
+  plant:   {major:'plant',   courses:buildSupport(RAW_SUPPORT_PLANT)},
+  agri:    {major:'agri',    courses:buildSupport(RAW_SUPPORT_AGRI)},
 };
