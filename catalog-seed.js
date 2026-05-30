@@ -333,9 +333,81 @@ const RAW_SUPPORT_AGRI=[
   {code:'0494-474',nameAr:'الإكثار النباتي',nameEn:'Plant Propagation',hours:3,type:'elective',prereqs:['0494-142']},
 ];
 
+// ── الميكروبيولوجيا المساند ────────────────────────────────────
+// (لغير طلبة العلوم البيولوجية)
+const RAW_SUPPORT_MICRO=[
+  // إلزامي
+  {code:'0490-105',nameAr:'علم الكائنات الدقيقة',nameEn:'Microbiology',hours:3,type:'required',prereqs:[]},
+  // اختياري — من مقررات الميكروبيولوجيا (6 وحدات على الأقل من مستوى 300 أو 400)
+  {code:'0495-106',nameAr:'علم الميكروبيولوجيا',nameEn:'Microbiology',hours:3,type:'elective',prereqs:['0490-105']},
+  {code:'0495-107',nameAr:'تقنيات دقيقة ومجهرية',nameEn:'Microscopy and Microtechniques',hours:3,type:'elective',prereqs:['0490-105']},
+  {code:'0495-203',nameAr:'الأيض والوراثة الميكروبية',nameEn:'Microbial Metabolism and Genetics',hours:3,type:'elective',prereqs:['0495-106']},
+  {code:'0495-204',nameAr:'علم الفيروسات',nameEn:'Virology',hours:3,type:'elective',prereqs:['0490-105']},
+  {code:'0495-205',nameAr:'علم البكتيريا',nameEn:'Bacteriology',hours:3,type:'elective',prereqs:['0495-107']},
+  {code:'0495-206',nameAr:'علم الفطريات',nameEn:'Mycology',hours:3,type:'elective',prereqs:['0495-107']},
+  {code:'0495-207',nameAr:'الطحالب الدقيقة والبروتوزوا',nameEn:'Microalgae and Protozoa',hours:3,type:'elective',prereqs:['0495-107']},
+  {code:'0495-315',nameAr:'التركيب الدقيق للكائنات المجهرية',nameEn:'Fine Structure of Microorganisms',hours:4,type:'elective',prereqs:['0495-205']},
+  {code:'0495-335',nameAr:'علم الوراثة الميكروبية والبيولوجيا الجزيئية',nameEn:'Microbial Genetics and Molecular Biology',hours:3,type:'elective',prereqs:['0495-205']},
+  {code:'0495-343',nameAr:'ميكروبيولوجيا الهواء والماء',nameEn:'Air and Water Microbiology',hours:3,type:'elective',prereqs:['0495-205']},
+  {code:'0495-344',nameAr:'الميكروبيولوجيا الصناعية',nameEn:'Industrial Microbiology',hours:3,type:'elective',prereqs:['0495-205']},
+  {code:'0495-371',nameAr:'فسيولوجيا الكائنات الدقيقة',nameEn:'Microbial Physiology',hours:3,type:'elective',prereqs:['0495-205']},
+  {code:'0495-382',nameAr:'علم المناعة',nameEn:'Immunology',hours:3,type:'elective',prereqs:['0495-203']},
+  {code:'0495-406',nameAr:'التحلل الحيوي',nameEn:'Biodegradation',hours:3,type:'elective',prereqs:['0495-205']},
+  {code:'0495-408',nameAr:'ميكروبيولوجيا الغذاء',nameEn:'Food Microbiology',hours:3,type:'elective',prereqs:['0495-205']},
+  {code:'0495-409',nameAr:'ميكروبيولوجيا المضادات الحيوية',nameEn:'Antimicrobial Microbiology',hours:3,type:'elective',prereqs:['0495-205']},
+  {code:'0495-465',nameAr:'ميكروبيولوجيا البيئات القاسية',nameEn:'Extremophile Microbiology',hours:4,type:'elective',prereqs:['0495-205']},
+];
+
+// ── الكيمياء الحيوية المساند ────────────────────────────────────
+// (لغير طلبة العلوم البيولوجية — الأشمل)
+const RAW_SUPPORT_BIOCHEM=[
+  // إلزامي
+  {code:'0490-271',nameAr:'مقدمة في الكيمياء الحيوية',nameEn:'Intro to Biochemistry',hours:4,type:'required',prereqs:[]},
+  {code:'0496-217',nameAr:'الكيمياء البيولوجية',nameEn:'Biological Chemistry',hours:4,type:'required',prereqs:['0490-271']},
+  {code:'0496-300',nameAr:'مختبر الكيمياء الحيوية 1',nameEn:'Biochemistry Lab 1',hours:2,type:'required',prereqs:['0496-217']},
+  {code:'0496-315',nameAr:'الكيمياء الحيوية 1',nameEn:'Biochemistry 1',hours:3,type:'required',prereqs:['0496-217']},
+  {code:'0496-337',nameAr:'الإنزيمات',nameEn:'Enzymology',hours:3,type:'required',prereqs:['0496-315']},
+  {code:'0496-415',nameAr:'الكيمياء الحيوية 2',nameEn:'Biochemistry 2',hours:3,type:'required',prereqs:['0496-315']},
+  // اختياري — من مقررات الكيمياء الحيوية مستوى 200+ (لا يحسب 0496-402)
+  {code:'0496-325',nameAr:'علم السموم وتقدير الأخطار',nameEn:'Toxicology and Risk Assessment',hours:2,type:'elective',prereqs:['0490-271']},
+  {code:'0496-333',nameAr:'الكيمياء الحيوية التحليلية',nameEn:'Analytical Biochemistry',hours:3,type:'elective',prereqs:['0496-217']},
+  {code:'0496-345',nameAr:'الكيمياء الحيوية للهرمونات والعقاقير',nameEn:'Biochemistry of Hormones and Drugs',hours:3,type:'elective',prereqs:['0496-315']},
+  {code:'0496-372',nameAr:'مقدمة في الوراثة الجزيئية',nameEn:'Intro to Molecular Genetics',hours:3,type:'elective',prereqs:['0490-271']},
+  {code:'0496-420',nameAr:'مختبر الكيمياء الحيوية 2',nameEn:'Biochemistry Lab 2',hours:2,type:'elective',prereqs:['0496-415']},
+  {code:'0496-432',nameAr:'علم المناعة الخلوية والجزيئية',nameEn:'Cellular and Molecular Immunology',hours:3,type:'elective',prereqs:['0496-315']},
+  {code:'0496-435',nameAr:'الكيمياء الحيوية الإكلينيكية',nameEn:'Clinical Biochemistry',hours:4,type:'elective',prereqs:['0496-415']},
+  {code:'0496-444',nameAr:'ورشة عمل الكيمياء الحيوية التطبيقية',nameEn:'Applied Biochemistry Workshop',hours:3,type:'elective',prereqs:['0496-315']},
+  {code:'0496-464',nameAr:'التغذية',nameEn:'Nutrition',hours:3,type:'elective',prereqs:['0496-315']},
+  {code:'0496-473',nameAr:'الطاقة الحيوية',nameEn:'Bioenergetics',hours:3,type:'elective',prereqs:['0496-315']},
+];
+
+// ── البيولوجيا الجزيئية المساند ────────────────────────────────
+// (لطلبة العلوم البيولوجية ما عدا تخصص البيولوجيا الجزيئية)
+const RAW_SUPPORT_MOLECULAR=[
+  // إلزامي
+  {code:'0497-291',nameAr:'تقنيات في الكيمياء الحيوية',nameEn:'Techniques in Biochemistry',hours:4,type:'required',prereqs:[]},
+  {code:'0497-371',nameAr:'مقدمة في الوراثة الجزيئية',nameEn:'Intro to Molecular Genetics',hours:3,type:'required',prereqs:['0497-291']},
+  {code:'0497-482',nameAr:'مقدمة في الهندسة الوراثية',nameEn:'Intro to Genetic Engineering',hours:3,type:'required',prereqs:['0497-371']},
+  {code:'0497-483',nameAr:'مختبر البيولوجيا الجزيئية',nameEn:'Molecular Biology Lab',hours:2,type:'required',prereqs:['0497-482']},
+  // اختياري — 12 وحدة (6 وحدات على الأقل من مستوى 400)
+  {code:'0497-383',nameAr:'بيولوجيا الخلية الجزيئية للكائنات الدقيقة',nameEn:'Molecular Cell Biology of Microorganisms',hours:3,type:'elective',prereqs:['0497-371']},
+  {code:'0497-401',nameAr:'علم المناعة الحيوانية الخلوية',nameEn:'Cellular Animal Immunology',hours:3,type:'elective',prereqs:['0497-371']},
+  {code:'0497-403',nameAr:'قضايا أخلاقية في البيولوجيا الجزيئية',nameEn:'Ethical Issues in Molecular Biology',hours:3,type:'elective',prereqs:['0497-371']},
+  {code:'0497-404',nameAr:'الوراثة الجزيئية لأمراض الإنسان',nameEn:'Molecular Genetics of Human Diseases',hours:3,type:'elective',prereqs:['0497-371']},
+  {code:'0497-405',nameAr:'الأساس الجزيئي للسرطان',nameEn:'Molecular Basis of Cancer',hours:3,type:'elective',prereqs:['0497-371']},
+  {code:'0497-410',nameAr:'التطور الجزيئي',nameEn:'Molecular Evolution',hours:3,type:'elective',prereqs:['0497-371']},
+  {code:'0497-475',nameAr:'تقنية الخلايا الجذعية والتجديدية',nameEn:'Stem Cell and Regenerative Technology',hours:3,type:'elective',prereqs:['0497-371']},
+  {code:'0497-480',nameAr:'مقدمة في الهندسة البيولوجية الجزيئية',nameEn:'Intro to Molecular Bioengineering',hours:3,type:'elective',prereqs:['0497-371']},
+  {code:'0497-485',nameAr:'مقدمة في الجينوم',nameEn:'Intro to Genomics',hours:3,type:'elective',prereqs:['0497-371']},
+  {code:'0497-490',nameAr:'أساسيات التكنولوجيا الوراثية الحيوية',nameEn:'Fundamentals of Genetic Biotechnology',hours:3,type:'elective',prereqs:['0497-371']},
+];
+
 export const SUPPORT_CATALOG_SEED={
-  forensic:{major:'forensic',courses:buildSupport(RAW_SUPPORT_FORENSIC)},
-  animal:  {major:'animal',  courses:buildSupport(RAW_SUPPORT_ANIMAL)},
-  plant:   {major:'plant',   courses:buildSupport(RAW_SUPPORT_PLANT)},
-  agri:    {major:'agri',    courses:buildSupport(RAW_SUPPORT_AGRI)},
+  forensic: {major:'forensic', courses:buildSupport(RAW_SUPPORT_FORENSIC)},
+  animal:   {major:'animal',   courses:buildSupport(RAW_SUPPORT_ANIMAL)},
+  plant:    {major:'plant',    courses:buildSupport(RAW_SUPPORT_PLANT)},
+  agri:     {major:'agri',     courses:buildSupport(RAW_SUPPORT_AGRI)},
+  micro:    {major:'micro',    courses:buildSupport(RAW_SUPPORT_MICRO)},
+  biochem:  {major:'biochem',  courses:buildSupport(RAW_SUPPORT_BIOCHEM)},
+  molecular:{major:'molecular',courses:buildSupport(RAW_SUPPORT_MOLECULAR)},
 };
