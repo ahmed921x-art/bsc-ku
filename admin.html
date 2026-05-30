@@ -1165,6 +1165,8 @@ document.getElementById("importCatalogBtn").onclick=async()=>{
   }
   status.textContent=`✅ تم استيراد ${done} تخصص`;status.style.color="#10b981";
   btn.disabled=false;btn.textContent="📥 استيراد الكتالوج الكامل";
+  // reload current major after import
+  await loadSheetCourses(currentSheetMajor);
 };
 
 // MAJORSHEET LOGIC
@@ -1284,7 +1286,17 @@ document.getElementById("addBatchBtn").onclick=async()=>{
   const status=document.getElementById("batchStatus");
   if(!year||!/^\d{4}$/.test(year)){status.textContent="⚠️ أدخل سنة صحيحة (4 أرقام)";status.style.color="#f87171";return;}
   if(allSheetBatches[year]){status.textContent=`⚠️ دفعة ${year} موجودة مسبقاً`;status.style.color="#f87171";return;}
-  const initialCourses=!sheetBatchMode?[...sheetCourses]:[];
+  // if in batch mode but sheetCourses empty, try loading from default courses field
+  let initialCourses=[...sheetCourses];
+  if(sheetBatchMode&&!initialCourses.length){
+    try{
+      const snap=await getDoc(doc(db,"majorSheets",currentSheetMajor));
+      if(snap.exists()&&snap.data().courses&&snap.data().courses.length){
+        initialCourses=[...snap.data().courses];
+        status.textContent="✅ تم نسخ المواد من الكتالوج للدفعة";
+      }
+    }catch{}
+  }
   allSheetBatches[year]={courses:initialCourses};
   sheetBatchMode=true;currentSheetBatch=year;sheetCourses=initialCourses;
   await setDoc(doc(db,"majorSheets",currentSheetMajor),{major:currentSheetMajor,batches:allSheetBatches,updatedAt:serverTimestamp()});
