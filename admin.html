@@ -638,6 +638,29 @@ a{color:inherit;text-decoration:none}
             <button class="btn btn-ghost" onclick="selectSupportMajor('biotech')">🧪 التقنية الحيوية</button>
           </div>
         </div>
+        <!-- SUPPORT SHEET IMAGE -->
+        <div class="card" style="border-color:rgba(16,185,129,.25)">
+          <h3>🖼️ صورة صحيفة التخصص المساند — <span id="spImgMajorLabel" style="color:#a5b4fc">الأحياء الجزيئية</span></h3>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">صورة أو PDF رسمية لصحيفة التخصص المساند — تظهر فوق قائمة المواد للطلبة</p>
+          <div style="display:flex;gap:.75rem;align-items:flex-end;flex-wrap:wrap">
+            <div class="form-group" style="flex:1;min-width:200px">
+              <label>رابط الصورة / PDF</label>
+              <input id="supportSheetImageUrl" placeholder="https://drive.google.com/... أو رابط مباشر للصورة">
+            </div>
+            <div style="flex-shrink:0;padding-bottom:.05rem">
+              <button class="btn btn-green" id="saveSupportSheetImage">💾 حفظ الصورة</button>
+            </div>
+          </div>
+          <div id="supportSheetImagePreview" style="display:none;margin-top:1rem">
+            <p style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem">معاينة:</p>
+            <img id="supportSheetImgEl" style="max-width:100%;border-radius:12px;border:1px solid var(--border);max-height:300px;object-fit:contain" alt="صحيفة التخصص المساند">
+            <div style="margin-top:.5rem;display:flex;gap:.5rem">
+              <a id="supportSheetImgLink" href="#" target="_blank" class="btn btn-ghost btn-sm">🔗 فتح في تاب جديد</a>
+              <button class="btn btn-danger btn-sm" id="removeSupportSheetImage">🗑️ حذف الصورة</button>
+            </div>
+          </div>
+          <div id="supportSheetImageStatus" style="margin-top:.5rem;font-size:.82rem;min-height:1.2em"></div>
+        </div>
         <div class="card">
           <h3>➕ إضافة مادة — <span id="supportMajorLabel" style="color:#a5b4fc">الأحياء الجزيئية</span></h3>
           <div class="form-grid">
@@ -1475,12 +1498,13 @@ let supportCourses=[];
 window.selectSupportMajor=function(major){
   currentSupportMajor=major;
   document.getElementById("supportMajorLabel").textContent=MN[major]||major;
-  // update button styles
+  document.getElementById("spImgMajorLabel").textContent=MN[major]||major;
   document.querySelectorAll("#supportMajorBtns .btn").forEach(b=>{
     const isCurrent=b.getAttribute("onclick")===`selectSupportMajor('${major}')`;
     b.className=isCurrent?"btn btn-primary":"btn btn-ghost";
   });
   loadSupportCourses(major);
+  loadSupportSheetImage(major);
 };
 
 async function loadSupportCourses(major){
@@ -1490,6 +1514,47 @@ async function loadSupportCourses(major){
   }catch{supportCourses=[];}
   renderSupportCourses();
 }
+
+async function loadSupportSheetImage(major){
+  const urlInp=document.getElementById("supportSheetImageUrl");
+  const preview=document.getElementById("supportSheetImagePreview");
+  const status=document.getElementById("supportSheetImageStatus");
+  try{
+    const d=await getDoc(doc(db,"supportSheets",major));
+    const url=d.exists()?(d.data().sheetImage||""):"";
+    urlInp.value=url;
+    if(url){
+      document.getElementById("supportSheetImgEl").src=url;
+      document.getElementById("supportSheetImgLink").href=url;
+      preview.style.display="block";
+    }else{
+      preview.style.display="none";
+    }
+    status.textContent="";
+  }catch{preview.style.display="none";}
+}
+document.getElementById("saveSupportSheetImage").onclick=async()=>{
+  const url=document.getElementById("supportSheetImageUrl").value.trim();
+  const status=document.getElementById("supportSheetImageStatus");
+  const preview=document.getElementById("supportSheetImagePreview");
+  try{
+    await setDoc(doc(db,"supportSheets",currentSupportMajor),{sheetImage:url,updatedAt:serverTimestamp()},{merge:true});
+    status.textContent="✅ تم حفظ الصورة";status.style.color="#6ee7b7";
+    if(url){
+      document.getElementById("supportSheetImgEl").src=url;
+      document.getElementById("supportSheetImgLink").href=url;
+      preview.style.display="block";
+    }else{preview.style.display="none";}
+  }catch(e){status.textContent="❌ "+e.message;status.style.color="#f87171";}
+};
+document.getElementById("removeSupportSheetImage").onclick=async()=>{
+  if(!confirm("حذف صورة صحيفة التخصص المساند؟"))return;
+  await setDoc(doc(db,"supportSheets",currentSupportMajor),{sheetImage:"",updatedAt:serverTimestamp()},{merge:true});
+  document.getElementById("supportSheetImageUrl").value="";
+  document.getElementById("supportSheetImagePreview").style.display="none";
+  document.getElementById("supportSheetImageStatus").textContent="✅ تم الحذف";
+  document.getElementById("supportSheetImageStatus").style.color="#6ee7b7";
+};
 
 async function saveSupportSheetNow(){
   await setDoc(doc(db,"supportSheets",currentSupportMajor),{major:currentSupportMajor,courses:supportCourses,updatedAt:serverTimestamp()});

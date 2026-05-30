@@ -559,6 +559,7 @@ a{color:inherit;text-decoration:none}
   <div class="tab-panel" id="tab-suggest">
     <div class="section-label">صحيفة التخصص المساند</div>
     <div class="section-h2">صحيفة التخصص للتخصص المساند</div>
+    <div id="supportSheetImageWrap" style="display:none;margin-bottom:1.5rem"></div>
     <div class="schedule-builder reveal" style="max-width:640px">
       <p style="font-size:.875rem;color:var(--muted);margin-bottom:1.5rem">
         صحيفة التخصص للتخصص المساند — تُظهر المتطلبات اللازمة لإتمام التخصص المساند بنجاح.
@@ -661,6 +662,22 @@ function renderSheetImage(){
   const container=document.getElementById("graduateSheetContainer");
   try{
     const d=await getDoc(doc(db,"supportSheets",major));
+    // show support sheet image if exists
+    const spImg=d.exists()?(d.data().sheetImage||""):"";
+    const spWrap=document.getElementById("supportSheetImageWrap");
+    if(spImg&&spWrap){
+      spWrap.style.display="block";
+      spWrap.innerHTML=`
+        <div style="border-radius:16px;overflow:hidden;border:1px solid var(--border);background:rgba(22,22,22,.6)">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.1rem;border-bottom:1px solid var(--border)">
+            <span style="font-size:.82rem;font-weight:700;color:var(--muted)">📄 صحيفة التخصص المساند الرسمية</span>
+            <a href="${spImg}" target="_blank" style="font-size:.78rem;color:#a5b4fc;font-weight:700;display:flex;align-items:center;gap:.3rem">فتح كاملاً ↗</a>
+          </div>
+          <img src="${spImg}" alt="صحيفة التخصص المساند"
+            style="width:100%;max-height:420px;object-fit:contain;display:block;padding:.75rem"
+            onerror="this.closest('div').style.display='none'">
+        </div>`;
+    }
     const courses=d.exists()?(d.data().courses||[]):[];
     if(!courses.length){
       container.innerHTML='<div class="empty-state" style="padding:2.5rem 1rem"><div style="font-size:2rem;margin-bottom:.75rem">📋</div><p>لم تُضف صحيفة التخصص المساند بعد.</p></div>';
