@@ -953,10 +953,16 @@ function renderTree(){
       const pP=pos[pcode];if(!pP)return;
       const x1=pP.cx, y1=pP.bot, x2=pC.cx, y2=pC.top;
       if(LY[pcode]>=LY[child.code])return;
-      const cpY=(y1+y2)/2;
-      svgH+=`<path d="M${x1},${y1} C${x1},${cpY} ${x2},${cpY} ${x2},${y2}"
-        fill="none" stroke="${col}" stroke-width="1.5" stroke-opacity=".65"
-        marker-end="url(#${mid})"/>`;
+      const busY=y1+38;
+      if(Math.abs(x1-x2)<6){
+        svgH+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
+          stroke="${col}" stroke-width="1.5" stroke-opacity=".65"
+          marker-end="url(#${mid})"/>`;
+      }else{
+        svgH+=`<path d="M${x1},${y1} L${x1},${busY} L${x2},${busY} L${x2},${y2}"
+          fill="none" stroke="${col}" stroke-width="1.5" stroke-opacity=".65"
+          stroke-linejoin="round" marker-end="url(#${mid})"/>`;
+      }
     });
   });
   svg.innerHTML=svgH;
