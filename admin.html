@@ -453,7 +453,7 @@ a{color:inherit;text-decoration:none}
         <div class="card"><h3>إضافة نوتة جديدة</h3>
           <div class="form-grid">
             <div class="form-group"><label>عنوان النوتة</label><input id="noteTitle" placeholder="Genetics Review"></div>
-            <div class="form-group"><label>اسم المادة</label><input id="noteCourse" placeholder="Genetics 301"></div>
+            <div class="form-group"><label>اسم المادة</label><select id="noteCourse"><option value="">-- اختر المادة --</option></select></div>
             <div class="form-group"><label>التخصص</label>
               <select id="noteMajor">
                 <option value="molecular">الأحياء الجزيئية</option><option value="micro">مايكروبيولوجي</option>
@@ -1092,6 +1092,7 @@ onAuthStateChanged(auth,user=>{
   document.getElementById("adminApp").classList.remove("hidden");
   document.getElementById("userEmail").textContent=em;
   loadAll();
+  loadNoteCourses(document.getElementById("noteMajor").value);
 });
 
 // PANELS NAV
@@ -1109,6 +1110,28 @@ window.goPanel=function(id){
   document.querySelector(`.nav-item[data-panel="${id}"]`).classList.add("active");
   document.getElementById("panel-"+id).classList.add("active");
 };
+
+// COURSE DROPDOWN FOR NOTES
+async function loadNoteCourses(majorKey){
+  const sel=document.getElementById("noteCourse");
+  sel.innerHTML='<option value="">⏳ جاري التحميل...</option>';
+  try{
+    const snap=await getDoc(doc(db,"majorSheets",majorKey));
+    let courses=[];
+    if(snap.exists()){
+      const data=snap.data();
+      courses=data.courses||[];
+      if(!courses.length&&data.batches){
+        const latest=Object.keys(data.batches).sort((a,b)=>b.localeCompare(a,undefined,{numeric:true}))[0];
+        if(latest)courses=(data.batches[latest]?.courses)||[];
+      }
+    }
+    if(!courses.length){sel.innerHTML='<option value="">لا توجد مواد مضافة لهذا التخصص</option>';return;}
+    sel.innerHTML='<option value="">-- اختر المادة --</option>'+
+      courses.map(c=>`<option value="${c.code} — ${c.nameAr}">${c.code} — ${c.nameAr}</option>`).join('');
+  }catch{sel.innerHTML='<option value="">خطأ في التحميل</option>';}
+}
+document.getElementById("noteMajor").addEventListener("change",function(){loadNoteCourses(this.value);});
 
 // FIREBASE HELPERS
 async function getItems(col){try{const s=await getDocs(query(collection(db,col),orderBy("createdAt","desc")));return s.docs.map(d=>({id:d.id,...d.data()}))}catch{const s=await getDocs(collection(db,col));return s.docs.map(d=>({id:d.id,...d.data()}))}}
