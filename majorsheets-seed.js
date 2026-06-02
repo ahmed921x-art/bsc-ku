@@ -107,17 +107,16 @@ animal: { major:"animal", courses:[
   // Row 1
   {code:"E 162",nameAr:"اللغة الإنجليزية (2)",nameEn:"English (2)",hours:3,level:2,type:"required",prereqs:["E 161"]},
   {code:"ب ج 281",nameAr:"مقدمة في البيولوجيا الجزيئية",nameEn:"Intro Molecular Biology",hours:3,level:2,type:"dept",prereqs:["ب 101"]},
-  {code:"ح 200",nameAr:"تطبيقات مخبرية",nameEn:"Animal Biology Lab",hours:3,level:2,type:"major",prereqs:["ب 101"]},
-  {code:"ح 206",nameAr:"التنوع الحيواني الحبليات",nameEn:"Chordate Diversity",hours:3,level:2,type:"major",prereqs:["ب 101"]},
+  {code:"0493200",nameAr:"تطبيقات مخبرية في بيولوجيا الحيوان",nameEn:"Lab Applications in Animal Biology",hours:3,level:2,type:"major",prereqs:["ب 101"]},
+  {code:"0493202",nameAr:"بيولوجيا الخلية",nameEn:"Cell Biology",hours:3,level:2,type:"major",prereqs:["ب 101"]},
+  {code:"0493205",nameAr:"التنوع الحيواني I: اللافقاريات",nameEn:"Animal Diversity I: Invertebrates",hours:4,level:2,type:"major",prereqs:["ب 101","E 162"]},
+  {code:"0493206",nameAr:"التنوع الحيواني II: الحبليات",nameEn:"Animal Diversity II: Chordates",hours:3,level:2,type:"major",prereqs:["ب 101"]},
   {code:"ك 271",nameAr:"مقدمة في الكيمياء الحيوية",nameEn:"Intro Biochemistry",hours:3,level:2,type:"support",prereqs:["ك 110"]},
   // Row 2
-  {code:"ح 202",nameAr:"بيولوجيا الخلية",nameEn:"Cell Biology",hours:4,level:3,type:"major",prereqs:["ب 101"]},
-  {code:"ح 205",nameAr:"التنوع اللافقاريات",nameEn:"Invertebrate Diversity",hours:4,level:3,type:"major",prereqs:["ح 206"]},
-  {code:"ح 320",nameAr:"علم الوراثة",nameEn:"Genetics",hours:4,level:3,type:"major",prereqs:["ب ج 281"]},
-  // Row 3
-  {code:"ح 306",nameAr:"علم البيئة",nameEn:"Ecology",hours:3,level:4,type:"major",prereqs:["ح 206"]},
-  {code:"ح 312",nameAr:"علم وظائف أعضاء الحيوانات",nameEn:"Animal Physiology",hours:3,level:4,type:"major",prereqs:["ح 202"]},
-  {code:"ح 305",nameAr:"علم الأجنة",nameEn:"Embryology",hours:4,level:4,type:"major",prereqs:["ح 320"]},
+  {code:"0493305",nameAr:"علم الأجنة",nameEn:"Embryology",hours:4,level:3,type:"major",prereqs:["0493206"]},
+  {code:"0493306",nameAr:"علم البيئة",nameEn:"Ecology",hours:3,level:3,type:"major",prereqs:["0493205","0493206"]},
+  {code:"0493312",nameAr:"علم وظائف أعضاء الحيوانات",nameEn:"Animal Physiology",hours:3,level:3,type:"major",prereqs:["0493205","0493206"]},
+  {code:"0493320",nameAr:"علم الوراثة",nameEn:"Genetics",hours:4,level:3,type:"major",prereqs:["ب 101"]},
 ]},
 
 // ══════════════════════════════════════════════════════════════
