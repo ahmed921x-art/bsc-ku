@@ -705,7 +705,7 @@ a{color:inherit;text-decoration:none}
             <div class="form-group"><label>اسم المادة إنجليزي</label><input id="cNameEn" placeholder="Genetics"></div>
             <div class="form-group"><label>عدد الساعات</label><input id="cHours" type="number" value="3" min="1" max="6"></div>
             <div class="form-group"><label>المستوى (Level)</label>
-              <select id="cLevel"><option value="1">Level 1</option><option value="2">Level 2</option><option value="3">Level 3</option><option value="4">Level 4</option></select>
+              <select id="cLevel"><option value="1">Level 1</option><option value="2">Level 2</option><option value="3">Level 3</option><option value="4">Level 4</option><option value="5">Level 5</option><option value="6">Level 6</option></select>
             </div>
             <div class="form-group"><label>نوع المادة</label>
               <select id="cType">
@@ -1669,23 +1669,26 @@ function renderSheetCourses(){
   const typeColors={required:"rgba(16,185,129,.15)",dept:"rgba(59,130,246,.15)",major:"rgba(245,158,11,.15)",support:"rgba(239,68,68,.12)",elective:"rgba(139,92,246,.15)"};
   el.innerHTML=`
   <style>
-  .edit-row{display:grid;grid-template-columns:90px 1fr 80px 80px 1fr 36px;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;margin-bottom:6px;border:1px solid var(--border)}
+  .edit-row{display:grid;grid-template-columns:90px 1fr 70px 60px 80px 1fr 36px;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;margin-bottom:6px;border:1px solid var(--border)}
   .edit-row:hover{border-color:rgba(99,102,241,.3)}
   .edit-row input,.edit-row select{padding:5px 8px;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:Tajawal,system-ui;font-size:.82rem;width:100%;outline:none}
   .edit-row input:focus,.edit-row select:focus{border-color:rgba(99,102,241,.5)}
   .edit-row select option{background:#0f172a}
   .edit-label{font-size:.68rem;color:var(--muted);font-weight:700;text-align:center;display:block;margin-bottom:2px}
-  .col-head{display:grid;grid-template-columns:90px 1fr 80px 80px 1fr 36px;gap:8px;padding:4px 10px;margin-bottom:4px}
+  .col-head{display:grid;grid-template-columns:90px 1fr 70px 60px 80px 1fr 36px;gap:8px;padding:4px 10px;margin-bottom:4px}
   .col-head span{font-size:.68rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
   </style>
   <div class="col-head">
-    <span>رمز المادة</span><span>اسم المادة</span><span>ساعات</span><span>النوع</span><span>المسبقات (مفصولة بفاصلة)</span><span></span>
+    <span>رمز المادة</span><span>اسم المادة</span><span>ساعات</span><span>مستوى</span><span>النوع</span><span>المسبقات (مفصولة بفاصلة)</span><span></span>
   </div>
   `+sheetCourses.map((c,i)=>`
     <div class="edit-row" style="background:${typeColors[c.type]||'rgba(255,255,255,.03)'}">
       <input value="${c.code}" onchange="updateCourse(${i},'code',this.value)" placeholder="رمز">
       <input value="${c.nameAr}" onchange="updateCourse(${i},'nameAr',this.value)" placeholder="اسم المادة">
       <input type="number" value="${c.hours}" min="1" max="9" onchange="updateCourse(${i},'hours',parseInt(this.value))" style="text-align:center">
+      <select onchange="updateCourse(${i},'level',parseInt(this.value));renderTreePreview()">
+        ${[1,2,3,4,5,6].map(n=>`<option value="${n}" ${(c.level||1)==n?'selected':''}>${n}</option>`).join('')}
+      </select>
       <select onchange="updateCourse(${i},'type',this.value)">
         <option value="required" ${c.type==='required'?'selected':''}>إلزامي</option>
         <option value="dept"     ${c.type==='dept'    ?'selected':''}>قسم</option>
@@ -2166,20 +2169,23 @@ function renderSupportCourses(){
   const typeColors={required:"rgba(16,185,129,.15)",dept:"rgba(59,130,246,.15)",major:"rgba(245,158,11,.15)",support:"rgba(239,68,68,.12)",elective:"rgba(139,92,246,.15)"};
   el.innerHTML=`
   <style>
-  .sp-row{display:grid;grid-template-columns:90px 1fr 70px 80px 1fr 36px;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;margin-bottom:6px;border:1px solid var(--border)}
+  .sp-row{display:grid;grid-template-columns:90px 1fr 70px 60px 80px 1fr 36px;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;margin-bottom:6px;border:1px solid var(--border)}
   .sp-row:hover{border-color:rgba(99,102,241,.3)}
   .sp-row input,.sp-row select{padding:5px 8px;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:Tajawal,system-ui;font-size:.82rem;width:100%;outline:none}
   .sp-row input:focus,.sp-row select:focus{border-color:rgba(99,102,241,.5)}
   .sp-row select option{background:#0f172a}
-  .sp-head{display:grid;grid-template-columns:90px 1fr 70px 80px 1fr 36px;gap:8px;padding:4px 10px;margin-bottom:4px}
+  .sp-head{display:grid;grid-template-columns:90px 1fr 70px 60px 80px 1fr 36px;gap:8px;padding:4px 10px;margin-bottom:4px}
   .sp-head span{font-size:.68rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
   </style>
-  <div class="sp-head"><span>رمز المادة</span><span>اسم المادة</span><span>ساعات</span><span>النوع</span><span>المسبقات</span><span></span></div>
+  <div class="sp-head"><span>رمز المادة</span><span>اسم المادة</span><span>ساعات</span><span>مستوى</span><span>النوع</span><span>المسبقات</span><span></span></div>
   `+supportCourses.map((c,i)=>`
     <div class="sp-row" style="background:${typeColors[c.type]||'rgba(255,255,255,.03)'}">
       <input value="${c.code}" onchange="updateSupportCourse(${i},'code',this.value)" placeholder="رمز">
       <input value="${c.nameAr}" onchange="updateSupportCourse(${i},'nameAr',this.value)" placeholder="اسم المادة">
       <input type="number" value="${c.hours||3}" min="1" max="9" onchange="updateSupportCourse(${i},'hours',parseInt(this.value))" style="text-align:center">
+      <select onchange="updateSupportCourse(${i},'level',parseInt(this.value))">
+        ${[1,2,3,4,5,6].map(n=>`<option value="${n}" ${(c.level||1)==n?'selected':''}>${n}</option>`).join('')}
+      </select>
       <select onchange="updateSupportCourse(${i},'type',this.value)">
         <option value="required" ${c.type==='required'?'selected':''}>إلزامي</option>
         <option value="dept"     ${c.type==='dept'    ?'selected':''}>قسم</option>
