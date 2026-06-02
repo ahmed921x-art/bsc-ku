@@ -525,8 +525,7 @@ ${kb}
       conversationHistory.push({role:"user", parts:[{text:q}]});
       if(conversationHistory.length > 12) conversationHistory.splice(0, 2);
 
-      const GEMINI_KEY="AIzaSyBHEQHCa1BvjAkfPrmIEbfU_BlZH5vvQ0c";
-      const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`,{
+      const res=await fetch("https://gemini-proxy.ahmed921x.workers.dev/?model=gemini-2.5-flash",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({

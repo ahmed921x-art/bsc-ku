@@ -531,8 +531,7 @@ ${kb}
       // Keep last 10 messages only
       if(conversationHistory.length > 10) conversationHistory.splice(0, 2);
 
-      const GEMINI_KEY="AIzaSyBHEQHCa1BvjAkfPrmIEbfU_BlZH5vvQ0c";
-      const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,{
+      const res=await fetch("https://gemini-proxy.ahmed921x.workers.dev/?model=gemini-2.0-flash",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({
