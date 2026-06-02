@@ -541,6 +541,7 @@ a{color:inherit;text-decoration:none}
         <input class="sched-input" id="schedSearch" placeholder="🔍  اكتب اسم أو رمز المادة..." autocomplete="off">
         <div class="sched-suggestions" id="schedSuggestions"></div>
       </div>
+      <div id="schedWarning" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);border-radius:12px;padding:.85rem 1.1rem;font-size:.875rem;color:#fca5a5;margin-bottom:.75rem;line-height:1.7;animation:fu .3s ease"></div>
       <div class="selected-courses" id="selectedCourses"><span style="font-size:.85rem;color:var(--muted)">لم تختر مواد بعد...</span></div>
       <div class="sched-table-wrap">
         <table class="sched-table">
@@ -1023,6 +1024,30 @@ function setupScheduleSearch(){
         const code=item.dataset.code;
         const course=sheetCourses.find(c=>c.code===code);
         if(!course||schedSelected.find(s=>s.code===code))return;
+        // فحص تعارض المسبقات
+        const norm=s=>s.replace(/\s+/g,"").toLowerCase();
+        const prereqCodes=(course.prereqs||"").split(/[,،]/).map(p=>p.trim()).filter(Boolean);
+        let conflict=null;
+        // هل مسبق هذه المادة موجود في الجدول؟
+        for(const pc of prereqCodes){
+          const found=schedSelected.find(s=>norm(s.code)===norm(pc));
+          if(found){conflict=`🚫 ممنوع — "${course.nameAr}" تحتاج "${found.nameAr} (${found.code})" كمسبق. لازم تنهي المسبق أول قبل ما تاخذها.`;break}
+        }
+        // هل هذه المادة مسبق لمادة موجودة في الجدول؟
+        if(!conflict){
+          for(const sel of schedSelected){
+            const sp=(sel.prereqs||"").split(/[,،]/).map(p=>p.trim()).filter(Boolean);
+            if(sp.some(p=>norm(p)===norm(course.code))){
+              conflict=`🚫 ممنوع — "${sel.nameAr} (${sel.code})" تحتاجك مسبقاً لها وموجودة بالجدول. ما تقدر تاخذهم بنفس الفصل.`;break
+            }
+          }
+        }
+        const warn=document.getElementById("schedWarning");
+        if(conflict){
+          if(warn){warn.textContent=conflict;warn.style.display="block";setTimeout(()=>warn.style.display="none",6000)}
+          inp.value="";sug.style.display="none";return;
+        }
+        if(warn)warn.style.display="none";
         schedSelected.push(course);inp.value="";sug.style.display="none";
         renderSchedule(schedSelected);
       }
