@@ -2264,7 +2264,18 @@ document.addEventListener('click',e=>{
           ${m.photo?`<img src="${m.photo}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border)" onerror="this.style.display='none'">`:'<div style="width:44px;height:44px;border-radius:50%;background:rgba(99,102,241,.2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">👤</div>'}
           <div class="list-item-body" style="min-width:0">
             <h4>${m.name||'—'}</h4>
-            <p>${m.role||''} ${m.category?'· '+(catNames[m.category]||m.category):''} ${m.major?'· '+m.major:''}</p>
+            <div id="role-display-${m.id}" style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap">
+              <span id="role-text-${m.id}" style="font-size:.85rem;color:var(--muted)">${m.role||'—'}</span>
+              <button onclick="quickEditRole('${m.id}')" title="تعديل المنصب" style="background:none;border:none;color:#818cf8;cursor:pointer;font-size:.8rem;padding:.1rem .3rem;border-radius:4px">✏️</button>
+            </div>
+            <div id="role-editor-${m.id}" style="display:none;margin-top:.25rem">
+              <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap">
+                <input id="role-input-${m.id}" value="${(m.role||'').replace(/"/g,'&quot;')}" style="padding:.3rem .6rem;background:rgba(255,255,255,.08);border:1px solid rgba(99,102,241,.4);border-radius:8px;color:var(--text);font-family:Tajawal,sans-serif;font-size:.85rem;outline:none;width:200px">
+                <button onclick="saveQuickRole('${m.id}')" style="padding:.3rem .7rem;background:#10b981;border:none;border-radius:8px;color:#fff;font-size:.78rem;font-weight:700;cursor:pointer;font-family:Tajawal,sans-serif">حفظ</button>
+                <button onclick="cancelQuickRole('${m.id}')" style="padding:.3rem .7rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--muted);font-size:.78rem;cursor:pointer;font-family:Tajawal,sans-serif">إلغاء</button>
+              </div>
+            </div>
+            ${m.category?`<p style="font-size:.78rem;color:var(--muted);margin-top:.15rem">${catNames[m.category]||m.category}${m.major?' · '+m.major:''}</p>`:''}
             ${m.email?`<p style="font-size:.75rem;color:var(--muted)">${m.email}</p>`:''}
           </div>
         </div>
@@ -2274,6 +2285,34 @@ document.addEventListener('click',e=>{
         </div>
       </div>`).join('');
   }
+
+  window.quickEditRole = function(id){
+    document.getElementById('role-display-'+id).style.display = 'none';
+    const editor = document.getElementById('role-editor-'+id);
+    editor.style.display = 'block';
+    const input = document.getElementById('role-input-'+id);
+    if(input){ input.focus(); input.select(); }
+  };
+
+  window.cancelQuickRole = function(id){
+    document.getElementById('role-editor-'+id).style.display = 'none';
+    document.getElementById('role-display-'+id).style.display = 'flex';
+  };
+
+  window.saveQuickRole = async function(id){
+    const input = document.getElementById('role-input-'+id);
+    if(!input) return;
+    const newRole = input.value.trim();
+    if(!newRole){ alert('المنصب لا يمكن أن يكون فارغاً'); return; }
+    try{
+      await setDoc(doc(db,'teamMembers',id),{role:newRole,updatedAt:serverTimestamp()},{merge:true});
+      const span = document.getElementById('role-text-'+id);
+      if(span) span.textContent = newRole;
+      cancelQuickRole(id);
+    }catch(e){
+      alert('حدث خطأ: '+e.message);
+    }
+  };
 
   window.editMember = function(id){
     getItems('teamMembers').then(members=>{
