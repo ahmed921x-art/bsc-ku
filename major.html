@@ -1029,10 +1029,10 @@ function setupScheduleSearch(){
   }
 
   // دالة عالمية يستدعيها الـ onclick مباشرة من الـ HTML
-  window._addToSched=function(encoded){
-    let course;
-    try{course=JSON.parse(decodeURIComponent(encoded))}catch{return}
-    if(!course||schedSelected.find(s=>s.code===course.code))return;
+  window._addToSched=function(i){
+    const course=(window._schedMap||{})[i];
+    if(!course)return;
+    if(schedSelected.find(s=>s.code===course.code))return;
     sug.style.display="none";inp.value="";
     const norm=s=>s.replace(/\s+/g,"").toLowerCase();
     const prereqCodes=(course.prereqs||"").split(/[,،]/).map(p=>p.trim()).filter(Boolean);
@@ -1064,10 +1064,12 @@ function setupScheduleSearch(){
     if(!q||!sheetCourses.length){sug.style.display="none";return}
     const matches=sheetCourses.filter(c=>`${c.code} ${c.nameAr} ${c.nameEn||""}`.toLowerCase().includes(q)).slice(0,8);
     if(!matches.length){sug.style.display="none";return}
-    sug.innerHTML=matches.map(c=>{
-      const enc=encodeURIComponent(JSON.stringify(c));
-      return`<div class="sug-item" onclick="window._addToSched('${enc}')"><span class="sug-code">${c.code}</span>${c.nameAr}${c.nameEn?" — "+c.nameEn:""} <span style="font-size:.72rem;color:var(--muted)">(${c.hours}ساعات)</span></div>`;
-    }).join("");
+    // نخزّن المواد الظاهرة في map عالمي ونمرر الـ index فقط للـ onclick
+    window._schedMap={};
+    matches.forEach((c,i)=>{window._schedMap[i]=c});
+    sug.innerHTML=matches.map((c,i)=>
+      `<div class="sug-item" onclick="window._addToSched(${i})"><span class="sug-code">${c.code}</span>${c.nameAr}${c.nameEn?" — "+c.nameEn:""} <span style="font-size:.72rem;color:var(--muted)">(${c.hours}ساعات)</span></div>`
+    ).join("");
     sug.style.display="block";
   });
 
