@@ -1017,18 +1017,18 @@ function setupScheduleSearch(){
     if(!q||!sheetCourses.length){sug.style.display="none";return}
     const matches=sheetCourses.filter(c=>`${c.code} ${c.nameAr} ${c.nameEn||""}`.toLowerCase().includes(q)).slice(0,8);
     if(!matches.length){sug.style.display="none";return}
-    sug.innerHTML=matches.map(c=>`<div class="sug-item" data-code="${c.code}"><span class="sug-code">${c.code}</span>${c.nameAr}${c.nameEn?" — "+c.nameEn:""} <span style="font-size:.72rem;color:var(--muted)">(${c.hours}ساعات)</span></div>`).join("");
+    sug.innerHTML=matches.map(c=>`<div class="sug-item" data-course='${encodeURIComponent(JSON.stringify(c))}'><span class="sug-code">${c.code}</span>${c.nameAr}${c.nameEn?" — "+c.nameEn:""} <span style="font-size:.72rem;color:var(--muted)">(${c.hours}ساعات)</span></div>`).join("");
     sug.style.display="block";
   });
 
-  // event delegation على mousedown عشان يشتغل قبل ما يضيع الـ focus
-  sug.addEventListener("mousedown",e=>{
-    e.preventDefault(); // يمنع ضياع الـ focus عن الـ input
+  // event delegation — mousedown + click كلاهم عشان يضمن التسجيل
+  function handleSugPick(e){
+    e.preventDefault();e.stopPropagation();
     const item=e.target.closest(".sug-item");
     if(!item)return;
-    const code=item.dataset.code;
-    const course=sheetCourses.find(c=>c.code===code);
-    if(!course||schedSelected.find(s=>s.code===code))return;
+    let course;
+    try{course=JSON.parse(decodeURIComponent(item.dataset.course))}catch{return}
+    if(!course||schedSelected.find(s=>s.code===course.code))return;
     // فحص تعارض المسبقات
     const norm=s=>s.replace(/\s+/g,"").toLowerCase();
     const prereqCodes=(course.prereqs||"").split(/[,،]/).map(p=>p.trim()).filter(Boolean);
@@ -1055,7 +1055,9 @@ function setupScheduleSearch(){
     if(warn)warn.style.display="none";
     schedSelected.push(course);inp.value="";sug.style.display="none";
     renderSchedule(schedSelected);
-  });
+  }
+  sug.addEventListener("mousedown",handleSugPick);
+  sug.addEventListener("click",handleSugPick);
 
   document.addEventListener("click",e=>{if(!sug.contains(e.target)&&e.target!==inp)sug.style.display="none"});
   window._schedRemove=function(code){schedSelected=schedSelected.filter(s=>s.code!==code);renderSchedule(schedSelected)};
