@@ -2468,7 +2468,7 @@ document.addEventListener('click',e=>{
     for (const m of members) {
       try {
         const {id, ...data} = m;
-        await setDoc(doc(collection(db,'teamMembers'), id), data);
+        await setDoc(doc(collection(db,'teamMembers'), id), {...data, createdAt:serverTimestamp()});
         done++;
         bar.style.width = (done/members.length*100)+'%';
         log.innerHTML += `<span style="color:#10b981">✓ ${m.name}</span><br>`;
@@ -2481,7 +2481,7 @@ document.addEventListener('click',e=>{
     btn.textContent = '✅ تم الاستيراد!';
     status.textContent = `رُفع ${done} من ${members.length} عضو`;
     status.style.color = '#10b981';
-    setTimeout(() => { if(typeof loadMembers === 'function') loadMembers(); }, 800);
+    setTimeout(() => { if(typeof window.loadMembers === 'function') window.loadMembers(); }, 800);
   }
 
   // ربط الزر بعد تحميل الصفحة
