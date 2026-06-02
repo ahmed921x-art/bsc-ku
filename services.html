@@ -1279,24 +1279,34 @@ function renderGuide(filter){
     return;
   }
   grid.innerHTML=list.map((s,i)=>{
-    const imgs=s.images&&s.images.length?s.images:[s.imageUrl||""];
-    const url=imgs[0].replace(/"/g,"&quot;");
+    const imgs=(s.images&&s.images.length)?s.images:(s.imageUrl?[s.imageUrl]:[]);
+    const hasImgs=imgs.length>0&&imgs[0];
+    const imgUrl=hasImgs?imgs[0].replace(/"/g,"&quot;"):"";
     const imgsJson=JSON.stringify(imgs).replace(/"/g,"&quot;");
     const title=(s.title||"").replace(/</g,"&lt;").replace(/"/g,"&quot;");
     const tag=(s.section?GUIDE_SECTIONS[s.section]||s.section:"دليل").replace(/</g,"&lt;");
     const desc=(s.desc||"").replace(/</g,"&lt;");
-    return`<div class="sched-card reveal" style="animation-delay:${i*.07}s" data-url="${url}" data-imgs="${imgsJson}" data-title="${title}">
-      <div class="sched-img-wrap" style="position:relative"><img class="sched-img" src="${url}" alt="${title}" loading="lazy">${imgs.length>1?`<span style="position:absolute;bottom:.4rem;left:.5rem;background:rgba(0,0,0,.65);color:#fff;font-size:.7rem;font-weight:700;padding:.18rem .55rem;border-radius:999px">🖼 ${imgs.length}</span>`:""}</div>
+    const extUrl=s.url||"";
+    const linkLabel=extUrl.includes("drive.google")?"📂 فتح Google Drive":extUrl.includes("adobe")?"📄 فتح Adobe":"📄 فتح الرابط";
+    const imgSection=hasImgs
+      ?`<div class="sched-img-wrap" style="position:relative"><img class="sched-img" src="${imgUrl}" alt="${title}" loading="lazy">${imgs.length>1?`<span style="position:absolute;bottom:.4rem;left:.5rem;background:rgba(0,0,0,.65);color:#fff;font-size:.7rem;font-weight:700;padding:.18rem .55rem;border-radius:999px">🖼 ${imgs.length}</span>`:""}</div>`
+      :`<div class="sched-img-wrap" style="background:rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;font-size:3rem;min-height:130px">📄</div>`;
+    return`<div class="sched-card reveal" style="animation-delay:${i*.07}s" data-url="${imgUrl}" data-imgs="${imgsJson}" data-title="${title}" data-exturl="${extUrl.replace(/"/g,"&quot;")}">
+      ${imgSection}
       <div class="sched-info">
         <div class="sched-tag">${tag}</div>
         <h3>${title}</h3>
         ${desc?`<p>${desc}</p>`:""}
+        ${extUrl?`<a href="${extUrl.replace(/"/g,"&quot;")}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:.6rem;padding:.4rem .9rem;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.35);border-radius:8px;color:#a5b4fc;font-size:.8rem;font-weight:700;text-decoration:none">${linkLabel}</a>`:""}
       </div>
     </div>`;
   }).join("");
   document.querySelectorAll("#guideGrid .sched-card").forEach(card=>{
-    const imgs=card.dataset.imgs?JSON.parse(card.dataset.imgs):[card.dataset.url];
-    card.onclick=()=>openLightbox(imgs,card.dataset.title);
+    card.onclick=()=>{
+      const imgs=card.dataset.imgs?JSON.parse(card.dataset.imgs):[];
+      if(imgs.length&&imgs[0])openLightbox(imgs,card.dataset.title);
+      else if(card.dataset.exturl)window.open(card.dataset.exturl,"_blank");
+    };
   });
   trigReveal();
 }
