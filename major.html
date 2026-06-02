@@ -1019,40 +1019,44 @@ function setupScheduleSearch(){
     if(!matches.length){sug.style.display="none";return}
     sug.innerHTML=matches.map(c=>`<div class="sug-item" data-code="${c.code}"><span class="sug-code">${c.code}</span>${c.nameAr}${c.nameEn?" — "+c.nameEn:""} <span style="font-size:.72rem;color:var(--muted)">(${c.hours}ساعات)</span></div>`).join("");
     sug.style.display="block";
-    sug.querySelectorAll(".sug-item").forEach(item=>{
-      item.onclick=()=>{
-        const code=item.dataset.code;
-        const course=sheetCourses.find(c=>c.code===code);
-        if(!course||schedSelected.find(s=>s.code===code))return;
-        // فحص تعارض المسبقات
-        const norm=s=>s.replace(/\s+/g,"").toLowerCase();
-        const prereqCodes=(course.prereqs||"").split(/[,،]/).map(p=>p.trim()).filter(Boolean);
-        let conflict=null;
-        // هل مسبق هذه المادة موجود في الجدول؟
-        for(const pc of prereqCodes){
-          const found=schedSelected.find(s=>norm(s.code)===norm(pc));
-          if(found){conflict=`🚫 ممنوع — "${course.nameAr}" تحتاج "${found.nameAr} (${found.code})" كمسبق. لازم تنهي المسبق أول قبل ما تاخذها.`;break}
-        }
-        // هل هذه المادة مسبق لمادة موجودة في الجدول؟
-        if(!conflict){
-          for(const sel of schedSelected){
-            const sp=(sel.prereqs||"").split(/[,،]/).map(p=>p.trim()).filter(Boolean);
-            if(sp.some(p=>norm(p)===norm(course.code))){
-              conflict=`🚫 ممنوع — "${sel.nameAr} (${sel.code})" تحتاجك مسبقاً لها وموجودة بالجدول. ما تقدر تاخذهم بنفس الفصل.`;break
-            }
-          }
-        }
-        const warn=document.getElementById("schedWarning");
-        if(conflict){
-          if(warn){warn.textContent=conflict;warn.style.display="block";setTimeout(()=>warn.style.display="none",6000)}
-          inp.value="";sug.style.display="none";return;
-        }
-        if(warn)warn.style.display="none";
-        schedSelected.push(course);inp.value="";sug.style.display="none";
-        renderSchedule(schedSelected);
-      }
-    });
   });
+
+  // event delegation على mousedown عشان يشتغل قبل ما يضيع الـ focus
+  sug.addEventListener("mousedown",e=>{
+    e.preventDefault(); // يمنع ضياع الـ focus عن الـ input
+    const item=e.target.closest(".sug-item");
+    if(!item)return;
+    const code=item.dataset.code;
+    const course=sheetCourses.find(c=>c.code===code);
+    if(!course||schedSelected.find(s=>s.code===code))return;
+    // فحص تعارض المسبقات
+    const norm=s=>s.replace(/\s+/g,"").toLowerCase();
+    const prereqCodes=(course.prereqs||"").split(/[,،]/).map(p=>p.trim()).filter(Boolean);
+    let conflict=null;
+    // هل مسبق هذه المادة موجود في الجدول؟
+    for(const pc of prereqCodes){
+      const found=schedSelected.find(s=>norm(s.code)===norm(pc));
+      if(found){conflict=`🚫 ممنوع — "${course.nameAr}" تحتاج "${found.nameAr} (${found.code})" كمسبق. لازم تنهي المسبق أول قبل ما تاخذها.`;break}
+    }
+    // هل هذه المادة مسبق لمادة موجودة في الجدول؟
+    if(!conflict){
+      for(const sel of schedSelected){
+        const sp=(sel.prereqs||"").split(/[,،]/).map(p=>p.trim()).filter(Boolean);
+        if(sp.some(p=>norm(p)===norm(course.code))){
+          conflict=`🚫 ممنوع — "${sel.nameAr} (${sel.code})" تحتاجك مسبقاً لها وموجودة بالجدول. ما تقدر تاخذهم بنفس الفصل.`;break
+        }
+      }
+    }
+    const warn=document.getElementById("schedWarning");
+    if(conflict){
+      if(warn){warn.textContent=conflict;warn.style.display="block";setTimeout(()=>warn.style.display="none",6000)}
+      inp.value="";sug.style.display="none";return;
+    }
+    if(warn)warn.style.display="none";
+    schedSelected.push(course);inp.value="";sug.style.display="none";
+    renderSchedule(schedSelected);
+  });
+
   document.addEventListener("click",e=>{if(!sug.contains(e.target)&&e.target!==inp)sug.style.display="none"});
   window._schedRemove=function(code){schedSelected=schedSelected.filter(s=>s.code!==code);renderSchedule(schedSelected)};
   function renderSchedule(list){
