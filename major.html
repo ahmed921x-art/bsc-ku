@@ -1007,72 +1007,82 @@ function renderTree(){
     `position:relative;width:${CW}px;height:${CH}px`;
 }
 
-// SCHEDULE SEARCH
+// SCHEDULE SEARCH — كل الـ state على window لتفادي أي مشكلة في الـ closure
+window._sched={list:[],map:{}};
+
+window._renderSchedule=function(){
+  const list=window._sched.list;
+  const typeLabel={required:"إلزامي",dept:"قسم",major:"تخصص",support:"مساند",elective:"اختياري"};
+  const chips=document.getElementById("selectedCourses");
+  const tbody=document.getElementById("schedTableBody");
+  const total=document.getElementById("schedTotal");
+  if(!chips||!tbody||!total)return;
+  if(!list.length){
+    chips.innerHTML='<span style="font-size:.85rem;color:var(--muted)">لم تختر مواد بعد...</span>';
+    tbody.innerHTML='<tr><td colspan="6" style="color:var(--muted);padding:2rem">ابحث عن مادة وأضفها للجدول</td></tr>';
+    total.style.display="none";return;
+  }
+  chips.innerHTML=list.map(c=>`<div class="sel-chip">${c.code} — ${c.nameAr}<button onclick="window._schedRemove('${c.code}')">×</button></div>`).join("");
+  let hrs=0;
+  tbody.innerHTML=list.map((c,i)=>{hrs+=Number(c.hours)||0;return`<tr><td>${i+1}</td><td style="font-weight:700;color:#a5b4fc">${c.code}</td><td>${c.nameAr}${c.nameEn?`<br><span style="font-size:.72rem;color:var(--muted)">${c.nameEn}</span>`:""}</td><td>${c.hours||3}</td><td>${typeLabel[c.type]||c.type||"—"}</td><td><button onclick="window._schedRemove('${c.code}')" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:8px;padding:3px 8px;cursor:pointer;font-size:.75rem">حذف</button></td></tr>`}).join("");
+  document.getElementById("totCourses").textContent=list.length;
+  document.getElementById("totHours").textContent=hrs;
+  document.getElementById("totGPA").textContent="—";
+  total.style.display="flex";
+};
+
+window._schedRemove=function(code){
+  window._sched.list=window._sched.list.filter(s=>s.code!==code);
+  window._renderSchedule();
+};
+
+window._addToSched=function(i){
+  const course=window._sched.map[i];
+  if(!course)return;
+  if(window._sched.list.find(s=>s.code===course.code))return;
+  // فحص تعارض المسبقات
+  const norm=s=>String(s).replace(/\s+/g,"").toLowerCase();
+  const prereqs=String(course.prereqs||"").split(/[,،]/).map(p=>p.trim()).filter(Boolean);
+  let conflict=null;
+  for(const pc of prereqs){
+    const found=window._sched.list.find(s=>norm(s.code)===norm(pc));
+    if(found){conflict=`🚫 ممنوع — "${course.nameAr}" تحتاج "${found.nameAr}" كمسبق.`;break}
+  }
+  if(!conflict){
+    for(const sel of window._sched.list){
+      const sp=String(sel.prereqs||"").split(/[,،]/).map(p=>p.trim()).filter(Boolean);
+      if(sp.some(p=>norm(p)===norm(course.code))){conflict=`🚫 ممنوع — "${sel.nameAr}" تحتاجك مسبقاً. ما تقدر تاخذهم بنفس الفصل.`;break}
+    }
+  }
+  const warn=document.getElementById("schedWarning");
+  if(conflict){
+    if(warn){warn.textContent=conflict;warn.style.display="block";setTimeout(()=>warn.style.display="none",6000)}
+    document.getElementById("schedSearch").value="";
+    document.getElementById("schedSuggestions").style.display="none";
+    return;
+  }
+  if(warn)warn.style.display="none";
+  window._sched.list.push(course);
+  document.getElementById("schedSearch").value="";
+  document.getElementById("schedSuggestions").style.display="none";
+  window._renderSchedule();
+};
+
 function setupScheduleSearch(){
   const inp=document.getElementById("schedSearch");
   const sug=document.getElementById("schedSuggestions");
-  let schedSelected=[];
-
-  function renderSchedule(list){
-    const typeLabel={required:"إلزامي",dept:"قسم",major:"تخصص",support:"مساند",elective:"اختياري"};
-    const chips=document.getElementById("selectedCourses");
-    const tbody=document.getElementById("schedTableBody");
-    const total=document.getElementById("schedTotal");
-    if(!list.length){chips.innerHTML='<span style="font-size:.85rem;color:var(--muted)">لم تختر مواد بعد...</span>';tbody.innerHTML='<tr><td colspan="6" style="color:var(--muted);padding:2rem">ابحث عن مادة وأضفها للجدول</td></tr>';total.style.display="none";return}
-    chips.innerHTML=list.map(c=>`<div class="sel-chip">${c.code} — ${c.nameAr}<button onclick="_schedRemove('${c.code}')">×</button></div>`).join("");
-    let totalHours=0;
-    tbody.innerHTML=list.map((c,i)=>{totalHours+=c.hours||0;return`<tr><td>${i+1}</td><td style="font-weight:700;color:#a5b4fc">${c.code}</td><td>${c.nameAr}${c.nameEn?`<br><span style="font-size:.72rem;color:var(--muted)">${c.nameEn}</span>`:""}</td><td>${c.hours||3}</td><td>${typeLabel[c.type]||c.type||"—"}</td><td><button onclick="_schedRemove('${c.code}')" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:8px;padding:3px 8px;cursor:pointer;font-size:.75rem">حذف</button></td></tr>`}).join("");
-    document.getElementById("totCourses").textContent=list.length;
-    document.getElementById("totHours").textContent=totalHours;
-    document.getElementById("totGPA").textContent="—";
-    total.style.display="flex";
-  }
-
-  // دالة عالمية يستدعيها الـ onclick مباشرة من الـ HTML
-  window._addToSched=function(i){
-    const course=(window._schedMap||{})[i];
-    if(!course)return;
-    if(schedSelected.find(s=>s.code===course.code))return;
-    sug.style.display="none";inp.value="";
-    const norm=s=>s.replace(/\s+/g,"").toLowerCase();
-    const prereqCodes=(course.prereqs||"").split(/[,،]/).map(p=>p.trim()).filter(Boolean);
-    let conflict=null;
-    for(const pc of prereqCodes){
-      const found=schedSelected.find(s=>norm(s.code)===norm(pc));
-      if(found){conflict=`🚫 ممنوع — "${course.nameAr}" تحتاج "${found.nameAr} (${found.code})" كمسبق. لازم تنهي المسبق أول.`;break}
-    }
-    if(!conflict){
-      for(const sel of schedSelected){
-        const sp=(sel.prereqs||"").split(/[,،]/).map(p=>p.trim()).filter(Boolean);
-        if(sp.some(p=>norm(p)===norm(course.code))){conflict=`🚫 ممنوع — "${sel.nameAr} (${sel.code})" تحتاجك مسبقاً. ما تقدر تاخذهم بنفس الفصل.`;break}
-      }
-    }
-    const warn=document.getElementById("schedWarning");
-    if(conflict){
-      if(warn){warn.textContent=conflict;warn.style.display="block";setTimeout(()=>warn.style.display="none",6000)}
-      return;
-    }
-    if(warn)warn.style.display="none";
-    schedSelected.push(course);
-    renderSchedule(schedSelected);
-  };
-
-  window._schedRemove=function(code){schedSelected=schedSelected.filter(s=>s.code!==code);renderSchedule(schedSelected)};
-
   inp.addEventListener("input",()=>{
     const q=inp.value.trim().toLowerCase();
     if(!q||!sheetCourses.length){sug.style.display="none";return}
     const matches=sheetCourses.filter(c=>`${c.code} ${c.nameAr} ${c.nameEn||""}`.toLowerCase().includes(q)).slice(0,8);
     if(!matches.length){sug.style.display="none";return}
-    // نخزّن المواد الظاهرة في map عالمي ونمرر الـ index فقط للـ onclick
-    window._schedMap={};
-    matches.forEach((c,i)=>{window._schedMap[i]=c});
+    window._sched.map={};
+    matches.forEach((c,i)=>{window._sched.map[i]=c});
     sug.innerHTML=matches.map((c,i)=>
       `<div class="sug-item" onclick="window._addToSched(${i})"><span class="sug-code">${c.code}</span>${c.nameAr}${c.nameEn?" — "+c.nameEn:""} <span style="font-size:.72rem;color:var(--muted)">(${c.hours}ساعات)</span></div>`
     ).join("");
     sug.style.display="block";
   });
-
   document.addEventListener("click",e=>{if(!sug.contains(e.target)&&e.target!==inp)sug.style.display="none"});
 }
 </script>
