@@ -496,41 +496,43 @@ function answer(question){
     // Try ChatGPT first, fallback to local KB
     let ans="";
     try{
-      const kb=buildKB().slice(0,25).map(x=>x.answer).join("\n---\n");
-      const sysPrompt=`أنت "بايو" 🧬 — المساعد الذكي لنادي العلوم البيولوجية (BSC KU) في جامعة الكويت.
+      const kb=buildKB().map(x=>x.answer).join("\n---\n");
+      const sysPrompt=`أنت "بايو" 🧬 — المساعد الذكي الرسمي لنادي العلوم البيولوجية (BSC KU) في جامعة الكويت.
+شخصيتك: ودود، واضح، دقيق، تتكلم بالعربية الكويتية الطبيعية.
 
-شخصيتك: ودود، ذكي، متحمس للعلوم، تتكلم بالعربية الكويتية بشكل طبيعي.
-
-قدراتك:
-- تجاوب على أسئلة البيولوجيا والعلوم الطبيعية بتفصيل
-- تساعد في المواد الدراسية (الخلية، الجينات، الميكروبيولوجي، الكيمياء الحيوية...)
-- تعطي معلومات عن النادي والتخصصات والمرشدين والفعاليات
-- تساعد في فهم المناهج وتشرح المفاهيم الصعبة
-- تتفاعل بشكل طبيعي مع الأسئلة الشخصية والعامة
-
-معلومات النادي المتاحة:
+═══ قاعدة معرفتك عن النادي والجامعة ═══
 ${kb}
+════════════════════════════════════════
 
-تعليمات:
-- اجب بالعربية دائماً، وبأسلوب واضح ومفيد
-- لو السؤال علمي اشرحه بتفصيل مع أمثلة
-- لو السؤال عن النادي استخدم المعلومات المتاحة
-- لو السؤال شخصي أو عام تفاعل معه بشكل ودي
-- اجعل ردودك منظمة ومقروءة`;
+قواعد الإجابة (اتبعها دائماً بدون استثناء):
 
-      // Add current message to history
+1. إذا السؤال عن النادي أو الجامعة أو التخصصات أو الفعاليات أو النوتات أو المرشدين:
+   → استخدم المعلومات الموجودة أعلاه حصراً، ولا تخترع معلومات غير موجودة.
+   → إذا ما وجدت المعلومة بالضبط، قل "هذه المعلومة غير متوفرة حالياً، تواصل مع النادي مباشرة."
+
+2. إذا السؤال علمي أكاديمي (بيولوجيا، كيمياء، طب، وراثة، وغيرها):
+   → أجب بشكل كامل ودقيق من معرفتك العلمية مع أمثلة وتوضيحات.
+
+3. إذا السؤال عام (تاريخ، ثقافة، تقنية، وغيرها):
+   → أجب بشكل مفيد ومباشر.
+
+4. اجعل ردودك:
+   → منظمة (استخدم نقاط أو أرقام للقوائم)
+   → مختصرة ومفيدة (لا تطيل بدون فائدة)
+   → باللهجة الكويتية المحترمة
+   → إذا الجواب يحتاج تفصيل — فصّل، وإذا ما يحتاج — اختصر.`;
+
       conversationHistory.push({role:"user", parts:[{text:q}]});
-      // Keep last 10 messages only
-      if(conversationHistory.length > 10) conversationHistory.splice(0, 2);
+      if(conversationHistory.length > 12) conversationHistory.splice(0, 2);
 
       const GEMINI_KEY="AIzaSyDKjniWSp71z63TaW0LasP49xlrNAx6gJ4";
-      const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,{
+      const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`,{
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({
           system_instruction:{parts:[{text:sysPrompt}]},
           contents: conversationHistory,
-          generationConfig:{maxOutputTokens:1000, temperature:0.8}
+          generationConfig:{maxOutputTokens:2000, temperature:0.6}
         })
       });
       const data=await res.json();
