@@ -435,6 +435,118 @@ import { getFirestore, collection, getDocs, query, orderBy, addDoc, serverTimest
 const app=initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"});
 const db=getFirestore(app);
 const mn={molecular:"البيولوجيا الجزيئية",micro:"علم الميكروبيولوجي",plant:"بيولوجيا النبات",animal:"بيولوجيا الحيوان",biochem:"الكيمياء الحيوية"};
+const MAJOR_SHEETS={
+  molecular:[
+    {code:"ع 101",nameAr:"مهارات الاتصال اللغوية",hours:3,type:"required",prereqs:[]},
+    {code:"ك 110",nameAr:"كيمياء عامة",hours:3,type:"required",prereqs:[]},
+    {code:"ك 111",nameAr:"مختبر كيمياء عامة",hours:1,type:"required",prereqs:[]},
+    {code:"ب 103",nameAr:"رياضة حيوية",hours:3,type:"dept",prereqs:[]},
+    {code:"E 161",nameAr:"اللغة الإنجليزية (1)",hours:3,type:"required",prereqs:[]},
+    {code:"ب 101",nameAr:"بيولوجيا (1)",hours:4,type:"dept",prereqs:[]},
+    {code:"ب 105",nameAr:"علم الكائنات الدقيقة",hours:3,type:"dept",prereqs:[]},
+    {code:"إح 102",nameAr:"إحصاء لعلوم الحياة",hours:3,type:"required",prereqs:[]},
+    {code:"ر 103",nameAr:"رياضيات",hours:3,type:"required",prereqs:[]},
+    {code:"E 162",nameAr:"اللغة الإنجليزية (2)",hours:3,type:"required",prereqs:["E 161"]},
+    {code:"ب ج 281",nameAr:"مقدمة في البيولوجيا الجزيئية",hours:3,type:"major",prereqs:["ب 101"]},
+    {code:"ب ج 271",nameAr:"بيولوجيا الخلية",hours:3,type:"major",prereqs:["ب 101"]},
+    {code:"ب ج 283",nameAr:"زراعة الأنسجة الحيوانية",hours:4,type:"major",prereqs:["ب 101"]},
+    {code:"ب ج 291",nameAr:"تقنيات في الكيمياء الحيوية",hours:3,type:"major",prereqs:["ب ج 271"]},
+    {code:"ب ج 320",nameAr:"علم الوراثة",hours:4,type:"major",prereqs:["ب ج 281"]},
+    {code:"ب ج 371",nameAr:"مقدمة في الوراثة الجزيئية",hours:3,type:"major",prereqs:["ب ج 281","ب ج 271"]},
+    {code:"ب ج 383",nameAr:"بيولوجيا الخلية الجزيئية",hours:3,type:"major",prereqs:["ب 101","ب ج 281"]},
+    {code:"ب ج 390",nameAr:"المعلوماتية الحياتية",hours:3,type:"major",prereqs:["ب ج 281"]},
+    {code:"ب ج 401",nameAr:"علم المناعة الخلوية والجزيئية",hours:3,type:"major",prereqs:["ب ج 371"]},
+    {code:"ب ج 402",nameAr:"مختبر علم المناعة",hours:3,type:"major",prereqs:["ب ج 371"]},
+    {code:"ب ج 480",nameAr:"تقنية الحمض النووي المؤشب",hours:6,type:"major",prereqs:["ب ج 482","ب ج 383"]},
+    {code:"ب ج 482",nameAr:"بيولوجيا جزيئية",hours:3,type:"major",prereqs:["ب ج 371"]},
+    {code:"ب ج 483",nameAr:"تقنيات البيولوجيا الجزيئية",hours:3,type:"major",prereqs:["ب ج 371"]},
+    {code:"ب ج 490",nameAr:"أساسيات التكنولوجيا الحيوية",hours:6,type:"major",prereqs:["ب ج 482","ب ج 383"]},
+    {code:"ب ج 495",nameAr:"بيولوجيا جزيئية متقدمة",hours:3,type:"major",prereqs:["ب ج 371","ب ج 383"]},
+  ],
+  micro:[
+    {code:"ع 101",nameAr:"مهارات الاتصال اللغوية",hours:3,type:"required",prereqs:[]},
+    {code:"ك 110",nameAr:"كيمياء عامة",hours:3,type:"required",prereqs:[]},
+    {code:"ك 111",nameAr:"مختبر كيمياء عامة",hours:1,type:"required",prereqs:[]},
+    {code:"ب 103",nameAr:"رياضة حيوية",hours:3,type:"dept",prereqs:[]},
+    {code:"E 161",nameAr:"اللغة الإنجليزية (1)",hours:3,type:"required",prereqs:[]},
+    {code:"ب 101",nameAr:"بيولوجيا (1)",hours:4,type:"dept",prereqs:[]},
+    {code:"ب 105",nameAr:"علم الكائنات الدقيقة",hours:3,type:"dept",prereqs:[]},
+    {code:"E 162",nameAr:"اللغة الإنجليزية (2)",hours:3,type:"required",prereqs:["E 161"]},
+    {code:"ب ج 281",nameAr:"مقدمة في البيولوجيا الجزيئية",hours:3,type:"dept",prereqs:["ب 101"]},
+    {code:"م ب 102",nameAr:"بيولوجيا (2)",hours:3,type:"major",prereqs:["ب 101"]},
+    {code:"م ب 103",nameAr:"بيولوجيا (3)",hours:3,type:"major",prereqs:["ب 101"]},
+    {code:"ك 271",nameAr:"مقدمة في الكيمياء الحيوية",hours:3,type:"support",prereqs:["ك 110"]},
+    {code:"م ب 107",nameAr:"تقنيات دقيقة ومجهرية",hours:3,type:"major",prereqs:["ب 105"]},
+    {code:"م ب 203",nameAr:"الأيض والوراثة الميكروبية",hours:3,type:"major",prereqs:["م ب 102"]},
+    {code:"م ب 204",nameAr:"علم الفيروسات",hours:3,type:"major",prereqs:["م ب 102"]},
+    {code:"م ب 205",nameAr:"علم البكتيريا",hours:3,type:"major",prereqs:["م ب 102"]},
+    {code:"م ب 382",nameAr:"علم المناعة",hours:3,type:"major",prereqs:["م ب 102"]},
+    {code:"م ب 206",nameAr:"علم الفطريات والبروتوزوا",hours:3,type:"major",prereqs:["م ب 102"]},
+    {code:"م ب 207",nameAr:"الطحالب الدقيقة",hours:3,type:"major",prereqs:["م ب 102"]},
+  ],
+  plant:[
+    {code:"ع 101",nameAr:"مهارات الاتصال اللغوية",hours:3,type:"required",prereqs:[]},
+    {code:"ك 110",nameAr:"كيمياء عامة",hours:3,type:"required",prereqs:[]},
+    {code:"ب 103",nameAr:"رياضة حيوية",hours:3,type:"dept",prereqs:[]},
+    {code:"E 161",nameAr:"اللغة الإنجليزية (1)",hours:3,type:"required",prereqs:[]},
+    {code:"ب 101",nameAr:"بيولوجيا (1)",hours:4,type:"dept",prereqs:[]},
+    {code:"ب 105",nameAr:"علم الكائنات الدقيقة",hours:3,type:"dept",prereqs:[]},
+    {code:"E 162",nameAr:"اللغة الإنجليزية (2)",hours:3,type:"required",prereqs:["E 161"]},
+    {code:"ب ج 281",nameAr:"مقدمة في البيولوجيا الجزيئية",hours:3,type:"dept",prereqs:["ب 101"]},
+    {code:"ن 211",nameAr:"تشريح نبات",hours:3,type:"major",prereqs:["ب 101"]},
+    {code:"ك 271",nameAr:"مقدمة في الكيمياء الحيوية",hours:3,type:"support",prereqs:["ك 110"]},
+    {code:"ن 102",nameAr:"التركيب والوظيفة في النبات",hours:4,type:"major",prereqs:["ب 101"]},
+    {code:"ن 221",nameAr:"مبادئ علم الطحالب",hours:3,type:"major",prereqs:["ب 101"]},
+    {code:"ن 231",nameAr:"مبادئ علم الوراثة",hours:3,type:"major",prereqs:["ب ج 281"]},
+    {code:"ن 251",nameAr:"مبادئ علم تصنيف النبات",hours:3,type:"major",prereqs:["ن 102"]},
+    {code:"ن 261",nameAr:"مبادئ علم البيئة النباتية",hours:3,type:"major",prereqs:["ب 101"]},
+    {code:"ن 271",nameAr:"فسيولوجيا النبات",hours:3,type:"major",prereqs:["ن 102","ك 271"]},
+  ],
+  animal:[
+    {code:"ع 101",nameAr:"مهارات الاتصال اللغوية",hours:3,type:"required",prereqs:[]},
+    {code:"ك 110",nameAr:"كيمياء عامة",hours:3,type:"required",prereqs:[]},
+    {code:"ك 111",nameAr:"مختبر كيمياء عامة",hours:1,type:"required",prereqs:[]},
+    {code:"ب 103",nameAr:"رياضة حيوية",hours:3,type:"dept",prereqs:[]},
+    {code:"E 161",nameAr:"اللغة الإنجليزية (1)",hours:3,type:"required",prereqs:[]},
+    {code:"ب 101",nameAr:"بيولوجيا (1)",hours:4,type:"dept",prereqs:[]},
+    {code:"ب 105",nameAr:"علم الكائنات الدقيقة",hours:3,type:"dept",prereqs:[]},
+    {code:"E 162",nameAr:"اللغة الإنجليزية (2)",hours:3,type:"required",prereqs:["E 161"]},
+    {code:"ب ج 281",nameAr:"مقدمة في البيولوجيا الجزيئية",hours:3,type:"dept",prereqs:["ب 101"]},
+    {code:"0493200",nameAr:"تطبيقات مخبرية في بيولوجيا الحيوان",hours:3,type:"major",prereqs:["ب 101"]},
+    {code:"0493202",nameAr:"بيولوجيا الخلية",hours:3,type:"major",prereqs:["ب 101"]},
+    {code:"0493205",nameAr:"التنوع الحيواني I اللافقاريات",hours:4,type:"major",prereqs:["ب 101","E 162"]},
+    {code:"0493206",nameAr:"التنوع الحيواني II الحبليات",hours:3,type:"major",prereqs:["ب 101"]},
+    {code:"ك 271",nameAr:"مقدمة في الكيمياء الحيوية",hours:3,type:"support",prereqs:["ك 110"]},
+    {code:"0493305",nameAr:"علم الأجنة",hours:4,type:"major",prereqs:["0493206"]},
+    {code:"0493306",nameAr:"علم البيئة",hours:3,type:"major",prereqs:["0493205","0493206"]},
+    {code:"0493312",nameAr:"علم وظائف أعضاء الحيوانات",hours:3,type:"major",prereqs:["0493205","0493206"]},
+    {code:"0493320",nameAr:"علم الوراثة",hours:4,type:"major",prereqs:["ب 101"]},
+  ],
+  biochem:[
+    {code:"ع 101",nameAr:"مهارات الاتصال اللغوية",hours:3,type:"required",prereqs:[]},
+    {code:"ك 110",nameAr:"كيمياء عامة",hours:3,type:"required",prereqs:[]},
+    {code:"ك 111",nameAr:"مختبر كيمياء عامة",hours:1,type:"required",prereqs:[]},
+    {code:"ب 103",nameAr:"رياضة حيوية",hours:3,type:"dept",prereqs:[]},
+    {code:"E 161",nameAr:"اللغة الإنجليزية (1)",hours:3,type:"required",prereqs:[]},
+    {code:"ب 101",nameAr:"بيولوجيا (1)",hours:4,type:"dept",prereqs:[]},
+    {code:"ب 105",nameAr:"علم الكائنات الدقيقة",hours:3,type:"dept",prereqs:[]},
+    {code:"E 162",nameAr:"اللغة الإنجليزية (2)",hours:3,type:"required",prereqs:["E 161"]},
+    {code:"ب ج 281",nameAr:"مقدمة في البيولوجيا الجزيئية",hours:3,type:"dept",prereqs:["ب 101"]},
+    {code:"ك 271",nameAr:"مقدمة في الكيمياء الحيوية",hours:3,type:"major",prereqs:["ك 110"]},
+    {code:"ح ب 217",nameAr:"الكيمياء البيولوجية",hours:4,type:"major",prereqs:["ك 271","ب 101"]},
+    {code:"ح ب 219",nameAr:"الكيمياء الحيوية الفيزيائية",hours:3,type:"major",prereqs:["ك 271"]},
+    {code:"ح ب 372",nameAr:"مقدمة في الوراثة الجزيئية",hours:3,type:"major",prereqs:["ب ج 281"]},
+    {code:"ح ب 300",nameAr:"مختبر الكيمياء الحيوية",hours:2,type:"major",prereqs:["ح ب 217"]},
+    {code:"ح ب 315",nameAr:"الكيمياء الحيوية (1)",hours:3,type:"major",prereqs:["ح ب 217"]},
+    {code:"ح ب 337",nameAr:"الإنزيمات",hours:3,type:"major",prereqs:["ح ب 217"]},
+    {code:"ح ب 464",nameAr:"التغذية",hours:3,type:"major",prereqs:["ح ب 217"]},
+    {code:"ح ب 482",nameAr:"الهندسة الوراثية",hours:3,type:"major",prereqs:["ح ب 372"]},
+    {code:"ح ب 415",nameAr:"الكيمياء الحيوية (2)",hours:3,type:"major",prereqs:["ح ب 315"]},
+    {code:"ح ب 420",nameAr:"مختبر الكيمياء الحيوية (2)",hours:2,type:"major",prereqs:["ح ب 315"]},
+    {code:"ح ب 425",nameAr:"الكيمياء الحيوية (3)",hours:3,type:"major",prereqs:["ح ب 315"]},
+    {code:"ح ب 435",nameAr:"الكيمياء الإكلينيكية",hours:3,type:"major",prereqs:["ح ب 415"]},
+  ]
+};
 let notes=[],events=[],advisors=[],aiKnowledge=[],majorResources=[];
 const conversationHistory = []; // remember chat context
 async function get(col){try{const s=await getDocs(query(collection(db,col),orderBy("createdAt","desc")));return s.docs.map(d=>({id:d.id,...d.data()}))}catch{try{const s=await getDocs(collection(db,col));return s.docs.map(d=>({id:d.id,...d.data()}))}catch{return[]}}}
@@ -465,6 +577,14 @@ function buildKB(){
   notes.forEach(n=>base.push({title:n.title||"نوتة",answer:`النوتة: ${n.title||""}\nالمادة: ${n.course||""}\nالتخصص: ${mn[n.major]||n.major||"عام"}\nالنوع: ${n.type||"Note"}\nالرابط: ${n.url||"غير متوفر"}`,keywords:`${n.title||""} ${n.course||""} ${mn[n.major]||""}`,source:"notes"}));
   events.forEach(e=>base.push({title:e.title||"فعالية",answer:`الفعالية: ${e.title||""}\nالتاريخ: ${e.date||"يعلن لاحقاً"}\n${e.description||""}${e.url?"\nالرابط: "+e.url:""}`,keywords:`${e.title||""} ${e.date||""} فعاليات ورشة`,source:"events"}));
   advisors.forEach(a=>base.push({title:a.name||"مرشد",answer:`المرشد: ${a.name||""}\nالتخصص: ${mn[a.major]||a.major||"عام"}\nالإيميل: ${a.email||""}`,keywords:`${a.name||""} ${mn[a.major]||""} مستشار مرشد`,source:"advisors"}));
+  const typeNames={required:"إلزامي",dept:"قسم",major:"تخصص",support:"دعم",elective:"اختياري"};
+  Object.entries(MAJOR_SHEETS).forEach(([mk,courses])=>{
+    const mName=mn[mk]||mk;
+    courses.forEach(c=>{
+      const pre=c.prereqs.length?c.prereqs.join(" ، "):"لا يوجد";
+      base.push({title:`${c.nameAr} (${c.code})`,answer:`المادة: ${c.nameAr}\nالكود: ${c.code}\nالتخصص: ${mName}\nالساعات: ${c.hours}\nالمسبقات: ${pre}\nالنوع: ${typeNames[c.type]||c.type}`,keywords:`${c.nameAr} ${c.code} مسبق مسبقات ${mName} ${c.prereqs.join(" ")}`,source:"courses"});
+    });
+  });
   return base.filter(x=>x.answer.trim());
 }
 function answer(question){
