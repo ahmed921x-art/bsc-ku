@@ -535,10 +535,11 @@ ${kb}
         })
       });
       const data=await res.json();
+      console.log("Worker response:", JSON.stringify(data));
       ans=data.candidates?.[0]?.content?.parts?.[0]?.text||answer(q);
       // Add assistant response to history
       conversationHistory.push({role:"model", parts:[{text:ans}]});
-    }catch{ans=answer(q);}
+    }catch(e){console.error("Fetch error:", e); ans=answer(q);}
     typing.remove();
     addMsg("bot",ans);
     try{await addDoc(collection(db,"aiChats"),{question:q,answer:ans,createdAt:serverTimestamp()})}catch{}
