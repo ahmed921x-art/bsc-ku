@@ -1,0 +1,67 @@
+rules_version = '2';
+
+// ════════════════════════════════════════════════════════════════
+//  BSC KU — Firestore Security Rules
+//  انسخ محتوى هذا الملف إلى:
+//  Firebase Console → Firestore Database → Rules → Publish
+//
+//  ⚠️ مهم: جرّب القواعد في "Rules Playground" قبل النشر،
+//     لأن أي خطأ هنا قد يعطّل قراءة/كتابة الموقع المباشر.
+// ════════════════════════════════════════════════════════════════
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // قائمة إيميلات الأدمن (نفس القائمة الموجودة في admin.html)
+    function isAdmin() {
+      return request.auth != null &&
+        request.auth.token.email in [
+          'ahmed921x@gmail.com',
+          'abdullaalshewaya66@gmail.com',
+          'kmaldebs@gmail.com',
+          'biosciclub@gmail.com'
+        ];
+    }
+
+    // ── المحتوى العام: يقرأه الجميع، يكتبه الأدمن فقط ──
+    // events, notes, advisors, announcements, news, studentGuide,
+    // majorSheets, supportSheets, teamMembers, majorResources,
+    // aiKnowledge, schedules
+    match /events/{id}        { allow read: if true; allow write: if isAdmin(); }
+    match /notes/{id}         { allow read: if true; allow write: if isAdmin(); }
+    match /advisors/{id}      { allow read: if true; allow write: if isAdmin(); }
+    match /announcements/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /news/{id}          { allow read: if true; allow write: if isAdmin(); }
+    match /studentGuide/{id}  { allow read: if true; allow write: if isAdmin(); }
+    match /majorSheets/{id}   { allow read: if true; allow write: if isAdmin(); }
+    match /supportSheets/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /teamMembers/{id}   { allow read: if true; allow write: if isAdmin(); }
+    match /majorResources/{id}{ allow read: if true; allow write: if isAdmin(); }
+    match /aiKnowledge/{id}   { allow read: if true; allow write: if isAdmin(); }
+    match /schedules/{id}     { allow read: if true; allow write: if isAdmin(); }
+
+    // ── محتوى ينشئه المستخدم (بدون تسجيل دخول) ──
+
+    // سجل محادثات المساعد الذكي: أي زائر يقدر يضيف، والأدمن فقط يقرأ/يحذف.
+    match /aiChats/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // اقتراحات تعديل المواد: إنشاء للجميع، قراءة/حذف للأدمن.
+    match /suggestions/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // حفظ بيانات حاسبة المعدل (لكل جهاز عبر deviceId) — لا تحتوي بيانات حساسة.
+    match /gpaData/{deviceId} {
+      allow read, write: if true;
+    }
+
+    // ── أي شيء آخر: ممنوع افتراضياً ──
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -17,6 +17,15 @@
   <meta name="theme-color" content="#101010">
 
 <title>التخصص | BSC KU</title>
+<meta name="description" content="تفاصيل تخصصات قسم العلوم البيولوجية — النوتات، صحيفة التخرج التفاعلية، ومنشئ الجدول الدراسي.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="تخصصات قسم العلوم البيولوجية | BSC KU">
+<meta property="og:description" content="تفاصيل تخصصات قسم العلوم البيولوجية — النوتات، صحيفة التخرج التفاعلية، ومنشئ الجدول الدراسي.">
+<meta property="og:url" content="https://biosci-ku.com/major.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="تخصصات قسم العلوم البيولوجية | BSC KU">
+<meta name="twitter:description" content="تفاصيل تخصصات قسم العلوم البيولوجية — النوتات، صحيفة التخرج، ومنشئ الجدول الدراسي.">
+<meta name="twitter:image" content="https://biosci-ku.com/logo.png">
 <link href="navbar.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -585,7 +594,7 @@ a{color:inherit;text-decoration:none}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, query, orderBy, where, doc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-const app=initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795339:web:94dcd1cb40be153987c8d4"});
+const app=initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"});
 const db=getFirestore(app);
 const info={molecular:{ar:"البيولوجيا الجزيئية",en:"Molecular Biology",icon:"🧬"},micro:{ar:"علم الميكروبيولوجي",en:"Microbiology",icon:"🦠"},plant:{ar:"بيولوجيا النبات",en:"Plant Biology",icon:"🌱"},animal:{ar:"بيولوجيا الحيوان",en:"Zoology",icon:"🦁"},biochem:{ar:"الكيمياء الحيوية",en:"Biochemistry",icon:"⚗️"},forensic:{ar:"الأدلة الجنائية",en:"Forensic Science",icon:"🔍"},agri:{ar:"النبات الزراعي",en:"Agricultural Botany",icon:"🌾"},biotech:{ar:"التقنية الحيوية",en:"Biotechnology",icon:"🧪"}};
 const major=new URLSearchParams(location.search).get("major")||"molecular";

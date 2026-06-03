@@ -11,6 +11,18 @@
   <link rel="apple-touch-icon" href="favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BSC KU | نادي العلوم البيولوجية</title>
+  <meta name="description" content="نادي العلوم البيولوجية في جامعة الكويت — مراجعات دراسية، فعاليات، إرشاد أكاديمي، حاسبة معدل، وأدوات تساعد طلبة قسم العلوم البيولوجية.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="BSC KU | نادي العلوم البيولوجية">
+  <meta property="og:description" content="مجتمع علمي طلابي متميز في جامعة الكويت — مراجعات، فعاليات، وإرشاد أكاديمي.">
+  <meta property="og:url" content="https://biosci-ku.com/">
+  <meta property="og:image" content="https://biosci-ku.com/logo.png">
+  <meta property="og:site_name" content="BSC KU">
+  <meta property="og:locale" content="ar_KW">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="BSC KU | نادي العلوم البيولوجية">
+  <meta name="twitter:description" content="مجتمع علمي طلابي متميز في جامعة الكويت — مراجعات، فعاليات، وإرشاد أكاديمي.">
+  <meta name="twitter:image" content="https://biosci-ku.com/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="navbar.css" rel="stylesheet">
@@ -760,7 +772,7 @@
       <span class="accent" data-ar="البيولوجية" data-en="Sciences Club">البيولوجية</span>
     </h1>
     <p class="hero-desc" data-ar="الحياة في أطيافها" data-en="Life Refracted through color">
-      Life Refracted through color
+      الحياة في أطيافها
     </p>
     <div class="hero-btns">
       <a class="btn btn-primary" href="ask.html" data-ar="اسأل النادي" data-en="Ask the Club">اسأل النادي</a>
@@ -1018,17 +1030,7 @@ function animateCount(el, target) {
   };
   triggerReveal();
 
-  /* Navbar shrink */
-  const nav = document.getElementById("navbar");
-  window.addEventListener("scroll", ()=>{
-    if (window.scrollY > 60) {
-      nav.style.height = "58px";
-      nav.style.background = "rgba(4,5,10,.97)";
-    } else {
-      nav.style.height = "";
-      nav.style.background = "rgba(4,5,10,.88)";
-    }
-  }, {passive:true});
+  /* Navbar shrink handled centrally in theme.js (single scroll handler) */
 
   /* 3D tilt on major cards */
   document.querySelectorAll(".major-card").forEach(card=>{

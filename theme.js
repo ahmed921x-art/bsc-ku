@@ -592,8 +592,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (nav) {
     window.addEventListener('scroll', () => {
       if (window.scrollY > 60) {
+        const isLight = document.documentElement.getAttribute('data-theme') === 'light';
         nav.style.height = '56px';
-        nav.style.background = 'rgba(8,12,20,.97)';
+        nav.style.background = isLight ? 'rgba(255,255,255,.97)' : 'rgba(16,16,16,.97)';
       } else {
         nav.style.height = '';
         nav.style.background = '';

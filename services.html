@@ -15,6 +15,15 @@
   <meta property="og:locale" content="ar_KW">
 
 <title>الخدمات | BSC KU</title>
+<meta name="description" content="أدوات وخدمات لطلبة العلوم البيولوجية في جامعة الكويت — حاسبة المعدل، الأخبار، والإعلانات.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="الخدمات | BSC KU">
+<meta property="og:description" content="أدوات وخدمات لطلبة العلوم البيولوجية في جامعة الكويت — حاسبة المعدل، الأخبار، والإعلانات.">
+<meta property="og:url" content="https://biosci-ku.com/services.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="الخدمات | BSC KU">
+<meta name="twitter:description" content="أدوات وخدمات لطلبة العلوم البيولوجية في جامعة الكويت — حاسبة المعدل، الأخبار، والإعلانات.">
+<meta name="twitter:image" content="https://biosci-ku.com/logo.png">
 <link href="navbar.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -796,7 +805,7 @@ a{color:inherit;text-decoration:none}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-const app=initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795339:web:94dcd1cb40be153987c8d4"});
+const app=initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"});
 const db=getFirestore(app);
 const months=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
 function fmtDate(ts){if(!ts)return{d:"—",m:""};const dt=ts.toDate?ts.toDate():new Date(ts);return{d:dt.getDate(),m:months[dt.getMonth()]}}
@@ -930,7 +939,7 @@ async function saveToCloud(){
   try{
     const {initializeApp,getApps}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
     const {getFirestore,doc,setDoc}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-    const fbApp=getApps().length?getApps()[0]:initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795339:web:94dcd1cb40be153987c8d4"});
+    const fbApp=getApps().length?getApps()[0]:initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"});
     const fdb=getFirestore(fbApp);
     await setDoc(doc(fdb,"gpaData",DEVICE_ID),{semesters,updatedAt:new Date().toISOString(),deviceId:DEVICE_ID});
     showSyncStatus("☁️ محفوظ على السحابة");
@@ -941,7 +950,7 @@ async function loadFromCloud(){
   try{
     const {initializeApp,getApps}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
     const {getFirestore,doc,getDoc}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-    const fbApp=getApps().length?getApps()[0]:initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795339:web:94dcd1cb40be153987c8d4"});
+    const fbApp=getApps().length?getApps()[0]:initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"});
     const fdb=getFirestore(fbApp);
     const snap=await getDoc(doc(fdb,"gpaData",DEVICE_ID));
     if(snap.exists()){
