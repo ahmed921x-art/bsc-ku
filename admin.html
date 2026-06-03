@@ -459,7 +459,7 @@ a{color:inherit;text-decoration:none}
                 <option value="molecular">الأحياء الجزيئية</option><option value="micro">مايكروبيولوجي</option>
                 <option value="plant">أحياء النبات</option><option value="animal">أحياء الحيوان</option>
                 <option value="biochem">الكيمياء الحيوية</option><option value="forensic">الأدلة الجنائية</option>
-                <option value="agri">الزراعة</option><option value="biotech">التقنية الحيوية</option>
+                <option value="agri">النبات الزراعي</option><option value="biotech">التقنية الحيوية</option>
               </select>
             </div>
             <div class="form-group"><label>نوع الملف</label>
@@ -683,7 +683,7 @@ a{color:inherit;text-decoration:none}
             <button class="btn btn-ghost" onclick="selectSheetMajor('animal')">🐾 أحياء الحيوان</button>
             <button class="btn btn-ghost" onclick="selectSheetMajor('biochem')">⚗️ الكيمياء الحيوية</button>
             <button class="btn btn-ghost" onclick="selectSheetMajor('forensic')">🔍 الأدلة الجنائية</button>
-            <button class="btn btn-ghost" onclick="selectSheetMajor('agri')">🌾 الزراعة</button>
+            <button class="btn btn-ghost" onclick="selectSheetMajor('agri')">🌾 النبات الزراعي</button>
             <button class="btn btn-ghost" onclick="selectSheetMajor('biotech')">🧪 التقنية الحيوية</button>
           </div>
         </div>
@@ -764,7 +764,7 @@ a{color:inherit;text-decoration:none}
             <button class="btn btn-ghost" onclick="selectSupportMajor('animal')">🐾 أحياء الحيوان</button>
             <button class="btn btn-ghost" onclick="selectSupportMajor('biochem')">⚗️ الكيمياء الحيوية</button>
             <button class="btn btn-ghost" onclick="selectSupportMajor('forensic')">🔍 الأدلة الجنائية</button>
-            <button class="btn btn-ghost" onclick="selectSupportMajor('agri')">🌾 الزراعة</button>
+            <button class="btn btn-ghost" onclick="selectSupportMajor('agri')">🌾 النبات الزراعي</button>
             <button class="btn btn-ghost" onclick="selectSupportMajor('biotech')">🧪 التقنية الحيوية</button>
           </div>
         </div>
@@ -834,7 +834,7 @@ a{color:inherit;text-decoration:none}
                 <option value="molecular">الأحياء الجزيئية</option><option value="micro">مايكروبيولوجي</option>
                 <option value="plant">أحياء النبات</option><option value="animal">أحياء الحيوان</option>
                 <option value="biochem">الكيمياء الحيوية</option><option value="forensic">الأدلة الجنائية</option>
-                <option value="agri">الزراعة</option><option value="biotech">التقنية الحيوية</option>
+                <option value="agri">النبات الزراعي</option><option value="biotech">التقنية الحيوية</option>
               </select>
             </div>
             <div class="form-group"><label>مكتب / ساعات الاستقبال</label><input id="advisorOffice" placeholder="مبنى 13 - مكتب 205"></div>
@@ -875,7 +875,7 @@ a{color:inherit;text-decoration:none}
                 <option value="animal">بيولوجيا الحيوان</option>
                 <option value="biochem">الكيمياء الحيوية</option>
                 <option value="forensic">علم الأدلة الجنائية</option>
-                <option value="agri">الزراعة</option>
+                <option value="agri">النبات الزراعي</option>
                 <option value="biotech">التقنية الحيوية</option>
               </select>
             </div>
@@ -957,7 +957,7 @@ a{color:inherit;text-decoration:none}
                 <option value="molecular">الأحياء الجزيئية</option><option value="micro">مايكروبيولوجي</option>
                 <option value="plant">أحياء النبات</option><option value="animal">أحياء الحيوان</option>
                 <option value="biochem">الكيمياء الحيوية</option><option value="forensic">الأدلة الجنائية</option>
-                <option value="agri">الزراعة</option><option value="biotech">التقنية الحيوية</option>
+                <option value="agri">النبات الزراعي</option><option value="biotech">التقنية الحيوية</option>
               </select>
             </div>
             <div class="form-group"><label>عنوان الملف</label><input id="resourceTitle" placeholder="ميجرشيت الأحياء الجزيئية 2025"></div>
@@ -1072,7 +1072,7 @@ const auth=getAuth(app);
 const db=getFirestore(app);
 const storage=getStorage(app);
 const ALLOWED=["ahmed921x@gmail.com","abdullaalshewaya66@gmail.com","kmaldebs@gmail.com","biosciclub@gmail.com"];
-const MN={molecular:"الأحياء الجزيئية",micro:"مايكروبيولوجي",plant:"أحياء النبات",animal:"أحياء الحيوان",biochem:"الكيمياء الحيوية",forensic:"الأدلة الجنائية",agri:"الزراعة",biotech:"التقنية الحيوية"};
+const MN={molecular:"الأحياء الجزيئية",micro:"مايكروبيولوجي",plant:"أحياء النبات",animal:"أحياء الحيوان",biochem:"الكيمياء الحيوية",forensic:"الأدلة الجنائية",agri:"النبات الزراعي",biotech:"التقنية الحيوية"};
 
 // AUTH
 document.getElementById("loginBtn").onclick=()=>signInWithPopup(auth,new GoogleAuthProvider());
@@ -2007,7 +2007,7 @@ const _MO=[
   {v:'molecular',l:'الأحياء الجزيئية'},{v:'micro',l:'مايكروبيولوجي'},
   {v:'plant',l:'أحياء النبات'},{v:'animal',l:'أحياء الحيوان'},
   {v:'biochem',l:'الكيمياء الحيوية'},{v:'forensic',l:'الأدلة الجنائية'},
-  {v:'agri',l:'الزراعة'},{v:'biotech',l:'التقنية الحيوية'},
+  {v:'agri',l:'النبات الزراعي'},{v:'biotech',l:'التقنية الحيوية'},
 ];
 const EDIT_SCHEMA={
   notes:[

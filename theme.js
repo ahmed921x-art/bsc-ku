@@ -302,7 +302,7 @@
     'علم الأدلة الجنائية': 'Forensic Science',
     'يجمع بين علوم الأحياء والكيمياء والقانون لتحليل علم الأدلة الجنائية واستخدامها في التحقيقات الجنائية.':
       'Combines biology, chemistry, and law to analyze forensic evidence and use it in criminal investigations.',
-    'الزراعة': 'Agriculture',
+    'النبات الزراعي': 'Agricultural Botany',
     'يدرس العلوم الزراعية وتطوير المحاصيل والنظم البيئية الزراعية واستدامة الغذاء.':
       'Studies agricultural sciences, crop development, agricultural ecosystems, and food sustainability.',
     'التقنية الحيوية': 'Biotechnology',
