@@ -551,6 +551,15 @@ let notes=[],events=[],advisors=[],aiKnowledge=[],majorResources=[];
 const conversationHistory = []; // remember chat context
 async function get(col){try{const s=await getDocs(query(collection(db,col),orderBy("createdAt","desc")));return s.docs.map(d=>({id:d.id,...d.data()}))}catch{try{const s=await getDocs(collection(db,col));return s.docs.map(d=>({id:d.id,...d.data()}))}catch{return[]}}}
 function norm(v){return(v||"").toString().toLowerCase().replace(/[إأآا]/g,"ا").replace(/[ة]/g,"ه").replace(/[ىي]/g,"ي").replace(/[ؤئ]/g,"ء").replace(/[ًٌٍَُِّْ]/g,"").trim()}
+function numCode(code){
+  const clean=code.replace(/\s/g,"");
+  if(/^\d+$/.test(clean))return clean;
+  const m=code.match(/^(.+?)\s*(\d+)$/);
+  if(!m)return code;
+  const prefix=m[1].replace(/\s/g,""),num=m[2];
+  const map={"بج":"0497","مب":"0495","حب":"0496","ن":"0494","ب":"0490"};
+  return map[prefix]?map[prefix]+num:code;
+}
 function addMsg(role,text){
   const b=document.getElementById("chatBox");
   const d=document.createElement("div");
@@ -581,8 +590,10 @@ function buildKB(){
   Object.entries(MAJOR_SHEETS).forEach(([mk,courses])=>{
     const mName=mn[mk]||mk;
     courses.forEach(c=>{
-      const pre=c.prereqs.length?c.prereqs.join(" ، "):"لا يوجد";
-      base.push({title:`${c.nameAr} (${c.code})`,answer:`المادة: ${c.nameAr}\nالكود: ${c.code}\nالتخصص: ${mName}\nالساعات: ${c.hours}\nالمسبقات: ${pre}\nالنوع: ${typeNames[c.type]||c.type}`,keywords:`${c.nameAr} ${c.code} مسبق مسبقات ${mName} ${c.prereqs.join(" ")}`,source:"courses"});
+      const nCode=numCode(c.code);
+      const nPre=c.prereqs.map(numCode);
+      const pre=nPre.length?nPre.join(" ، "):"لا يوجد";
+      base.push({title:`${c.nameAr} (${nCode})`,answer:`المادة: ${c.nameAr}\nالكود: ${nCode}\nالتخصص: ${mName}\nالساعات: ${c.hours}\nالمسبقات: ${pre}\nالنوع: ${typeNames[c.type]||c.type}`,keywords:`${c.nameAr} ${nCode} ${c.code} مسبق مسبقات ${mName} ${nPre.join(" ")}`,source:"courses"});
     });
   });
   return base.filter(x=>x.answer.trim());
