@@ -525,7 +525,7 @@ ${kb}
       conversationHistory.push({role:"user", parts:[{text:q}]});
       if(conversationHistory.length > 12) conversationHistory.splice(0, 2);
 
-      const res=await fetch("https://gemini-proxy.ahmed921x.workers.dev/?model=gemini-2.5-flash",{
+      const res=await fetch("https://gemini-proxy.ahmed921x.workers.dev/?model=gemini-1.5-flash",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({
