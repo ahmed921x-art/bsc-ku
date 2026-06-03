@@ -496,7 +496,12 @@ function answer(question){
     // Try ChatGPT first, fallback to local KB
     let ans="";
     try{
-      const kb=buildKB().map(x=>x.answer).join("\n---\n");
+      const allKB=buildKB();
+      const qNorm=norm(q);
+      const qWords=qNorm.split(/\s+/).filter(w=>w.length>2);
+      const scored=allKB.map(item=>{const h=norm(`${item.title} ${item.answer} ${item.keywords}`);let s=0;qWords.forEach(w=>{if(h.includes(w))s+=Math.min(w.length+2,12)});if(h.includes(qNorm))s+=35;return{item,s}}).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
+      const relevant=scored.length?scored.slice(0,5).map(x=>x.item.answer):allKB.slice(0,3).map(x=>x.answer);
+      const kb=relevant.join("\n---\n");
       const sysPrompt=`أنت "بايو" 🧬 — المساعد الذكي الرسمي لنادي العلوم البيولوجية (BSC KU) في جامعة الكويت.
 شخصيتك: ودود، واضح، دقيق، تتكلم بالعربية الكويتية الطبيعية.
 
