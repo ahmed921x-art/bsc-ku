@@ -13,10 +13,10 @@
   --c4:      #34d399;
   --green:   #34d399;
   --cyan:    #38bdf8;
-  --bg:      #04050a;
-  --bg2:     #080a14;
-  --bg3:     #0d1022;
-  --surface: rgba(8,10,20,.65);
+  --bg:      #1e1e1e;
+  --bg2:     #242424;
+  --bg3:     #2a2a2a;
+  --surface: rgba(40,40,44,.65);
   --border:  rgba(129,140,248,.12);
   --border2: rgba(129,140,248,.22);
   --text:    #f0f2ff;
@@ -26,7 +26,7 @@
 }
 
 /* ── Base ── */
-body { background: #04050a !important; color: #f0f2ff !important; }
+body { background: #1e1e1e !important; color: #f0f2ff !important; }
 
 /* ── Aurora background ── */
 .bg-canvas {
@@ -54,7 +54,7 @@ body { background: #04050a !important; color: #f0f2ff !important; }
 
 /* ── Navbar ── */
 .navbar {
-  background: rgba(4,5,10,.88) !important;
+  background: rgba(26,26,28,.88) !important;
   border-bottom-color: rgba(129,140,248,.13) !important;
 }
 .nav-links a:hover,
@@ -72,12 +72,12 @@ body { background: #04050a !important; color: #f0f2ff !important; }
   color: #fff !important;
 }
 .ku-menu {
-  background: rgba(4,5,10,.98) !important;
+  background: rgba(26,26,28,.98) !important;
   border-color: rgba(129,140,248,.2) !important;
 }
 .ku-item:hover { background: rgba(129,140,248,.1) !important; }
 #themeToggle:hover { background: rgba(129,140,248,.15) !important; }
-.mobile-menu { background: rgba(4,5,10,.98) !important; }
+.mobile-menu { background: rgba(26,26,28,.98) !important; }
 .mobile-nav a:hover,
 .mobile-nav a.active {
   background: rgba(129,140,248,.12) !important;
@@ -130,7 +130,7 @@ body { background: #04050a !important; color: #f0f2ff !important; }
 .section-label::before { background: var(--c1) !important; }
 
 /* ── Cards ── */
-.card { background: rgba(8,10,20,.78) !important; }
+.card { background: rgba(40,40,44,.78) !important; }
 .card::after,
 .note-card::after {
   background: linear-gradient(90deg, var(--c1), var(--c2)) !important;
@@ -170,7 +170,7 @@ body { background: #04050a !important; color: #f0f2ff !important; }
 .dl-btn:hover { background: rgba(129,140,248,.22) !important; }
 .see-all {
   color: var(--c1) !important;
-  background: rgba(8,10,20,.7) !important;
+  background: rgba(40,40,44,.7) !important;
   border-color: rgba(129,140,248,.22) !important;
 }
 .see-all:hover {
@@ -179,7 +179,7 @@ body { background: #04050a !important; color: #f0f2ff !important; }
 }
 
 /* ── Stats ── */
-.stat { background: rgba(8,10,20,.7) !important; }
+.stat { background: rgba(40,40,44,.7) !important; }
 .stat:hover {
   border-color: rgba(129,140,248,.4) !important;
   box-shadow: 0 24px 64px rgba(129,140,248,.18) !important;
@@ -193,7 +193,7 @@ body { background: #04050a !important; color: #f0f2ff !important; }
 }
 
 /* ── Majors ── */
-.major-card { background: rgba(8,10,20,.82) !important; }
+.major-card { background: rgba(40,40,44,.82) !important; }
 .major-card:nth-child(1)::before { background: linear-gradient(135deg, rgba(129,140,248,.15), transparent) !important; }
 .major-card:nth-child(1):hover   { border-color: rgba(129,140,248,.5) !important; box-shadow: 0 32px 80px rgba(129,140,248,.15) !important; }
 .major-card:nth-child(2)::before { background: linear-gradient(135deg, rgba(52,211,153,.15), transparent) !important; }
@@ -207,7 +207,7 @@ body { background: #04050a !important; color: #f0f2ff !important; }
 
 /* ── Footer ── */
 .footer {
-  background: rgba(4,5,10,.88) !important;
+  background: rgba(26,26,28,.88) !important;
   border-color: rgba(129,140,248,.1) !important;
 }
 .social-btn:hover {
@@ -224,14 +224,14 @@ body { background: #04050a !important; color: #f0f2ff !important; }
   color: transparent !important;
 }
 .value-card {
-  background: rgba(8,10,20,.78) !important;
+  background: rgba(40,40,44,.78) !important;
 }
 .value-card:hover {
   border-color: rgba(129,140,248,.4) !important;
   box-shadow: 0 20px 50px rgba(129,140,248,.15) !important;
 }
-.about-visual { background: rgba(4,5,10,.8) !important; }
-.stat-mini { background: rgba(8,10,20,.7) !important; }
+.about-visual { background: rgba(26,26,28,.8) !important; }
+.stat-mini { background: rgba(40,40,44,.7) !important; }
 .stat-mini:hover { border-color: rgba(129,140,248,.4) !important; }
 
 /* ── Page hero titles ── */
@@ -245,7 +245,7 @@ body { background: #04050a !important; color: #f0f2ff !important; }
 /* ── Filters ── */
 .filter-input,
 .filter-select {
-  background: rgba(8,10,20,.7) !important;
+  background: rgba(40,40,44,.7) !important;
   border-color: rgba(129,140,248,.15) !important;
   color: #f0f2ff !important;
 }
@@ -254,7 +254,7 @@ body { background: #04050a !important; color: #f0f2ff !important; }
   border-color: rgba(129,140,248,.5) !important;
   background: rgba(129,140,248,.06) !important;
 }
-.filter-select option { background: #080a14; }
+.filter-select option { background: #242424; }
 
 /* ── Announcement banner ── */
 #annBanner {
@@ -265,7 +265,7 @@ body { background: #04050a !important; color: #f0f2ff !important; }
 /* ── Advisor / member cards ── */
 .advisor-card,
 .member-card {
-  background: rgba(8,10,20,.78) !important;
+  background: rgba(40,40,44,.78) !important;
 }
 .advisor-card:hover,
 .member-card:hover {
@@ -279,7 +279,7 @@ body { background: #04050a !important; color: #f0f2ff !important; }
 .schedule-builder,
 .tree-container,
 .pref-card {
-  background: rgba(8,10,20,.72) !important;
+  background: rgba(40,40,44,.72) !important;
   border-color: rgba(129,140,248,.12) !important;
 }
 .chat-input,
@@ -287,7 +287,7 @@ body { background: #04050a !important; color: #f0f2ff !important; }
 .form-group input,
 .form-group select,
 .form-group textarea {
-  background: rgba(8,10,20,.7) !important;
+  background: rgba(40,40,44,.7) !important;
   border-color: rgba(129,140,248,.15) !important;
   color: #f0f2ff !important;
 }

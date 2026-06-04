@@ -5,10 +5,10 @@
 // ── 1. THEME (Dark / Light) ──────────────────────────────────
 (function () {
   const DARK = {
-    // ── الألوان المستخرجة من الصورة: درجات أسود حقيقية ──
-    '--bg':         '#101010',   // أغمق — خلفية الصفحة
-    '--bg2':        '#161616',   // خلفية الأقسام
-    '--bg3':        '#1c1c1c',   // خلفية البطاقات الداخلية
+    // ── رمادي فحمي (chosen by user) ──
+    '--bg':         '#1e1e1e',   // خلفية الصفحة — رمادي فحمي
+    '--bg2':        '#242424',   // خلفية الأقسام
+    '--bg3':        '#2a2a2a',   // خلفية البطاقات الداخلية
     '--surface':    'rgba(255,255,255,0.04)',
     '--border':     'rgba(255,255,255,0.07)',
     '--border2':    'rgba(255,255,255,0.13)',
@@ -50,20 +50,19 @@
   }
 
   function updateThemeVisuals(mode) {
-    // Swap the logo file: old logo in dark mode (glows), clearer black-text logo in light mode
+    const isLight = mode === 'light';
+    // Always use the clear black-text logo, shown normally in both themes
     document.querySelectorAll('img').forEach(img => {
       const src = img.getAttribute('src') || '';
-      if (/(^|\/)logo(-light)?\.png(\?|$)/.test(src)) {
-        img.setAttribute('src', mode === 'light' ? 'logo-light.png' : 'logo.png');
-      }
+      if (/(^|\/)logo(-light)?\.png(\?|$)/.test(src)) img.setAttribute('src', 'logo-light.png');
     });
-    document.querySelectorAll('.brand img, .footer-brand img').forEach(img => {
-      img.style.mixBlendMode = mode === 'light' ? 'multiply' : 'screen';
-      img.style.filter = mode === 'light'
-        ? 'drop-shadow(0 0 8px rgba(99,102,241,0.3)) brightness(0.9)'
-        : 'drop-shadow(0 0 14px rgba(99,102,241,.7)) brightness(1.2)';
+    document.querySelectorAll('.brand img, .footer-brand img, .hero-logo-wrap > img').forEach(img => {
+      img.style.mixBlendMode = 'normal';
+      img.style.filter = isLight
+        ? 'drop-shadow(0 1px 5px rgba(99,102,241,.2))'
+        : 'drop-shadow(0 2px 10px rgba(0,0,0,.5))';
     });
-    document.querySelectorAll('.particle').forEach(p => { p.style.display = mode === 'light' ? 'none' : ''; });
+    document.querySelectorAll('.particle').forEach(p => { p.style.display = isLight ? 'none' : ''; });
     const canvas = document.querySelector('.bg-canvas');
     if (canvas) canvas.style.opacity = mode === 'light' ? '0.3' : '1';
     const grid = document.querySelector('.bg-grid');
