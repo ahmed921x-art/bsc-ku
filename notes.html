@@ -535,7 +535,7 @@ a{color:inherit;text-decoration:none}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { CATALOG_SEED } from "./catalog-seed.js";
+import { CATALOG_SEED, SUPPORT_CATALOG_SEED } from "./catalog-seed.js";
 const app=initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"});
 const db=getFirestore(app);
 
@@ -546,6 +546,9 @@ const MAJORS=[
   {key:"plant",    icon:"🌱",name:"أحياء النبات"},
   {key:"animal",   icon:"🐾",name:"أحياء الحيوان"},
   {key:"biochem",  icon:"⚗️",name:"الكيمياء الحيوية"},
+  {key:"forensic", icon:"🔍",name:"الأدلة الجنائية"},
+  {key:"agri",     icon:"🌾",name:"النبات الزراعي"},
+  {key:"biotech",  icon:"🧪",name:"التقنية الحيوية"},
 ];
 const MINFO=Object.fromEntries(MAJORS.map(m=>[m.key,m]));
 const TYPE_ORDER=["required","major","elective","support"];
@@ -557,7 +560,7 @@ const state={major:null,query:"",showEmpty:false};
 const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
 const codeOf=s=>{const m=(s||"").match(/\d{6,7}/);return m?m[0]:"";};
 const norm=s=>(s||"").toString().toLowerCase();
-const coursesOf=k=>(CATALOG_SEED[k]&&CATALOG_SEED[k].courses)||[];
+const coursesOf=k=>(CATALOG_SEED[k]&&CATALOG_SEED[k].courses)||(SUPPORT_CATALOG_SEED[k]&&SUPPORT_CATALOG_SEED[k].courses)||[];
 
 // notes belonging to a major, grouped by course code
 function majorNoteIndex(k){

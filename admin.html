@@ -1120,19 +1120,32 @@ async function loadNoteCourses(majorKey){
   const sel=document.getElementById("noteCourse");
   sel.innerHTML='<option value="">⏳ جاري التحميل...</option>';
   try{
-    const snap=await getDoc(doc(db,"majorSheets",majorKey));
-    let courses=[];
-    if(snap.exists()){
-      const data=snap.data();
-      courses=data.courses||[];
-      if(!courses.length&&data.batches){
-        const latest=Object.keys(data.batches).sort((a,b)=>b.localeCompare(a,undefined,{numeric:true}))[0];
-        if(latest)courses=(data.batches[latest]?.courses)||[];
+    const extract=(snap)=>{
+      let courses=[];
+      if(snap.exists()){
+        const data=snap.data();
+        courses=data.courses||[];
+        if(!courses.length&&data.batches){
+          const latest=Object.keys(data.batches).sort((a,b)=>b.localeCompare(a,undefined,{numeric:true}))[0];
+          if(latest)courses=(data.batches[latest]?.courses)||[];
+        }
       }
-    }
-    if(!courses.length){sel.innerHTML='<option value="">لا توجد مواد مضافة لهذا التخصص</option>';return;}
-    sel.innerHTML='<option value="">-- اختر المادة --</option>'+
-      courses.map(c=>`<option value="${c.code} — ${c.nameAr}">${c.code} — ${c.nameAr}</option>`).join('');
+      return courses;
+    };
+    // مواد التخصص الرئيسي + مواد المساند
+    const [mainSnap,supSnap]=await Promise.all([
+      getDoc(doc(db,"majorSheets",majorKey)),
+      getDoc(doc(db,"supportSheets",majorKey))
+    ]);
+    const mainCourses=extract(mainSnap);
+    const mainCodes=new Set(mainCourses.map(c=>c.code));
+    const supCourses=extract(supSnap).filter(c=>!mainCodes.has(c.code)); // تفادي التكرار
+    if(!mainCourses.length&&!supCourses.length){sel.innerHTML='<option value="">لا توجد مواد مضافة لهذا التخصص</option>';return;}
+    const opt=c=>`<option value="${c.code} — ${c.nameAr}">${c.code} — ${c.nameAr}</option>`;
+    let html='<option value="">-- اختر المادة --</option>';
+    if(mainCourses.length) html+=`<optgroup label="📘 مواد التخصص">${mainCourses.map(opt).join('')}</optgroup>`;
+    if(supCourses.length)  html+=`<optgroup label="🔗 مواد المساند">${supCourses.map(opt).join('')}</optgroup>`;
+    sel.innerHTML=html;
   }catch{sel.innerHTML='<option value="">خطأ في التحميل</option>';}
 }
 document.getElementById("noteMajor").addEventListener("change",function(){loadNoteCourses(this.value);});
