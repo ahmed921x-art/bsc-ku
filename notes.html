@@ -89,6 +89,59 @@ a{color:inherit;text-decoration:none}
 .social-btn:hover{color:#fff;background:rgba(99,102,241,.18);border-color:rgba(99,102,241,.5);transform:translateY(-3px)}
 .social-btn svg{width:14px;height:14px;fill:currentColor}
 @media(max-width:768px){.main-content{padding:0 5% 4rem}.filters{flex-direction:column}.filter-input,.filter-select{width:100%}.footer{flex-direction:column;align-items:center;text-align:center}}
+
+/* ════════════════════════════════════
+   SPECIALIZATION + COURSE BROWSER
+════════════════════════════════════ */
+.toolbar{position:relative;z-index:3;max-width:760px;margin:0 auto 1.25rem}
+.toolbar .filter-input{width:100%;font-size:1rem;padding:.95rem 1.3rem}
+.major-chips{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;max-width:900px;margin:0 auto 2.25rem}
+.chip{display:inline-flex;align-items:center;gap:.45rem;padding:.5rem 1.05rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:999px;font-size:.85rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s;font-family:'Tajawal',sans-serif}
+.chip:hover{color:var(--text);border-color:rgba(99,102,241,.35)}
+.chip.active{background:linear-gradient(135deg,rgba(99,102,241,.25),rgba(139,92,246,.18));border-color:rgba(99,102,241,.5);color:#fff}
+.chip .chip-count{font-size:.72rem;background:rgba(255,255,255,.1);padding:.05rem .5rem;border-radius:999px}
+/* major picker cards */
+.major-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.25rem}
+.major-pick{cursor:pointer;text-align:right;background:rgba(22,22,22,.75);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius);padding:1.6rem;transition:all .35s var(--ease);position:relative;overflow:hidden;animation:fu .6s ease both}
+.major-pick::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ink),var(--ink2));transform:scaleX(0);transform-origin:right;transition:transform .45s}
+.major-pick:hover{transform:translateY(-6px);border-color:rgba(99,102,241,.32);box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.major-pick:hover::after{transform:scaleX(1);transform-origin:left}
+.major-pick .mp-icon{font-size:2.4rem;margin-bottom:.55rem;display:block}
+.major-pick h3{font-size:1.15rem;font-weight:800;margin-bottom:.6rem;color:var(--text)}
+.major-pick .mp-stats{display:flex;gap:1.1rem;font-size:.82rem;color:var(--muted)}
+.major-pick .mp-stats b{color:#a5b4fc;font-weight:800}
+/* back button */
+.back-btn{display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.1rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:999px;font-size:.85rem;font-weight:700;color:var(--muted);cursor:pointer;margin-bottom:1.5rem;transition:all .2s;font-family:'Tajawal',sans-serif}
+.back-btn:hover{color:#fff;border-color:rgba(99,102,241,.4)}
+/* section title */
+.cat-section-title{display:flex;align-items:center;gap:.65rem;font-size:1.05rem;font-weight:800;margin:1.9rem 0 1rem;color:var(--text)}
+.cat-section-title .st-line{flex:1;height:1px;background:linear-gradient(90deg,rgba(99,102,241,.3),transparent)}
+.cat-major-head{display:flex;align-items:center;gap:.7rem;font-size:1.5rem;font-weight:900;margin-bottom:.4rem;color:var(--text)}
+/* course group */
+.course-list{display:flex;flex-direction:column;gap:.7rem}
+.course-group{background:rgba(22,22,22,.7);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .25s;animation:fu .5s ease both}
+.course-group.has-notes .course-head{cursor:pointer}
+.course-group.has-notes:hover{border-color:rgba(99,102,241,.3)}
+.course-head{display:flex;align-items:center;gap:.9rem;padding:1rem 1.2rem}
+.course-code{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:.76rem;color:#a5b4fc;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);border-radius:8px;padding:.28rem .6rem;flex-shrink:0;letter-spacing:.02em}
+.course-info{flex:1;min-width:0}
+.course-info h4{font-size:.95rem;font-weight:700;margin:0;line-height:1.4;color:var(--text)}
+.course-info span{font-size:.75rem;color:var(--muted)}
+.course-badge{flex-shrink:0;font-size:.74rem;font-weight:700;padding:.28rem .72rem;border-radius:999px;white-space:nowrap}
+.course-badge.has{background:rgba(16,185,129,.14);border:1px solid rgba(16,185,129,.32);color:#34d399}
+.course-badge.none{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted)}
+.course-chev{flex-shrink:0;color:var(--muted);transition:transform .3s;width:16px;height:16px}
+.course-group.open .course-chev{transform:rotate(180deg)}
+.course-notes{display:none;flex-direction:column;gap:.5rem;padding:.2rem 1.2rem 1.1rem}
+.course-group.open .course-notes{display:flex;animation:fu .35s ease both}
+.note-row{display:flex;align-items:center;gap:.75rem;padding:.7rem .9rem;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px}
+.note-row .nr-info{flex:1;min-width:0}
+.note-row .nr-info strong{display:block;font-size:.86rem;font-weight:700;color:var(--text)}
+.note-row .nr-info span{font-size:.74rem;color:var(--muted)}
+.toggle-empty{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--muted);cursor:pointer;user-select:none;margin-bottom:1.25rem;font-weight:600}
+.toggle-empty input{accent-color:#6366f1;width:15px;height:15px;cursor:pointer}
+@media(max-width:600px){.course-head{flex-wrap:wrap;gap:.6rem}.course-info{flex-basis:100%;order:3}}
+
     /* ════════════════════════════════════
        LIGHT MODE — Complete Override
     ════════════════════════════════════ */
@@ -303,6 +356,46 @@ a{color:inherit;text-decoration:none}
       background: linear-gradient(135deg,#4f46e5,#6366f1) !important;
       -webkit-background-clip: text !important; background-clip: text !important; color: transparent !important;
     }
+    /* Course browser — light */
+    [data-theme="light"] .major-pick,
+    [data-theme="light"] .course-group {
+      background: #ffffff !important;
+      border-color: rgba(99,102,241,.15) !important;
+      box-shadow: 0 2px 16px rgba(99,102,241,.08) !important;
+      backdrop-filter: none !important;
+    }
+    [data-theme="light"] .major-pick:hover,
+    [data-theme="light"] .course-group.has-notes:hover {
+      border-color: rgba(99,102,241,.35) !important;
+      box-shadow: 0 8px 28px rgba(99,102,241,.14) !important;
+    }
+    [data-theme="light"] .major-pick h3,
+    [data-theme="light"] .course-info h4,
+    [data-theme="light"] .cat-section-title,
+    [data-theme="light"] .cat-major-head { color: #161616 !important; }
+    [data-theme="light"] .note-row {
+      background: #f8fafc !important;
+      border-color: rgba(99,102,241,.12) !important;
+    }
+    [data-theme="light"] .note-row .nr-info strong { color: #161616 !important; }
+    [data-theme="light"] .course-code {
+      background: rgba(99,102,241,.08) !important;
+      border-color: rgba(99,102,241,.2) !important;
+      color: #4f46e5 !important;
+    }
+    [data-theme="light"] .chip {
+      background: #f1f5f9 !important;
+      border-color: rgba(99,102,241,.18) !important;
+      color: #475569 !important;
+    }
+    [data-theme="light"] .chip.active {
+      background: linear-gradient(135deg,rgba(99,102,241,.18),rgba(139,92,246,.12)) !important;
+      border-color: rgba(99,102,241,.4) !important;
+      color: #4f46e5 !important;
+    }
+    [data-theme="light"] .chip .chip-count { background: rgba(99,102,241,.12) !important; }
+    [data-theme="light"] .course-badge.none { background: #f1f5f9 !important; color: #94a3b8 !important; }
+    [data-theme="light"] .back-btn { background: #f8fafc !important; border-color: rgba(99,102,241,.2) !important; color: #475569 !important; }
     /* Theme toggle button */
 @media(max-width:1280px){}
     </style>
@@ -417,21 +510,16 @@ a{color:inherit;text-decoration:none}
 </div>
 
 <main class="main-content">
-  <div class="filters reveal">
-    <input class="filter-input" id="noteSearch" type="text" placeholder="🔍  ابحث عن نوتة...">
-    <select class="filter-select" id="majorFilter">
-      <option value="all" data-ar="كل التخصصات" data-en="All Majors">كل التخصصات</option>
-      <option value="molecular" data-ar="البيولوجيا الجزيئية" data-en="Molecular Biology">البيولوجيا الجزيئية</option>
-      <option value="micro" data-ar="علم الميكروبيولوجي" data-en="Microbiology">علم الميكروبيولوجي</option>
-      <option value="plant" data-ar="بيولوجيا النبات" data-en="Plant Biology">بيولوجيا النبات</option>
-      <option value="animal" data-ar="بيولوجيا الحيوان" data-en="Zoology">بيولوجيا الحيوان</option>
-      <option value="biochem" data-ar="الكيمياء الحيوية" data-en="Biochemistry">الكيمياء الحيوية</option>
-    </select>
+  <div class="toolbar">
+    <input class="filter-input" id="noteSearch" type="text" placeholder="🔍  ابحث عن مادة (بالاسم أو الرقم) أو عن نوتة...">
   </div>
-  <div class="notes-grid" id="notesGrid">
-    <div style="height:160px;background:rgba(255,255,255,.04);border-radius:20px"></div>
-    <div style="height:160px;background:rgba(255,255,255,.04);border-radius:20px;animation-delay:.1s"></div>
-    <div style="height:160px;background:rgba(255,255,255,.04);border-radius:20px;animation-delay:.2s"></div>
+  <div class="major-chips" id="majorChips"></div>
+  <div id="notesRoot">
+    <div class="major-cards">
+      <div class="major-pick" style="height:150px;opacity:.35"></div>
+      <div class="major-pick" style="height:150px;opacity:.35"></div>
+      <div class="major-pick" style="height:150px;opacity:.35"></div>
+    </div>
   </div>
 </main>
 
@@ -447,36 +535,180 @@ a{color:inherit;text-decoration:none}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { CATALOG_SEED } from "./catalog-seed.js";
 const app=initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"});
 const db=getFirestore(app);
-const mn={molecular:"الأحياء الجزيئية",micro:"مايكروبيولوجي",plant:"أحياء النبات",animal:"أحياء الحيوان",biochem:"الكيمياء الحيوية"};
+
+// ── التخصصات ──
+const MAJORS=[
+  {key:"molecular",icon:"🧬",name:"الأحياء الجزيئية"},
+  {key:"micro",    icon:"🦠",name:"مايكروبيولوجي"},
+  {key:"plant",    icon:"🌱",name:"أحياء النبات"},
+  {key:"animal",   icon:"🐾",name:"أحياء الحيوان"},
+  {key:"biochem",  icon:"⚗️",name:"الكيمياء الحيوية"},
+];
+const MINFO=Object.fromEntries(MAJORS.map(m=>[m.key,m]));
+const TYPE_ORDER=["required","major","elective","support"];
+const TYPE_LABEL={required:"📋 متطلبات عامة",major:"🎯 متطلبات التخصص",elective:"✨ مقررات اختيارية",support:"🔗 مقررات مساندة",other:"📌 مواد أخرى"};
+
 let allNotes=[];
-function render(){
-  const q=document.getElementById("noteSearch").value.trim().toLowerCase();
-  const m=document.getElementById("majorFilter").value;
-  const filtered=allNotes.filter(n=>{
-    const ok=m==="all"||n.major===m;
-    const txt=`${n.title||""} ${n.course||""} ${mn[n.major]||""}`.toLowerCase();
-    return ok&&(!q||txt.includes(q));
-  });
-  const g=document.getElementById("notesGrid");
-  if(!filtered.length){g.innerHTML='<div class="empty-state"><span class="empty-icon">📚</span>لا توجد نوتات مطابقة.</div>';return}
-  g.innerHTML=filtered.map((n,i)=>`
-    <div class="note-card" style="animation-delay:${i*.06}s">
-      <div class="note-tag">📖 ${mn[n.major]||n.major||"عام"}</div>
-      <h3>${n.title||"Untitled"}</h3>
-      <div class="course">${n.course||""} ${n.term?"· "+n.term:""}</div>
-      <div class="note-footer">
-        <span style="font-size:.76rem;color:var(--muted)">${n.type||"Note"}</span>
-        <a class="dl-btn" href="${n.url||"#"}" target="_blank">📥 فتح</a>
-      </div>
-    </div>`).join("");
+const state={major:null,query:"",showEmpty:false};
+
+const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+const codeOf=s=>{const m=(s||"").match(/\d{6,7}/);return m?m[0]:"";};
+const norm=s=>(s||"").toString().toLowerCase();
+const coursesOf=k=>(CATALOG_SEED[k]&&CATALOG_SEED[k].courses)||[];
+
+// notes belonging to a major, grouped by course code
+function majorNoteIndex(k){
+  const ns=allNotes.filter(n=>n.major===k), byCode={};
+  ns.forEach(n=>{const c=codeOf(n.course);(byCode[c]=byCode[c]||[]).push(n);});
+  return {ns,byCode};
 }
-(async()=>{
-  try{const s=await getDocs(query(collection(db,"notes"),orderBy("createdAt","desc")));allNotes=s.docs.map(d=>({id:d.id,...d.data()}))}catch{try{const s=await getDocs(collection(db,"notes"));allNotes=s.docs.map(d=>({id:d.id,...d.data()}))}catch{}}
+function majorNoteCount(k){return allNotes.filter(n=>n.major===k).length;}
+
+const CHEV='<svg class="course-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
+
+function noteRow(n){
+  const meta=[n.type,n.term].filter(x=>x&&x!=="General").join(" · ");
+  return `<div class="note-row">
+    <div class="nr-info"><strong>${esc(n.title||"نوتة")}</strong>${meta?`<span>${esc(meta)}</span>`:""}</div>
+    <a class="dl-btn" href="${esc(n.url||"#")}" target="_blank" rel="noopener">📥 فتح</a>
+  </div>`;
+}
+function courseGroup(code,nameAr,nameEn,notes,open){
+  const has=notes.length;
+  return `<div class="course-group ${has?"has-notes":""} ${open&&has?"open":""}">
+    <div class="course-head" ${has?'data-toggle="1"':""}>
+      ${code?`<span class="course-code">${esc(code)}</span>`:""}
+      <div class="course-info"><h4>${esc(nameAr)}</h4>${nameEn?`<span>${esc(nameEn)}</span>`:""}</div>
+      <span class="course-badge ${has?"has":"none"}">${has?has+" نوتة":"لا نوتات بعد"}</span>
+      ${has?CHEV:""}
+    </div>
+    ${has?`<div class="course-notes">${notes.map(noteRow).join("")}</div>`:""}
+  </div>`;
+}
+
+// build the ordered groups (catalog courses + any extra coded/uncoded notes) for a major
+function majorSections(k,{searchOnly}={}){
+  const {byCode}=majorNoteIndex(k);
+  const catalog=coursesOf(k);
+  const seen=new Set();
+  const buckets={}; // type -> [{code,nameAr,nameEn,notes}]
+  catalog.forEach(c=>{
+    if(seen.has(c.code))return; seen.add(c.code);
+    buckets[c.type]=buckets[c.type]||[];
+    buckets[c.type].push({code:c.code,nameAr:c.nameAr,nameEn:c.nameEn,notes:byCode[c.code]||[]});
+  });
+  // notes whose code isn't in the catalog → "other"
+  Object.keys(byCode).forEach(code=>{
+    if(seen.has(code))return;
+    const notes=byCode[code];
+    const cs=notes[0].course||"";
+    const nameAr=cs.replace(/^\s*\d{6,7}\s*[—–-]\s*/,"")||"مادة";
+    (buckets.other=buckets.other||[]).push({code,nameAr,nameEn:"",notes});
+  });
+  return buckets;
+}
+
+function filterCourse(c,q){
+  if(!q)return true;
+  const hay=norm(`${c.code} ${c.nameAr} ${c.nameEn} ${c.notes.map(n=>n.title+" "+(n.term||"")).join(" ")}`);
+  return hay.includes(q);
+}
+
+// ── RENDERERS ──
+function renderHome(){
+  return `<div class="major-cards">${MAJORS.map(m=>{
+    const cc=coursesOf(m.key).length, nc=majorNoteCount(m.key);
+    return `<div class="major-pick" data-major="${m.key}">
+      <span class="mp-icon">${m.icon}</span>
+      <h3>${m.name}</h3>
+      <div class="mp-stats"><span><b>${cc}</b> مادة</span><span><b>${nc}</b> نوتة</span></div>
+    </div>`;
+  }).join("")}</div>`;
+}
+
+function renderMajorView(k){
+  const m=MINFO[k], q=norm(state.query);
+  const buckets=majorSections(k);
+  const order=[...TYPE_ORDER,"other"];
+  let body="";
+  order.forEach(t=>{
+    let list=(buckets[t]||[]).filter(c=>filterCourse(c,q));
+    if(!state.showEmpty&&!q) list=list.filter(c=>c.notes.length);
+    // courses with notes first
+    list.sort((a,b)=>(b.notes.length>0)-(a.notes.length>0));
+    if(!list.length)return;
+    body+=`<div class="cat-section-title">${TYPE_LABEL[t]||t}<span class="st-line"></span></div>
+      <div class="course-list">${list.map(c=>courseGroup(c.code,c.nameAr,c.nameEn,c.notes,!!q)).join("")}</div>`;
+  });
+  if(!body) body=`<div class="empty-state"><span class="empty-icon">📭</span>${q?"ما لقينا مواد مطابقة في هذا التخصص.":"لا توجد مواد بنوتات بعد في هذا التخصص."}</div>`;
+  return `<button class="back-btn" data-back>← رجوع لكل التخصصات</button>
+    <div class="cat-major-head">${m.icon} ${m.name}</div>
+    <label class="toggle-empty"><input type="checkbox" id="toggleEmpty" ${state.showEmpty?"checked":""}> عرض كل المواد (حتى اللي بدون نوتات)</label>
+    ${body}`;
+}
+
+function renderSearchAll(){
+  const q=norm(state.query);
+  let html="";
+  MAJORS.forEach(m=>{
+    const buckets=majorSections(m.key);
+    const matches=[];
+    [...TYPE_ORDER,"other"].forEach(t=>(buckets[t]||[]).forEach(c=>{if(filterCourse(c,q))matches.push(c);}));
+    // only show courses that actually have notes OR match by name
+    if(!matches.length)return;
+    matches.sort((a,b)=>(b.notes.length>0)-(a.notes.length>0));
+    html+=`<div class="cat-section-title">${m.icon} ${m.name}<span class="st-line"></span></div>
+      <div class="course-list">${matches.map(c=>courseGroup(c.code,c.nameAr,c.nameEn,c.notes,true)).join("")}</div>`;
+  });
+  return html||`<div class="empty-state"><span class="empty-icon">🔍</span>ما لقينا مواد أو نوتات تطابق بحثك.</div>`;
+}
+
+function render(){
+  const root=document.getElementById("notesRoot");
+  if(state.query.trim()){
+    root.innerHTML = state.major ? renderMajorView(state.major) : renderSearchAll();
+  }else if(state.major){
+    root.innerHTML = renderMajorView(state.major);
+  }else{
+    root.innerHTML = renderHome();
+  }
+  renderChips();
+}
+
+function renderChips(){
+  const wrap=document.getElementById("majorChips");
+  const total=allNotes.length;
+  wrap.innerHTML=`<button class="chip ${state.major?"":"active"}" data-chip="all">الكل <span class="chip-count">${total}</span></button>`+
+    MAJORS.map(m=>`<button class="chip ${state.major===m.key?"active":""}" data-chip="${m.key}">${m.icon} ${m.name} <span class="chip-count">${majorNoteCount(m.key)}</span></button>`).join("");
+}
+
+// ── EVENTS ──
+document.getElementById("notesRoot").addEventListener("click",e=>{
+  const pick=e.target.closest(".major-pick[data-major]");
+  if(pick){state.major=pick.dataset.major;state.query="";document.getElementById("noteSearch").value="";render();window.scrollTo({top:0,behavior:"smooth"});return;}
+  if(e.target.closest("[data-back]")){state.major=null;render();return;}
+  const head=e.target.closest('.course-head[data-toggle]');
+  if(head){head.parentElement.classList.toggle("open");return;}
+  const te=e.target.closest("#toggleEmpty");
+  if(te){state.showEmpty=te.checked;render();}
+});
+document.getElementById("majorChips").addEventListener("click",e=>{
+  const chip=e.target.closest("[data-chip]");
+  if(!chip)return;
+  state.major=chip.dataset.chip==="all"?null:chip.dataset.chip;
   render();
-  document.getElementById("noteSearch").addEventListener("input",render);
-  document.getElementById("majorFilter").addEventListener("change",render);
+});
+document.getElementById("noteSearch").addEventListener("input",e=>{state.query=e.target.value;render();});
+
+// ── LOAD ──
+render(); // render the catalog immediately (works even before notes load)
+(async()=>{
+  try{const s=await getDocs(query(collection(db,"notes"),orderBy("createdAt","desc")));allNotes=s.docs.map(d=>({id:d.id,...d.data()}));}
+  catch{try{const s=await getDocs(collection(db,"notes"));allNotes=s.docs.map(d=>({id:d.id,...d.data()}));}catch{}}
+  render(); // re-render with the loaded notes (counts + note links)
 })();
 </script>
 
