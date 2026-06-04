@@ -619,6 +619,14 @@
     }
     [data-theme="light"] .tt-code { color: #6366f1 !important; }
     [data-theme="light"] .tt-name { color: #161616 !important; }
+    /* Hero logo: show true colors in light mode instead of washed-out white */
+    [data-theme="light"] .hero-logo-wrap > img {
+      mix-blend-mode: multiply;
+      filter: drop-shadow(0 0 18px rgba(99,102,241,.25)) brightness(1);
+    }
+    [data-theme="light"] .hero-logo-glow {
+      background: radial-gradient(circle, rgba(99,102,241,.16) 0%, transparent 70%);
+    }
     /* Theme toggle button */
 /* ══════════════════════════════════
        TOP BANNER
