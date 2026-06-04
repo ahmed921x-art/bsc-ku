@@ -50,6 +50,13 @@
   }
 
   function updateThemeVisuals(mode) {
+    // Swap the logo file: old logo in dark mode (glows), clearer black-text logo in light mode
+    document.querySelectorAll('img').forEach(img => {
+      const src = img.getAttribute('src') || '';
+      if (/(^|\/)logo(-light)?\.png(\?|$)/.test(src)) {
+        img.setAttribute('src', mode === 'light' ? 'logo-light.png' : 'logo.png');
+      }
+    });
     document.querySelectorAll('.brand img, .footer-brand img').forEach(img => {
       img.style.mixBlendMode = mode === 'light' ? 'multiply' : 'screen';
       img.style.filter = mode === 'light'
