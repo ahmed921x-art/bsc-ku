@@ -475,7 +475,7 @@ a{color:inherit;text-decoration:none}
         <!-- استيراد جماعي للنوتات -->
         <div class="card" style="border-color:rgba(16,185,129,.25)">
           <h3 style="color:#10b981">📥 استيراد نوتات جاهزة دفعة واحدة</h3>
-          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">يضيف نوتات مقدمة الكيمياء الحيوية (0490271) — ١٣ جابتر (00→12) + ٥ لابات، مرتّبة لكل من: الأحياء الجزيئية، أحياء الحيوان، الكيمياء الحيوية. الضغط أكثر من مرة لا يكرّر النوتات (يحدّثها فقط).</p>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">يضيف نوتات جاهزة مرتّبة دفعة واحدة:<br>• مقدمة الكيمياء الحيوية (0490271): ١٣ جابتر + ٥ لابات — للأحياء الجزيئية وأحياء الحيوان والكيمياء الحيوية.<br>• مقدمة الأدلة الجنائية (0409201): ١٠ سلايدات + ٧ نوتات — للأدلة الجنائية.<br>الضغط أكثر من مرة لا يكرّر النوتات (يحدّثها فقط).</p>
           <div id="notesImportProgress" style="display:none;margin-bottom:1rem">
             <div style="background:rgba(255,255,255,.06);border-radius:8px;overflow:hidden;height:8px;margin-bottom:.5rem">
               <div id="notesImportBar" style="height:100%;background:linear-gradient(90deg,#10b981,#6366f1);width:0%;transition:width .3s;border-radius:8px"></div>
@@ -484,7 +484,7 @@ a{color:inherit;text-decoration:none}
           </div>
           <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
             <button class="btn btn-primary" id="importNotesBtn" style="background:linear-gradient(135deg,#10b981,#059669);border:none">
-              ⬆️ استيراد نوتات الكيمياء الحيوية (271)
+              ⬆️ استيراد كل النوتات الجاهزة
             </button>
             <span id="notesImportStatus" style="font-size:.82rem;color:var(--muted)"></span>
           </div>
@@ -2565,6 +2565,37 @@ document.addEventListener('click',e=>{
         {order:102, title:"لاب — الإنزيمات (Enzymes Part 1)",         url:"https://drive.google.com/file/d/1fg1z_Qk7slQLjhAGP2GSJalyaEKEhb9a/view"},
         {order:103, title:"لاب — الهضم (Digestion Part 1)",           url:"https://drive.google.com/file/d/1kP2FxTAHQdOUARwaFYpcJ23k77UqPA48/view"},
         {order:104, title:"لاب 10 (Lab 10)",                          url:"https://drive.google.com/file/d/1cyuUOLaTKWttmQDq4T3uZxuWICuGNm0h/view"},
+      ]
+    },
+    {
+      // مقدمة في الأدلة الجنائية — سلايدات المواضيع (مرتّبة بتسلسل المنهج)
+      code:"0409201", name:"مقدمة في الأدلة الجنائية",
+      majors:["forensic"], type:"Slides",
+      files:[
+        {order:0, title:"00 — مقدمة وتاريخ (Introduction & History)",   url:"https://drive.google.com/file/d/17s5ZibkT-vhSP5G3cWVrejoosRztWgwb/view"},
+        {order:1, title:"01 — مسرح الجريمة (The Crime Scene)",          url:"https://drive.google.com/file/d/1N9820mII6hF1-MRmYZMVc1XPIPMCIBoy/view"},
+        {order:2, title:"02 — الأدلة المادية (Physical Evidence)",       url:"https://drive.google.com/file/d/1W-SVSfvl2r3Q5u7scbGt81INfPFL_Pm9/view"},
+        {order:3, title:"03 — البصمات (Fingerprints)",                  url:"https://drive.google.com/file/d/1N27s-b_W5zFetUa197tVig7qOerCiZsM/view"},
+        {order:4, title:"04 — علم الأمصال (Serology)",                  url:"https://drive.google.com/file/d/1KDnoE2G1MaSJlXPRGBLb_NbMKhz3tYlY/view"},
+        {order:5, title:"05 — الحمض النووي الجنائي (DNA Forensics)",     url:"https://drive.google.com/file/d/1L5LBH5cSLnjsP6VXCS9skTxSiihPQpiP/view"},
+        {order:6, title:"06 — المخدرات (Drugs)",                        url:"https://drive.google.com/file/d/1DRMFx9pyKTJ3qheNtDlfOumM026kEX0h/view"},
+        {order:7, title:"07 — علم السموم (Toxicology)",                 url:"https://drive.google.com/file/d/1k-jDkSc-aPRusI5zsOtEII581s2d-4Lv/view"},
+        {order:8, title:"08 — المقذوفات والأسلحة (Ballistics)",          url:"https://drive.google.com/file/d/1A2VpDSH4VaG2ob2SOBo-rKSLSMtxhtk1/view"},
+        {order:9, title:"09 — تحليل الزجاج (Glass Analysis)",            url:"https://drive.google.com/file/d/1N4fjPun_g-KFKfrUOiRb94V88LJVa1zj/view"},
+      ]
+    },
+    {
+      // مقدمة في الأدلة الجنائية — نوتات وتلخيصات (تظهر بعد السلايدات)
+      code:"0409201", name:"مقدمة في الأدلة الجنائية",
+      majors:["forensic"], type:"Summary",
+      files:[
+        {order:100, title:"نوتة — Chapter 1",                          url:"https://drive.google.com/file/d/1kj6YfZkTCbk207kP8T8FB06KiFP2x5GJ/view"},
+        {order:101, title:"نوتة — Chapter 2",                          url:"https://drive.google.com/file/d/14cK0b_sabbVwtyBfpBIRaW-mAC1hLdG4/view"},
+        {order:102, title:"نوتة — Chapter 3",                          url:"https://drive.google.com/file/d/1EA55w89l9q5vDLoP8dBROp3Y0ymmYPPq/view"},
+        {order:103, title:"تلخيص بسيط — البصمات (Fingerprints)",        url:"https://drive.google.com/file/d/1Dvgry5XPz1hIi5VaHOsL9D0S831RGa8n/view"},
+        {order:104, title:"نوتة — المخدرات (Drugs)",                    url:"https://drive.google.com/file/d/1XzAUL4FOxE_yy9uLY6Pve3VMjVGgQ7HB/view"},
+        {order:105, title:"نوتة — علم السموم (Toxicology)",             url:"https://drive.google.com/file/d/15BGgLrZ7gbLi80thz-r01vHJeNkd6vaz/view"},
+        {order:106, title:"صور مهمة (Important Images)",                url:"https://drive.google.com/file/d/1CNHeS1kbs6NfdMU-UNxR2ZTsHIWyhPyR/view"},
       ]
     }
   ];
