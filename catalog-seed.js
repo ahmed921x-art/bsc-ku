@@ -186,7 +186,7 @@ const RAW_MOLECULAR=[
   {code:'0497385',nameAr:'علم الوراثة الجزيئية للنبات',nameEn:'Plant Molecular Genetics',hours:3,type:'major',prereqs:['Bot281']},
   {code:'0497390',nameAr:'المعلوماتية الحيوية',nameEn:'Bioinformatics',hours:4,type:'major',prereqs:['Bot231']},
   {code:'0497401',nameAr:'علم المناعة الحيوانية الخلوية',nameEn:'Cellular Animal Immunology',hours:3,type:'major',prereqs:['Mol371']},
-  {code:'0497403',nameAr:'قضايا أخلاقية في البيولوجيا الجزيئية',nameEn:'Ethical Issues in Molecular Biology',hours:3,type:'major',prereqs:['Mol371']},
+  {code:'0497403',nameAr:'علم الغدد الصماء',nameEn:'Endocrinology',hours:3,type:'major',prereqs:['Mol371']},
   {code:'0497404',nameAr:'الوراثة الجزيئية لأمراض الإنسان',nameEn:'Molecular Genetics of Human Diseases',hours:3,type:'major',prereqs:['Mol371']},
   {code:'0497405',nameAr:'الأساس الجزيئي للسرطان',nameEn:'Molecular Basis of Cancer',hours:3,type:'major',prereqs:['Mol371']},
   {code:'0497410',nameAr:'التطور الجزيئي',nameEn:'Molecular Evolution',hours:3,type:'major',prereqs:['Mol371']},
@@ -407,7 +407,7 @@ const RAW_SUPPORT_MOLECULAR=[
   // اختياري — 12 وحدة (6 وحدات على الأقل من مستوى 400)
   {code:'0497-383',nameAr:'بيولوجيا الخلية الجزيئية للكائنات الدقيقة',nameEn:'Molecular Cell Biology of Microorganisms',hours:3,type:'elective',prereqs:['0497-371']},
   {code:'0497-401',nameAr:'علم المناعة الحيوانية الخلوية',nameEn:'Cellular Animal Immunology',hours:3,type:'elective',prereqs:['0497-371']},
-  {code:'0497-403',nameAr:'قضايا أخلاقية في البيولوجيا الجزيئية',nameEn:'Ethical Issues in Molecular Biology',hours:3,type:'elective',prereqs:['0497-371']},
+  {code:'0497-403',nameAr:'علم الغدد الصماء',nameEn:'Endocrinology',hours:3,type:'elective',prereqs:['0497-371']},
   {code:'0497-404',nameAr:'الوراثة الجزيئية لأمراض الإنسان',nameEn:'Molecular Genetics of Human Diseases',hours:3,type:'elective',prereqs:['0497-371']},
   {code:'0497-405',nameAr:'الأساس الجزيئي للسرطان',nameEn:'Molecular Basis of Cancer',hours:3,type:'elective',prereqs:['0497-371']},
   {code:'0497-410',nameAr:'التطور الجزيئي',nameEn:'Molecular Evolution',hours:3,type:'elective',prereqs:['0497-371']},
