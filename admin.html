@@ -475,7 +475,7 @@ a{color:inherit;text-decoration:none}
         <!-- استيراد جماعي للنوتات -->
         <div class="card" style="border-color:rgba(16,185,129,.25)">
           <h3 style="color:#10b981">📥 استيراد نوتات جاهزة دفعة واحدة</h3>
-          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">يضيف نوتات مقدمة الكيمياء الحيوية (0490271) — ١٣ جابتر (00→12) مرتّبة لكل من: الأحياء الجزيئية، أحياء الحيوان، الكيمياء الحيوية. الضغط أكثر من مرة لا يكرّر النوتات (يحدّثها فقط).</p>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">يضيف نوتات مقدمة الكيمياء الحيوية (0490271) — ١٣ جابتر (00→12) + ٥ لابات، مرتّبة لكل من: الأحياء الجزيئية، أحياء الحيوان، الكيمياء الحيوية. الضغط أكثر من مرة لا يكرّر النوتات (يحدّثها فقط).</p>
           <div id="notesImportProgress" style="display:none;margin-bottom:1rem">
             <div style="background:rgba(255,255,255,.06);border-radius:8px;overflow:hidden;height:8px;margin-bottom:.5rem">
               <div id="notesImportBar" style="height:100%;background:linear-gradient(90deg,#10b981,#6366f1);width:0%;transition:width .3s;border-radius:8px"></div>
@@ -2553,6 +2553,18 @@ document.addEventListener('click',e=>{
         {order:10, title:"10 — دورة حمض الستريك (Citric Acid Cycle)",       url:"https://drive.google.com/file/d/1wJwDIbRRUGCdpJmSXFDIy7A2OHOfnp6P/view"},
         {order:11, title:"11 — الفسفرة التأكسدية (Oxidative Phosphorylation)", url:"https://drive.google.com/file/d/1dIgPtV9JwL1GbG2sXM9RdVCYn1B0qt9j/view"},
         {order:12, title:"12 — أيض الجزيئات الحيوية (Metabolism of Biomolecules)", url:"https://drive.google.com/file/d/1dQKxPUDvBjepC_5YI1zK4YNNECgMj5f7/view"},
+      ]
+    },
+    {
+      // لابات نفس المادة — تظهر بعد المحاضرات (order 100+) بنوع Lab
+      code:"0490271", name:"مقدمة في الكيمياء الحيوية",
+      majors:["molecular","animal","biochem"], type:"Lab",
+      files:[
+        {order:100, title:"لاب — الكربوهيدرات (Carbohydrates Part 1)", url:"https://drive.google.com/file/d/1Wk_WWAwS51xTuQJDrcNcEgk9SUSzyoFJ/view"},
+        {order:101, title:"لاب — الكربوهيدرات (Carbohydrates Part 2)", url:"https://drive.google.com/file/d/1QEmm9flCVJYKXYpMhh0ANVHX2FFl06OH/view"},
+        {order:102, title:"لاب — الإنزيمات (Enzymes Part 1)",         url:"https://drive.google.com/file/d/1fg1z_Qk7slQLjhAGP2GSJalyaEKEhb9a/view"},
+        {order:103, title:"لاب — الهضم (Digestion Part 1)",           url:"https://drive.google.com/file/d/1kP2FxTAHQdOUARwaFYpcJ23k77UqPA48/view"},
+        {order:104, title:"لاب 10 (Lab 10)",                          url:"https://drive.google.com/file/d/1cyuUOLaTKWttmQDq4T3uZxuWICuGNm0h/view"},
       ]
     }
   ];
