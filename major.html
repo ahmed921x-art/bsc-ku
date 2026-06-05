@@ -778,9 +778,17 @@ window.selectBatch=function(batch){
   renderTree();
 };
 
+const canonCode=c=>String(c||"").replace(/\s+/g,"").toLowerCase();
 function isUnlocked(course){
   if(!course.prereqs||!course.prereqs.length)return true;
-  return course.prereqs.every(p=>completedCodes.has(p.trim()));
+  const done=new Set([...completedCodes].map(canonCode));
+  const present=new Set(sheetCourses.map(c=>canonCode(c.code)));
+  // a prereq only blocks if it exists as a course in this sheet (otherwise it's
+  // an external/general requirement the student can't tick here) AND isn't done.
+  return course.prereqs.every(p=>{
+    const cp=canonCode(p);
+    return !present.has(cp) || done.has(cp);
+  });
 }
 function saveCompleted(){localStorage.setItem("bscku_done_"+major+(currentBatch?"_"+currentBatch:""),JSON.stringify([...completedCodes]))}
 
@@ -971,6 +979,21 @@ function renderTree(){
   const SPAN=Math.min(NW-30,90); // horizontal spread of connection points
   const slotX=(node,idx,n)=> n<=1 ? node.cx : node.cx-SPAN/2+SPAN*(idx/(n-1));
 
+  // Orthogonal (right-angle) connector with softly-rounded corners, routed
+  // through a horizontal channel midway between the two layers — the classic
+  // course-map / flowchart look.
+  function orthPath(x1,y1,x2,y2){
+    if(Math.abs(x2-x1)<1) return `M${x1.toFixed(1)},${y1.toFixed(1)} L${x2.toFixed(1)},${y2.toFixed(1)}`;
+    const cy=(y1+y2)/2, dir=x2>x1?1:-1;
+    const r=Math.max(0,Math.min(10,Math.abs(x2-x1)/2,cy-y1,y2-cy));
+    return `M${x1.toFixed(1)},${y1.toFixed(1)} `+
+      `L${x1.toFixed(1)},${(cy-r).toFixed(1)} `+
+      `Q${x1.toFixed(1)},${cy.toFixed(1)} ${(x1+dir*r).toFixed(1)},${cy.toFixed(1)} `+
+      `L${(x2-dir*r).toFixed(1)},${cy.toFixed(1)} `+
+      `Q${x2.toFixed(1)},${cy.toFixed(1)} ${x2.toFixed(1)},${(cy+r).toFixed(1)} `+
+      `L${x2.toFixed(1)},${y2.toFixed(1)}`;
+  }
+
   sheetCourses.forEach(child=>{
     const pC=pos[child.code];if(!pC)return;
     const ins=inMap[child.code];if(!ins||!ins.length)return;
@@ -982,11 +1005,9 @@ function renderTree(){
       const outs=outMap[pcode];
       const x1=slotX(pP,outs.indexOf(child.code),outs.length), y1=pP.bot;
       const x2=slotX(pC,ci,ins.length), y2=pC.top-2;
-      const cy=(y1+y2)/2; // vertical control handles → smooth flow curve
-      svgH+=`<path d="M${x1.toFixed(1)},${y1} C${x1.toFixed(1)},${cy.toFixed(1)} `+
-        `${x2.toFixed(1)},${cy.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}"
-        fill="none" stroke="${col}" stroke-width="2.2" stroke-opacity=".78"
-        stroke-linecap="round" marker-end="url(#${mid})"/>`;
+      svgH+=`<path d="${orthPath(x1,y1,x2,y2)}"
+        fill="none" stroke="${col}" stroke-width="2.2" stroke-opacity=".8"
+        stroke-linejoin="round" stroke-linecap="round" marker-end="url(#${mid})"/>`;
     });
   });
   svg.innerHTML=svgH;

@@ -434,6 +434,7 @@ a{color:inherit;text-decoration:none}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { STATIC_KB } from "./ai-knowledge.js";
 const app=initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"});
 const db=getFirestore(app);
 const mn={molecular:"البيولوجيا الجزيئية",micro:"علم الميكروبيولوجي",plant:"بيولوجيا النبات",animal:"بيولوجيا الحيوان",biochem:"الكيمياء الحيوية"};
@@ -584,6 +585,7 @@ function addMsg(role,text){
 }
 function buildKB(){
   const base=[];
+  STATIC_KB.forEach(k=>base.push({title:k.title||"معلومة",answer:k.answer||"",keywords:k.keywords||"",source:"static"}));
   aiKnowledge.forEach(k=>base.push({title:k.title||"معلومة",answer:k.answer||k.content||"",keywords:k.keywords||"",source:"aiKnowledge"}));
   notes.forEach(n=>base.push({title:n.title||"نوتة",answer:`النوتة: ${n.title||""}\nالمادة: ${n.course||""}\nالتخصص: ${mn[n.major]||n.major||"عام"}\nالنوع: ${n.type||"Note"}\nالرابط: ${n.url||"غير متوفر"}`,keywords:`${n.title||""} ${n.course||""} ${mn[n.major]||""}`,source:"notes"}));
   events.forEach(e=>base.push({title:e.title||"فعالية",answer:`الفعالية: ${e.title||""}\nالتاريخ: ${e.date||"يعلن لاحقاً"}\n${e.description||""}${e.url?"\nالرابط: "+e.url:""}`,keywords:`${e.title||""} ${e.date||""} فعاليات ورشة`,source:"events"}));
