@@ -471,6 +471,25 @@ a{color:inherit;text-decoration:none}
           </div>
           <div class="btn-row"><button class="btn btn-primary" id="addNote">+ إضافة النوتة</button></div>
         </div>
+
+        <!-- استيراد جماعي للنوتات -->
+        <div class="card" style="border-color:rgba(16,185,129,.25)">
+          <h3 style="color:#10b981">📥 استيراد نوتات جاهزة دفعة واحدة</h3>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">يضيف نوتات مقدمة الكيمياء الحيوية (0490271) — ٦ جباتر مرتّبة لكل من: الأحياء الجزيئية، أحياء الحيوان، الكيمياء الحيوية. الضغط أكثر من مرة لا يكرّر النوتات (يحدّثها فقط).</p>
+          <div id="notesImportProgress" style="display:none;margin-bottom:1rem">
+            <div style="background:rgba(255,255,255,.06);border-radius:8px;overflow:hidden;height:8px;margin-bottom:.5rem">
+              <div id="notesImportBar" style="height:100%;background:linear-gradient(90deg,#10b981,#6366f1);width:0%;transition:width .3s;border-radius:8px"></div>
+            </div>
+            <div id="notesImportLog" style="font-size:.78rem;color:var(--muted);max-height:160px;overflow-y:auto;line-height:1.8"></div>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-primary" id="importNotesBtn" style="background:linear-gradient(135deg,#10b981,#059669);border:none">
+              ⬆️ استيراد نوتات الكيمياء الحيوية (271)
+            </button>
+            <span id="notesImportStatus" style="font-size:.82rem;color:var(--muted)"></span>
+          </div>
+        </div>
+
         <div class="items-list" id="notesList"></div>
       </div>
 
@@ -2512,6 +2531,73 @@ document.addEventListener('click',e=>{
   // ربط فوري في حال الصفحة محملة
   const _importBtn = document.getElementById('importMembersBtn');
   if(_importBtn) _importBtn.addEventListener('click', importAllMembers);
+
+  // ── استيراد النوتات الجاهزة دفعة واحدة ───────────────────
+  // دفعات النوتات: كل دفعة = مادة بكودها، تُضاف لعدة تخصصات بنفس الجباتر المرتّبة.
+  // المعرّفات ثابتة (note_<code>_<major>_<order>) فإعادة الاستيراد تحدّث ولا تكرّر.
+  const NOTE_BATCHES = [
+    {
+      code:"0490271", name:"مقدمة في الكيمياء الحيوية",
+      majors:["molecular","animal","biochem"], type:"Slides",
+      files:[
+        {order:0, title:"00 — مراجعة: الماء والمجموعات الوظيفية", url:"https://drive.google.com/file/d/1KgXTNoDESn49NPk4PCQ94mP5linQM-yd/view"},
+        {order:1, title:"01 — الأحماض الأمينية (Amino Acids)",     url:"https://drive.google.com/file/d/1tnqssjg1okzMPkq3sEz78K79MCKVQSZt/view"},
+        {order:2, title:"02 — البروتينات (Proteins)",              url:"https://drive.google.com/file/d/1LkD_Mk_V1PdK_dg8cpyw-COELnWBippA/view"},
+        {order:3, title:"03 — الكربوهيدرات (Carbohydrates)",       url:"https://drive.google.com/file/d/1-Sdy1NLrbRh0sUy_8prSokCFej4AeRTS/view"},
+        {order:4, title:"04 — الدهون (Lipids)",                     url:"https://drive.google.com/file/d/1ihroifr0W5bGhY9glNm0mrcsEqkO8mE0/view"},
+        {order:5, title:"05 — الأحماض النووية (Nucleic Acids)",     url:"https://drive.google.com/file/d/1zCMp_ZDNGljBwlUtfy5blMOLn6N5cgZH/view"},
+      ]
+    }
+  ];
+
+  async function importSeedNotes(){
+    const btn = document.getElementById('importNotesBtn');
+    const status = document.getElementById('notesImportStatus');
+    const progress = document.getElementById('notesImportProgress');
+    const bar = document.getElementById('notesImportBar');
+    const log = document.getElementById('notesImportLog');
+
+    // ابنِ قائمة المستندات (جابتر × تخصص)
+    const docs = [];
+    NOTE_BATCHES.forEach(b=>{
+      b.majors.forEach(major=>{
+        b.files.forEach(f=>{
+          docs.push({
+            id: `note_${b.code}_${major}_${f.order}`,
+            data: {
+              title: f.title,
+              course: `${b.code} — ${b.name}`,
+              major, type: b.type, term: "General",
+              url: f.url, order: f.order,
+            }
+          });
+        });
+      });
+    });
+
+    btn.disabled = true; btn.textContent = '⏳ جاري الاستيراد...';
+    progress.style.display = 'block'; log.innerHTML = '';
+    let done = 0;
+    for (const d of docs) {
+      try {
+        await setDoc(doc(collection(db,'notes'), d.id), {...d.data, createdAt:serverTimestamp()});
+        done++;
+        bar.style.width = (done/docs.length*100)+'%';
+        log.innerHTML += `<span style="color:#10b981">✓ ${d.data.major} · ${d.data.title}</span><br>`;
+        log.scrollTop = log.scrollHeight;
+      } catch(e) {
+        log.innerHTML += `<span style="color:#ef4444">✗ ${d.id}: ${e.message}</span><br>`;
+      }
+    }
+    btn.disabled = false; btn.textContent = '✅ تم الاستيراد!';
+    status.textContent = `رُفعت ${done} من ${docs.length} نوتة`;
+    status.style.color = '#10b981';
+    if(typeof loadAll === 'function') setTimeout(loadAll, 800);
+  }
+  {
+    const nb = document.getElementById('importNotesBtn');
+    if(nb) nb.addEventListener('click', importSeedNotes);
+  }
 
 </script>
 <script src="theme.js"></script>

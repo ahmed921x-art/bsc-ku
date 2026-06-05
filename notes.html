@@ -588,7 +588,7 @@ function courseGroup(code,nameAr,nameEn,notes,open){
       <span class="course-badge ${has?"has":"none"}">${has?has+" نوتة":"لا نوتات بعد"}</span>
       ${has?CHEV:""}
     </div>
-    ${has?`<div class="course-notes">${notes.map(noteRow).join("")}</div>`:""}
+    ${has?`<div class="course-notes">${[...notes].sort((a,b)=>(a.order??1e9)-(b.order??1e9)).map(noteRow).join("")}</div>`:""}
   </div>`;
 }
 
