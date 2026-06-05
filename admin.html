@@ -475,7 +475,7 @@ a{color:inherit;text-decoration:none}
         <!-- استيراد جماعي للنوتات -->
         <div class="card" style="border-color:rgba(16,185,129,.25)">
           <h3 style="color:#10b981">📥 استيراد نوتات جاهزة دفعة واحدة</h3>
-          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">يضيف نوتات فحص مسرح الجريمة (0409310): ١١ تجربة — لتخصص الأدلة الجنائية. الضغط أكثر من مرة لا يكرّر النوتات (يحدّثها فقط).</p>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">يضيف نوتات علم الغدد الصماء (0497483): ٧ تلخيصات — لتخصص البيولوجيا الجزيئية. الضغط أكثر من مرة لا يكرّر النوتات (يحدّثها فقط).</p>
           <div id="notesImportProgress" style="display:none;margin-bottom:1rem">
             <div style="background:rgba(255,255,255,.06);border-radius:8px;overflow:hidden;height:8px;margin-bottom:.5rem">
               <div id="notesImportBar" style="height:100%;background:linear-gradient(90deg,#10b981,#6366f1);width:0%;transition:width .3s;border-radius:8px"></div>
@@ -484,7 +484,7 @@ a{color:inherit;text-decoration:none}
           </div>
           <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
             <button class="btn btn-primary" id="importNotesBtn" style="background:linear-gradient(135deg,#10b981,#059669);border:none">
-              ⬆️ استيراد نوتات فحص مسرح الجريمة (310)
+              ⬆️ استيراد نوتات علم الغدد الصماء (483)
             </button>
             <span id="notesImportStatus" style="font-size:.82rem;color:var(--muted)"></span>
           </div>
@@ -2537,21 +2537,17 @@ document.addEventListener('click',e=>{
   // المعرّفات ثابتة (note_<code>_<major>_<order>) فإعادة الاستيراد تحدّث ولا تكرّر.
   const NOTE_BATCHES = [
     {
-      // فحص مسرح الجريمة وتقنيات جمع الأدلة — تجارب اللاب (مرتّبة بتسلسل المنهج)
-      code:"0409310", name:"فحص مسرح الجريمة وتقنيات جمع الأدلة",
-      majors:["forensic"], type:"Lab",
+      // علم الغدد الصماء — تلخيصات حسب الهرمون (مرتّبة بتسلسل المنهج)
+      code:"0497483", name:"علم الغدد الصماء",
+      majors:["molecular"], type:"Summary",
       files:[
-        {order:0,  title:"Experiment 1",                                           url:"https://drive.google.com/file/d/16ueN5F3VPn9vZZy7M-goDkyibqgaa5kT/view"},
-        {order:1,  title:"Experiment 2",                                           url:"https://drive.google.com/file/d/1mFRpHypn2xrBY04rYbwGjVEaUrK0jkQC/view"},
-        {order:2,  title:"Experiment 3",                                           url:"https://drive.google.com/file/d/1huOGHBj6HQDKHIkm5xcskIRAgQRFC2ET/view"},
-        {order:3,  title:"Experiment 4",                                           url:"https://drive.google.com/file/d/14cXZ-x3m7vPTEjGUdVtiAqPuq8RJOZ1o/view"},
-        {order:4,  title:"Experiment 5",                                           url:"https://drive.google.com/file/d/1v0Jh8YDQYPjB9PheOg9uzyc95PYNSTM2/view"},
-        {order:5,  title:"Experiment 6",                                           url:"https://drive.google.com/file/d/1AS27tIrXtR0vAbM4BBQxe0bM2EEhMe3z/view"},
-        {order:6,  title:"Experiment 7",                                           url:"https://drive.google.com/file/d/1Ub7Z8Zd3zNWXbNLCpPL50Dpopzwkjpr4/view"},
-        {order:7,  title:"Experiment 8",                                           url:"https://drive.google.com/file/d/1im2_6WL1BttYg-xt9ug0EOeyiuRUrXd4/view"},
-        {order:8,  title:"Experiment 9",                                           url:"https://drive.google.com/file/d/1L66hOXLDIEdbc16M9P96S8udZRCifcaU/view"},
-        {order:9,  title:"Experiment 10",                                          url:"https://drive.google.com/file/d/1YHXSk4RxnmrBTyhxwlbUh0B3gpcBVbZS/view"},
-        {order:10, title:"Experiment 11",                                          url:"https://drive.google.com/file/d/1l_ZcdyY0BLER3h02VxILY6deRMNfecZs/view"},
+        {order:0, title:"Vasopressin Essay",                                       url:"https://drive.google.com/file/d/1EIVHpKBU5EtjXYQEbSNmxBuENtqa_sKp/view"},
+        {order:1, title:"Oxytocin Essay",                                          url:"https://drive.google.com/file/d/1pNft-pP1B8d4M8G1g0p1z-7ZTQw1lz-t/view"},
+        {order:2, title:"Growth Hormone",                                          url:"https://drive.google.com/file/d/1-ecUr-x1n0DAA_6b4aZXtHPEe3J0ykxQ/view"},
+        {order:3, title:"Prolactin",                                               url:"https://drive.google.com/file/d/162p2kIFLWVrk8bZx7lmSFmBbkCq7uTnd/view"},
+        {order:4, title:"Cortisol",                                                url:"https://drive.google.com/file/d/1YDv7CdLFYKLwW0L4I6Rhi1Sd_1h_THJl/view"},
+        {order:5, title:"Insulin",                                                 url:"https://drive.google.com/file/d/1vUfDyDpbNcUnwCteJDd8696RpUgm7Mr1/view"},
+        {order:6, title:"Reproductive Hormones",                                   url:"https://drive.google.com/file/d/1U_moRcP43-82fLGBQl6yq3eSEH1sRqc7/view"},
       ]
     }
   ];
