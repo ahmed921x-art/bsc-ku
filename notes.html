@@ -649,7 +649,6 @@ function renderMajorView(k){
   if(!body) body=`<div class="empty-state"><span class="empty-icon">📭</span>${q?"ما لقينا مواد مطابقة في هذا التخصص.":"لا توجد مواد بنوتات بعد في هذا التخصص."}</div>`;
   return `<button class="back-btn" data-back>← رجوع لكل التخصصات</button>
     <div class="cat-major-head">${m.icon} ${m.name}</div>
-    <label class="toggle-empty"><input type="checkbox" id="toggleEmpty" ${state.showEmpty?"checked":""}> عرض كل المواد (حتى اللي بدون نوتات)</label>
     ${body}`;
 }
 
@@ -695,8 +694,6 @@ document.getElementById("notesRoot").addEventListener("click",e=>{
   if(e.target.closest("[data-back]")){state.major=null;render();return;}
   const head=e.target.closest('.course-head[data-toggle]');
   if(head){head.parentElement.classList.toggle("open");return;}
-  const te=e.target.closest("#toggleEmpty");
-  if(te){state.showEmpty=te.checked;render();}
 });
 document.getElementById("majorChips").addEventListener("click",e=>{
   const chip=e.target.closest("[data-chip]");
