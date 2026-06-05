@@ -942,37 +942,51 @@ function renderTree(){
   container.innerHTML=html;
   container.style.cssText=`position:relative;width:${CW}px;height:${CH}px`;
 
-  /* ── SVG ORTHOGONAL EDGES ── */
+  /* ── SVG SMOOTH BÉZIER EDGES ── */
   svg.setAttribute("width",CW);svg.setAttribute("height",CH);
   svg.setAttribute("viewBox",`0 0 ${CW} ${CH}`);
 
+  // notched arrowheads, fixed size (userSpaceOnUse) so they don't scale with stroke
   const markers=Object.entries(EC).map(([t,col])=>
-    `<marker id="ah-${t}" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
-      <polygon points="0 0,6 2.5,0 5" fill="${col}"/></marker>`).join('');
+    `<marker id="ah-${t}" markerWidth="11" markerHeight="9" refX="8.5" refY="4.5"
+       orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L10,4.5 L0.5,8.5 L3,4.5 Z" fill="${col}"/></marker>`).join('');
 
   let svgH=`<defs>${markers}</defs>`;
 
+  // Build incoming/outgoing edge lists so connection points can fan out
+  // across each node's edge instead of all stacking on the centre.
+  const outMap={}, inMap={};
+  sheetCourses.forEach(child=>{
+    (child.prereqs||[]).forEach(p=>{
+      if(!by[p]||!pos[p]||!pos[child.code])return;
+      if((LY[p]||0)>=(LY[child.code]||0))return; // skip back-edges
+      (outMap[p]||(outMap[p]=[])).push(child.code);
+      (inMap[child.code]||(inMap[child.code]=[])).push(p);
+    });
+  });
+  Object.keys(outMap).forEach(p=>outMap[p].sort((a,b)=>pos[a].cx-pos[b].cx));
+  Object.keys(inMap).forEach(c=>inMap[c].sort((a,b)=>pos[a].cx-pos[b].cx));
+
+  const SPAN=Math.min(NW-30,90); // horizontal spread of connection points
+  const slotX=(node,idx,n)=> n<=1 ? node.cx : node.cx-SPAN/2+SPAN*(idx/(n-1));
+
   sheetCourses.forEach(child=>{
     const pC=pos[child.code];if(!pC)return;
-    const prs=(child.prereqs||[]).filter(p=>by[p]&&pos[p]);
-    if(!prs.length)return;
+    const ins=inMap[child.code];if(!ins||!ins.length)return;
     const col=EC[child.type]||EC.dept;
     const mid=`ah-${child.type||'dept'}`;
 
-    prs.forEach(pcode=>{
+    ins.forEach((pcode,ci)=>{
       const pP=pos[pcode];if(!pP)return;
-      const x1=pP.cx, y1=pP.bot, x2=pC.cx, y2=pC.top;
-      if(LY[pcode]>=LY[child.code])return;
-      if(Math.abs(x1-x2)<6){
-        svgH+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
-          stroke="${col}" stroke-width="1.5" stroke-opacity=".65"
-          marker-end="url(#${mid})"/>`;
-      }else{
-        const busY=y1+Math.min(28+Math.abs(x1-x2)*0.08,(y2-y1)*0.45);
-        svgH+=`<path d="M${x1},${y1} L${x1},${busY} L${x2},${busY} L${x2},${y2}"
-          fill="none" stroke="${col}" stroke-width="1.5" stroke-opacity=".65"
-          stroke-linejoin="round" marker-end="url(#${mid})"/>`;
-      }
+      const outs=outMap[pcode];
+      const x1=slotX(pP,outs.indexOf(child.code),outs.length), y1=pP.bot;
+      const x2=slotX(pC,ci,ins.length), y2=pC.top-2;
+      const cy=(y1+y2)/2; // vertical control handles → smooth flow curve
+      svgH+=`<path d="M${x1.toFixed(1)},${y1} C${x1.toFixed(1)},${cy.toFixed(1)} `+
+        `${x2.toFixed(1)},${cy.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}"
+        fill="none" stroke="${col}" stroke-width="2.2" stroke-opacity=".78"
+        stroke-linecap="round" marker-end="url(#${mid})"/>`;
     });
   });
   svg.innerHTML=svgH;
