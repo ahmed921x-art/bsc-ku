@@ -63,11 +63,16 @@ a{color:inherit;text-decoration:none}
 .major-card:hover::before{opacity:1}
 .major-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;transform:scaleX(0);transform-origin:right;transition:transform .45s}
 .major-card:hover::after{transform:scaleX(1);transform-origin:left}
-.major-card:nth-child(1)::before{background:linear-gradient(135deg,rgba(99,102,241,.1),transparent)}.major-card:nth-child(1):hover{border-color:rgba(99,102,241,.45)}.major-card:nth-child(1)::after{background:linear-gradient(90deg,#6366f1,#8b5cf6)}
-.major-card:nth-child(2)::before{background:linear-gradient(135deg,rgba(16,185,129,.1),transparent)}.major-card:nth-child(2):hover{border-color:rgba(16,185,129,.45)}.major-card:nth-child(2)::after{background:linear-gradient(90deg,#10b981,#06b6d4)}
-.major-card:nth-child(3)::before{background:linear-gradient(135deg,rgba(139,92,246,.1),transparent)}.major-card:nth-child(3):hover{border-color:rgba(139,92,246,.45)}.major-card:nth-child(3)::after{background:linear-gradient(90deg,#8b5cf6,#ec4899)}
-.major-card:nth-child(4)::before{background:linear-gradient(135deg,rgba(6,182,212,.1),transparent)}.major-card:nth-child(4):hover{border-color:rgba(6,182,212,.45)}.major-card:nth-child(4)::after{background:linear-gradient(90deg,#06b6d4,#10b981)}
-.major-card:nth-child(5)::before{background:linear-gradient(135deg,rgba(245,158,11,.1),transparent)}.major-card:nth-child(5):hover{border-color:rgba(245,158,11,.45)}.major-card:nth-child(5)::after{background:linear-gradient(90deg,#f59e0b,#f97316)}
+/* molecular — yellow #FBE39B */
+.majors-grid>.major-card:nth-child(1)::before{background:linear-gradient(135deg,rgba(251,227,155,.12),transparent)}.majors-grid>.major-card:nth-child(1):hover{border-color:rgba(251,227,155,.5)}.majors-grid>.major-card:nth-child(1)::after{background:linear-gradient(90deg,#FBE39B,#f59e0b)}
+/* micro — pink #E28C99 */
+.majors-grid>.major-card:nth-child(2)::before{background:linear-gradient(135deg,rgba(226,140,153,.12),transparent)}.majors-grid>.major-card:nth-child(2):hover{border-color:rgba(226,140,153,.5)}.majors-grid>.major-card:nth-child(2)::after{background:linear-gradient(90deg,#E28C99,#f472b6)}
+/* plant — green #CEF516 */
+.majors-grid>.major-card:nth-child(3)::before{background:linear-gradient(135deg,rgba(206,245,22,.12),transparent)}.majors-grid>.major-card:nth-child(3):hover{border-color:rgba(206,245,22,.5)}.majors-grid>.major-card:nth-child(3)::after{background:linear-gradient(90deg,#CEF516,#84cc16)}
+/* animal — blue #9FE0F2 */
+.majors-grid>.major-card:nth-child(4)::before{background:linear-gradient(135deg,rgba(159,224,242,.12),transparent)}.majors-grid>.major-card:nth-child(4):hover{border-color:rgba(159,224,242,.5)}.majors-grid>.major-card:nth-child(4)::after{background:linear-gradient(90deg,#9FE0F2,#38bdf8)}
+/* biochem — purple #E6A6F8 */
+.majors-grid>.major-card:nth-child(5)::before{background:linear-gradient(135deg,rgba(230,166,248,.12),transparent)}.majors-grid>.major-card:nth-child(5):hover{border-color:rgba(230,166,248,.5)}.majors-grid>.major-card:nth-child(5)::after{background:linear-gradient(90deg,#E6A6F8,#a78bfa)}
 .major-icon-box{width:64px;height:64px;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.2);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;transition:all .4s var(--bounce)}
 .major-card:hover .major-icon-box{transform:scale(1.15)rotate(5deg)}
 .major-info h3{font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:.3rem;line-height:1.2}
@@ -407,7 +412,7 @@ a{color:inherit;text-decoration:none}
   <div class="majors-grid">
     <a class="major-card reveal" href="major.html?major=molecular" style="animation-delay:.05s">
       <div class="major-card-inner">
-        <div class="major-icon-box">🧬</div>
+        <div class="major-icon-box" style="background:rgba(251,227,155,.12);border-color:rgba(251,227,155,.2)">🧬</div>
         <div class="major-info">
           <h3>البيولوجيا الجزيئية</h3><div class="en">Molecular Biology</div>
           <p>يدرس آليات التعبير الجيني، تقنيات الحمض النووي، والهندسة الوراثية — من أكثر التخصصات تقدماً في العلوم البيولوجية.</p>
@@ -417,7 +422,7 @@ a{color:inherit;text-decoration:none}
     </a>
     <a class="major-card reveal" href="major.html?major=micro" style="animation-delay:.1s">
       <div class="major-card-inner">
-        <div class="major-icon-box" style="background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.2)">🦠</div>
+        <div class="major-icon-box" style="background:rgba(226,140,153,.12);border-color:rgba(226,140,153,.2)">🦠</div>
         <div class="major-info">
           <h3>علم الميكروبيولوجي</h3><div class="en">Microbiology</div>
           <p>يدرس البكتيريا والفيروسات والفطريات والطحالب الدقيقة — يُعدّ أساس علوم الصحة والبيئة والصناعة الحيوية.</p>
@@ -427,7 +432,7 @@ a{color:inherit;text-decoration:none}
     </a>
     <a class="major-card reveal" href="major.html?major=plant" style="animation-delay:.15s">
       <div class="major-card-inner">
-        <div class="major-icon-box" style="background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.2)">🌱</div>
+        <div class="major-icon-box" style="background:rgba(206,245,22,.12);border-color:rgba(206,245,22,.2)">🌱</div>
         <div class="major-info">
           <h3>بيولوجيا النبات</h3><div class="en">Plant Biology</div>
           <p>يغطي تشريح النبات وفسيولوجيته وعلاقته بالبيئة — مع تركيز على علم الطحالب والنباتات الطبية.</p>
@@ -437,7 +442,7 @@ a{color:inherit;text-decoration:none}
     </a>
     <a class="major-card reveal" href="major.html?major=animal"  style="animation-delay:.2s">
       <div class="major-card-inner">
-        <div class="major-icon-box" style="background:rgba(6,182,212,.12);border-color:rgba(6,182,212,.2)">🦁</div>
+        <div class="major-icon-box" style="background:rgba(159,224,242,.12);border-color:rgba(159,224,242,.2)">🦁</div>
         <div class="major-info">
           <h3>بيولوجيا الحيوان</h3><div class="en">Zoology</div>
           <p>يدرس تنوع الكائنات الحيوانية من لافقاريات وفقاريات — وظائفها الحيوية وسلوكها وبيئتها وتطورها.</p>
@@ -447,7 +452,7 @@ a{color:inherit;text-decoration:none}
     </a>
     <a class="major-card reveal" href="major.html?major=biochem" style="animation-delay:.25s">
       <div class="major-card-inner">
-        <div class="major-icon-box" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.2)">⚗️</div>
+        <div class="major-icon-box" style="background:rgba(230,166,248,.12);border-color:rgba(230,166,248,.2)">⚗️</div>
         <div class="major-info">
           <h3>الكيمياء الحيوية</h3><div class="en">Biochemistry</div>
           <p>يدرس التفاعلات الكيميائية في الكائنات الحية — البروتينات، الإنزيمات، التغذية، والكيمياء الإكلينيكية.</p>
