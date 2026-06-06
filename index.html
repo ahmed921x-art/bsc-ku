@@ -987,12 +987,11 @@ function animateCount(el, target) {
 }
 
 (async()=>{
-  const [evts, nts, nc, ec, ac] = await Promise.all([
-    getLatest("events",3), getLatest("notes",3),
+  const [evts, nc, ec, ac] = await Promise.all([
+    getLatest("events",3),
     getCount("notes"), getCount("events"), getCount("advisors")
   ]);
   renderEvents(evts);
-  renderNotes(nts);
   animateCount(document.getElementById("statNotes"),    nc);
   document.getElementById("statEvents").textContent="+50";
   animateCount(document.getElementById("statAdvisors"), ac);
