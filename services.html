@@ -746,10 +746,10 @@ a{color:inherit;text-decoration:none}
       <div class="pref-card reveal">
         <h3>🎯 تخصصي</h3>
         <div class="pref-grid" id="prefGrid">
-          <button class="pref-btn" data-major="molecular" onclick="setPref(this)">🧬 الأحياء الجزيئية</button>
+          <button class="pref-btn" data-major="molecular" onclick="setPref(this)">🧬 البيولوجيا الجزيئية</button>
           <button class="pref-btn" data-major="micro" onclick="setPref(this)">🦠 مايكروبيولوجي</button>
-          <button class="pref-btn" data-major="plant" onclick="setPref(this)">🌱 أحياء النبات</button>
-          <button class="pref-btn" data-major="animal" onclick="setPref(this)">🐾 أحياء الحيوان</button>
+          <button class="pref-btn" data-major="plant" onclick="setPref(this)">🌱 بيولوجيا النبات</button>
+          <button class="pref-btn" data-major="animal" onclick="setPref(this)">🐾 بيولوجيا الحيوان</button>
           <button class="pref-btn" data-major="biochem" onclick="setPref(this)">⚗️ الكيمياء الحيوية</button>
         </div>
       </div>
@@ -1137,7 +1137,7 @@ loadState();
 loadFromCloud().then(()=>{renderSemTabs();loadSemUI()});
 renderSemTabs();loadSemUI();
 addSyncUI();
-const majorNames={molecular:"🧬 الأحياء الجزيئية",micro:"🦠 مايكروبيولوجي",plant:"🌱 أحياء النبات",animal:"🐾 أحياء الحيوان",biochem:"⚗️ الكيمياء الحيوية"};
+const majorNames={molecular:"🧬 البيولوجيا الجزيئية",micro:"🦠 مايكروبيولوجي",plant:"🌱 بيولوجيا النبات",animal:"🐾 بيولوجيا الحيوان",biochem:"⚗️ الكيمياء الحيوية"};
 function setPref(btn){
   const major=btn.dataset.major;
   localStorage.setItem("bscku_major",major);
@@ -1166,10 +1166,10 @@ function loadPref(){
 window._schedData=window._schedData||[];
 
 const SCHED_CATS={
-  molecular:"🧬 الأحياء الجزيئية",
+  molecular:"🧬 البيولوجيا الجزيئية",
   micro:"🦠 مايكروبيولوجي",
-  plant:"🌱 أحياء النبات",
-  animal:"🐾 أحياء الحيوان",
+  plant:"🌱 بيولوجيا النبات",
+  animal:"🐾 بيولوجيا الحيوان",
   biochem:"⚗️ الكيمياء الحيوية",
 };
 
