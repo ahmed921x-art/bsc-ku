@@ -619,7 +619,7 @@ async function loadTeamTab() {
     if (!members.length) throw new Error('empty');
     const groups={};
     members.forEach(m=>{const cat=m.category||'board';if(!groups[cat])groups[cat]=[];groups[cat].push(m);});
-    const lang=localStorage.getItem('lang')||'ar';
+    const lang=localStorage.getItem('bscku_lang')||'ar';
     let html='';
     catOrder.forEach(cat=>{
       if(!groups[cat])return;

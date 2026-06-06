@@ -954,6 +954,14 @@ a{color:inherit;text-decoration:none}
           <div id="memberFormStatus" style="margin-top:.75rem;font-size:.85rem;color:var(--muted);min-height:1.2em"></div>
         </div>
 
+        <!-- تحديث الأسماء الإنجليزية دفعة واحدة -->
+        <div class="card" style="border-color:rgba(99,102,241,.25)">
+          <h3 style="color:#a5b4fc">🌐 تحديث الأسماء الإنجليزية للأعضاء</h3>
+          <p style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">يُحدّث حقل nameEn لكل الأعضاء الحاليين بناءً على الاسم العربي — يمكنك التعديل يدوياً بعدها.</p>
+          <div class="btn-row"><button class="btn btn-primary" id="seedNamesEnBtn">🌐 تحديث الأسماء الإنجليزية</button></div>
+          <div id="seedNamesStatus" style="margin-top:.75rem;font-size:.85rem;color:var(--muted)"></div>
+        </div>
+
         <!-- استيراد جماعي -->
         <div class="card" style="border-color:rgba(16,185,129,.25)">
           <h3 style="color:#10b981">📥 استيراد الأعضاء دفعة واحدة</h3>
@@ -2452,6 +2460,58 @@ document.addEventListener('click',e=>{
       status.style.color = '#f87171';
     }
     btn.disabled = false;
+  };
+
+  // Batch: seed English names
+  const NAME_EN_MAP = {
+    "عبدالرحمن السلامي":  "Abdulrahman Al-Salami",
+    "كيراز الدبس":         "Kiraz Al-Debs",
+    "عبدالله الأحمد":      "Abdullah Al-Ahmad",
+    "عيسى الكندري":        "Essa Al-Kandari",
+    "سارة سليم":           "Sara Salim",
+    "بتول عوض":            "Batoul Awad",
+    "سامية جنادلة":        "Samia Jnadla",
+    "علياء العجمي":         "Ulya Al-Ajmi",
+    "شوق المطيري":         "Shawq Al-Mutairi",
+    "حنين العنزي":          "Haneen Al-Anzi",
+    "عبدالرحمن النجدي":    "Abdulrahman Al-Najdi",
+    "مطيعة كاتبي":         "Mutia Katibi",
+    "عبدالرحمن الجمل":     "Abdulrahman Al-Jamal",
+    "عبدالله الشويع":       "Abdullah Al-Shuwaie",
+    "شهد الخالدي":          "Shahad Al-Khalidi",
+    "مؤنس منتاج":           "Mu'nis Mentaj",
+    "رؤى الشمري":           "Ruwa Al-Shammari",
+    "جنان قديح":            "Jinan Qadeeh",
+    "زمزم إبراهيم":         "Zamzam Ibrahim",
+    "فايزة العنزي":          "Faiza Al-Anzi",
+    "أحمد حسين":            "Ahmad Hussein",
+    "هاجر عبدالحميد":       "Hajar Abdulhamid",
+    "فاطمة عيسى":           "Fatima Essa",
+    "أنفال العنزي":          "Anfal Al-Anzi",
+    "لجين العوضي":           "Lujain Al-Awadhi",
+    "شوق الدخيل":           "Shawq Al-Dakheel",
+  };
+  document.getElementById('seedNamesEnBtn').onclick = async function(){
+    const st = document.getElementById('seedNamesStatus');
+    this.disabled = true; st.textContent = 'جاري التحديث...'; st.style.color = '#a5b4fc';
+    try {
+      const snap = await getDocs(collection(db,'teamMembers'));
+      let updated = 0;
+      for (const d of snap.docs) {
+        const nameAr = d.data().name || '';
+        const nameEn = NAME_EN_MAP[nameAr];
+        if (nameEn && d.data().nameEn !== nameEn) {
+          await setDoc(doc(db,'teamMembers',d.id), {nameEn}, {merge:true});
+          updated++;
+        }
+      }
+      st.textContent = `✅ تم تحديث ${updated} عضو`;
+      st.style.color = '#6ee7b7';
+      await loadMembers();
+    } catch(e) {
+      st.textContent = '❌ ' + e.message; st.style.color = '#f87171';
+    }
+    this.disabled = false;
   };
 
   document.getElementById('clearMemberFormBtn').onclick = function(){
