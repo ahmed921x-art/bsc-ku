@@ -138,13 +138,21 @@ a{color:inherit;text-decoration:none}
     [data-theme="light"] .value-card,
     [data-theme="light"] .stat-mini,
     [data-theme="light"] .stat-card,
-    [data-theme="light"] .member-card,
-    [data-theme="light"] .supervisor-card {
+    [data-theme="light"] .member-card {
       background: #ffffff !important;
       border-color: rgba(99,102,241,.15) !important;
       box-shadow: 0 2px 16px rgba(99,102,241,.08) !important;
       backdrop-filter: none !important;
     }
+    [data-theme="light"] .supervisor-card {
+      background: #f8fafc !important;
+      border-color: rgba(245,158,11,.25) !important;
+      box-shadow: 0 4px 24px rgba(245,158,11,.08) !important;
+      backdrop-filter: none !important;
+    }
+    [data-theme="light"] .supervisor-info h3 { color: #161616 !important; }
+    [data-theme="light"] .supervisor-info p { color: #475569 !important; }
+    [data-theme="light"] .supervisor-role { color: #b45309 !important; }
     [data-theme="light"] .card:hover,
     [data-theme="light"] .note-card:hover,
     [data-theme="light"] .event-card:hover,
@@ -472,8 +480,8 @@ a{color:inherit;text-decoration:none}
 
   <!-- Values -->
   <div class="section">
-    <div class="section-label" data-ar="قيمنا" data-en="Our Values">قيمنا</div>
-    <h2 data-ar="ما الذي يميّزنا؟" data-en="What Sets Us Apart?">ما الذي يميّزنا؟</h2>
+    <div class="section-label" data-ar="دورنا" data-en="Our Role">دورنا</div>
+    <h2 data-ar="ما الذي نقدّمه؟" data-en="What Do We Offer?">ما الذي نقدّمه؟</h2>
     <div class="values-grid">
       <div class="value-card reveal">
         <span class="value-icon">🎓</span>
@@ -618,9 +626,8 @@ async function loadTeamTab() {
           :`<div class="member-avatar" style="background:linear-gradient(135deg,${col}33,${col}11);display:flex;align-items:center;justify-content:center;font-size:2rem;border:2px solid ${col}44">👤</div>`}
           <div class="member-role">${m.role||''}</div>
           <h3>${m.name||'—'}</h3>
-          <div style="display:flex;flex-wrap:wrap;gap:.3rem;justify-content:center;margin-top:.5rem">
+          <div style="display:flex;justify-content:center;margin-top:.5rem">
             ${m.major?`<span style="font-size:.65rem;background:${col}22;color:${col};border:1px solid ${col}44;padding:2px 8px;border-radius:20px;font-weight:700">${m.major}</span>`:''}
-            ${m.minor?`<span style="font-size:.65rem;background:rgba(255,255,255,.05);color:var(--muted);border:1px solid rgba(255,255,255,.1);padding:2px 8px;border-radius:20px">${m.minor}</span>`:''}
           </div>
         </div>`;
       });
