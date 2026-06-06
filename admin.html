@@ -2370,7 +2370,9 @@ document.addEventListener('click',e=>{
       // مسح حالة الصورة أولاً
       if(typeof clearMemberPhoto==='function') clearMemberPhoto();
       document.getElementById('memberName').value = m.name||'';
+      document.getElementById('memberNameEn').value = m.nameEn||'';
       document.getElementById('memberRole').value = m.role||'';
+      document.getElementById('memberRoleEn').value = m.roleEn||'';
       document.getElementById('memberStudentId').value = m.studentId||'';
       document.getElementById('memberMajor').value = m.major||'';
       document.getElementById('memberEmail').value = m.email||'';
