@@ -878,8 +878,16 @@ a{color:inherit;text-decoration:none}
               <input id="memberName" placeholder="اسم العضو">
             </div>
             <div class="form-group">
+              <label>Full Name (EN)</label>
+              <input id="memberNameEn" placeholder="e.g. Abdullah Al-Ahmad">
+            </div>
+            <div class="form-group">
               <label>المنصب / الدور *</label>
               <input id="memberRole" placeholder="مثال: رئيس النادي، نائب الرئيس...">
+            </div>
+            <div class="form-group">
+              <label>Role (EN)</label>
+              <input id="memberRoleEn" placeholder="e.g. Club President">
             </div>
             <div class="form-group">
               <label>الرقم الجامعي</label>
@@ -931,11 +939,11 @@ a{color:inherit;text-decoration:none}
             <div class="form-group">
               <label>الفئة</label>
               <select id="memberCategory">
-                <option value="board">الهيئة الإدارية</option>
-                <option value="academic">اللجنة الثقافية</option>
-                <option value="media">اللجنة الإعلامية</option>
-                <option value="events">فريق الفعاليات</option>
-                <option value="other">أخرى</option>
+                <option value="board">الهيئة الإدارية — Board of Directors</option>
+                <option value="academic">اللجنة الثقافية — Scientific Affairs Unit</option>
+                <option value="media">اللجنة الإعلامية — Media Affairs Unit</option>
+                <option value="events">فريق الفعاليات — Events Team</option>
+                <option value="other">أخرى — Other</option>
               </select>
             </div>
           </div>
@@ -2403,7 +2411,9 @@ document.addEventListener('click',e=>{
 
     const data = {
       name,
+      nameEn:    document.getElementById('memberNameEn').value.trim(),
       role,
+      roleEn:    document.getElementById('memberRoleEn').value.trim(),
       studentId: document.getElementById('memberStudentId').value.trim(),
       major:     document.getElementById('memberMajor').value,
       email:     document.getElementById('memberEmail').value.trim(),
@@ -2427,7 +2437,7 @@ document.addEventListener('click',e=>{
       } else {
         await addDoc(collection(db,'teamMembers'),{...data,createdAt:serverTimestamp()});
       }
-      ['memberName','memberRole','memberStudentId','memberEmail','memberPhoto','memberBio'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+      ['memberName','memberNameEn','memberRole','memberRoleEn','memberStudentId','memberEmail','memberPhoto','memberBio'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
       document.getElementById('memberOrder').value = 99;
       document.getElementById('memberMajor').value = '';
       document.getElementById('memberCategory').value = 'board';

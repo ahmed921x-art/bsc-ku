@@ -595,9 +595,13 @@ const app = initializeApp({
 });
 const db = getFirestore(app);
 
-const catNames={board:"الهيئة الإدارية",academic:"اللجنة الثقافية",media:"اللجنة الإعلامية",events:"فريق الفعاليات",other:"أخرى"};
+const catNamesAr={board:"الهيئة الإدارية",academic:"اللجنة الثقافية",media:"اللجنة الإعلامية",events:"فريق الفعاليات",other:"أخرى"};
+const catNamesEn={board:"Board of Directors",academic:"Scientific Affairs Unit",media:"Media Affairs Unit",events:"Events Team",other:"Other"};
 const catOrder=["board","academic","media","events","other"];
-const majorColors={"كيمياء حيوية":"#f59e0b","بيولوجيا جزيئية":"#6366f1","ميكروبيولوجي":"#10b981","بيولوجيا الحيوان":"#ec4899","بيولوجيا النبات":"#22c55e"};
+const majorAr={molecular:"البيولوجيا الجزيئية",micro:"مايكروبيولوجي",plant:"بيولوجيا النبات",animal:"بيولوجيا الحيوان",biochem:"الكيمياء الحيوية",forensic:"الأدلة الجنائية",agri:"النبات الزراعي",biotech:"التقنية الحيوية"};
+const majorEn={molecular:"Molecular Biology",micro:"Microbiology",plant:"Plant Biology",animal:"Zoology",biochem:"Biochemistry",forensic:"Forensic Science",agri:"Agricultural Botany",biotech:"Biotechnology"};
+const majorColors={molecular:"#FBE39B",micro:"#E28C99",plant:"#CEF516",animal:"#9FE0F2",biochem:"#E6A6F8",forensic:"#f87171",agri:"#86efac",biotech:"#67e8f9"};
+const roleMap={"رئيس النادي":"Club President","نائب رئيس النادي":"Vice President","رئيس اللجنة الثقافية":"Head of Scientific Affairs","رئيس اللجنة الإعلامية":"Head of Media Affairs","أمين السر":"Secretary","أمين الصندوق":"Treasurer","عضو اللجنة الثقافية":"Scientific Affairs Member","عضو اللجنة الإعلامية":"Media Affairs Member","عضو فريق الفعاليات":"Events Team Member","مسؤول الموقع":"Website Manager"};
 
 let teamLoaded = false;
 
@@ -615,19 +619,24 @@ async function loadTeamTab() {
     if (!members.length) throw new Error('empty');
     const groups={};
     members.forEach(m=>{const cat=m.category||'board';if(!groups[cat])groups[cat]=[];groups[cat].push(m);});
+    const lang=localStorage.getItem('lang')||'ar';
     let html='';
     catOrder.forEach(cat=>{
       if(!groups[cat])return;
-      html+=`<div style="grid-column:1/-1;margin:1.5rem 0 .25rem"><span style="font-size:.72rem;font-weight:800;color:#818cf8;text-transform:uppercase;letter-spacing:.1em">${catNames[cat]||cat}</span></div>`;
+      const catAr=catNamesAr[cat]||cat, catEn=catNamesEn[cat]||cat;
+      html+=`<div style="grid-column:1/-1;margin:1.5rem 0 .25rem"><span data-ar="${catAr}" data-en="${catEn}" style="font-size:.72rem;font-weight:800;color:#818cf8;text-transform:uppercase;letter-spacing:.1em">${lang==='en'?catEn:catAr}</span></div>`;
       groups[cat].forEach((m,i)=>{
         const col=majorColors[m.major]||'#818cf8';
+        const arName=m.name||'—', enName=m.nameEn||m.name||'—';
+        const arRole=m.role||'', enRole=m.roleEn||roleMap[m.role]||m.role||'';
+        const arMaj=majorAr[m.major]||m.major||'', enMaj=majorEn[m.major]||m.major||'';
         html+=`<div class="member-card reveal" style="animation-delay:${(i*.04).toFixed(2)}s">
-          ${m.photo?`<img class="member-avatar" src="${m.photo}" alt="${m.name}" onerror="this.style.display='none'">`
+          ${m.photo?`<img class="member-avatar" src="${m.photo}" alt="${arName}" onerror="this.style.display='none'">`
           :`<div class="member-avatar" style="background:linear-gradient(135deg,${col}33,${col}11);display:flex;align-items:center;justify-content:center;font-size:2rem;border:2px solid ${col}44">👤</div>`}
-          <div class="member-role">${m.role||''}</div>
-          <h3>${m.name||'—'}</h3>
+          <div class="member-role" data-ar="${arRole}" data-en="${enRole}">${lang==='en'?enRole:arRole}</div>
+          <h3 data-ar="${arName}" data-en="${enName}">${lang==='en'?enName:arName}</h3>
           <div style="display:flex;justify-content:center;margin-top:.5rem">
-            ${m.major?`<span style="font-size:.65rem;background:${col}22;color:${col};border:1px solid ${col}44;padding:2px 8px;border-radius:20px;font-weight:700">${m.major}</span>`:''}
+            ${arMaj?`<span data-ar="${arMaj}" data-en="${enMaj}" style="font-size:.65rem;background:${col}22;color:${col};border:1px solid ${col}44;padding:2px 8px;border-radius:20px;font-weight:700">${lang==='en'?enMaj:arMaj}</span>`:''}
           </div>
         </div>`;
       });
