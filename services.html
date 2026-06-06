@@ -847,6 +847,7 @@ function fmtDate(ts){if(!ts)return{d:"—",m:""};const dt=ts.toDate?ts.toDate():
           <div class="news-tag ${type}">${type==="urgent"?"🚨 عاجل":type==="event"?"🎤 فعالية":"📌 خبر"}</div>
           <h3>${n.title||"خبر"}</h3>
           <p>${n.content||n.description||""}</p>
+          ${n.driveUrl?`<a href="${n.driveUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:.35rem;margin-top:.6rem;padding:.38rem .9rem;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.28);border-radius:999px;font-size:.78rem;font-weight:700;color:#a5b4fc;text-decoration:none">📁 فتح الملف</a>`:""}
         </div>
       </div>`}).join("");
     trigReveal();

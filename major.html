@@ -487,31 +487,13 @@ a{color:inherit;text-decoration:none}
   <a class="back-btn" href="majors.html" data-ar="→ العودة للتخصصات" data-en="→ Back to Majors">→ العودة للتخصصات</a>
 
   <div class="page-tabs">
-    <button class="ptab active" onclick="switchTab('notes')" data-ar="📚 النوتات" data-en="📚 Notes">📚 النوتات</button>
-    <button class="ptab" onclick="switchTab('sheet')" data-ar="🗺️ صحيفة التخصص" data-en="🗺️ Graduation Sheet">🗺️ صحيفة التخصص</button>
+    <button class="ptab active" onclick="switchTab('sheet')" data-ar="🗺️ صحيفة التخصص" data-en="🗺️ Graduation Sheet">🗺️ صحيفة التخصص</button>
     <button class="ptab" onclick="switchTab('schedule')" data-ar="📅 منشئ الجدول" data-en="📅 Schedule Builder">📅 منشئ الجدول</button>
     <button class="ptab" onclick="switchTab('suggest')" data-ar="🎓 صحيفة التخصص المساند" data-en="🎓 Supporting Major Sheet">🎓 صحيفة التخصص المساند</button>
   </div>
 
-  <!-- NOTES -->
-  <div class="tab-panel active" id="tab-notes">
-    <div class="section-label">مكتبة المراجعات</div>
-    <div class="section-h2">نوتات التخصص</div>
-    <div style="display:flex;align-items:flex-start;gap:.75rem;padding:1rem 1.25rem;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:14px;margin-bottom:1.5rem">
-      <span style="font-size:1.2rem;flex-shrink:0">⚠️</span>
-      <p style="font-size:.85rem;color:#fcd34d;font-weight:600;line-height:1.6;margin:0">
-        المذكرات المتوفرة هي تجميع من طلاب القسم، ولا تُغني عن الكتاب المقرر أو حضور المحاضرات.
-      </p>
-    </div>
-    <div class="notes-grid" id="notesGrid">
-      <div style="height:160px;background:rgba(255,255,255,.04);border-radius:20px"></div>
-      <div style="height:160px;background:rgba(255,255,255,.04);border-radius:20px;animation-delay:.1s"></div>
-      <div style="height:160px;background:rgba(255,255,255,.04);border-radius:20px;animation-delay:.2s"></div>
-    </div>
-  </div>
-
   <!-- MAJORSHEET -->
-  <div class="tab-panel" id="tab-sheet">
+  <div class="tab-panel active" id="tab-sheet">
     <div class="section-label">خريطة المسار</div>
     <div class="section-h2">صحيفة التخصص التفاعلية</div>
     <div id="batchSelector" style="display:none;margin-bottom:1.25rem">
@@ -607,21 +589,6 @@ let completedCodes=new Set();
 let currentBatch=null;
 let allBatches={};
 const typeClass={required:"tn-required",dept:"tn-dept",major:"tn-major",support:"tn-support",elective:"tn-elective"};
-
-// NOTES
-(async()=>{
-  let notes=[];
-  try{const s=await getDocs(query(collection(db,"notes"),where("major","==",major),orderBy("createdAt","desc")));notes=s.docs.map(d=>({id:d.id,...d.data()}))}catch{try{const s=await getDocs(collection(db,"notes"));notes=s.docs.map(d=>({id:d.id,...d.data()})).filter(n=>n.major===major)}catch{}}
-  const g=document.getElementById("notesGrid");
-  if(!notes.length){g.innerHTML='<div class="empty-state">لا توجد نوتات لهذا التخصص بعد.</div>';return}
-  g.innerHTML=notes.map((n,i)=>`
-    <div class="note-card" style="animation-delay:${i*.08}s">
-      <div class="note-tag">📖 ${n.type||"Note"}</div>
-      <h3>${n.title||"Untitled"}</h3>
-      <div class="course">${n.course||""} ${n.term?"· "+n.term:""}</div>
-      <a class="dl-btn" href="${n.url||"#"}" target="_blank">📥 فتح</a>
-    </div>`).join("");
-})();
 
 // MAJORSHEET
 let sheetImageUrl="";
@@ -1130,7 +1097,7 @@ function setupScheduleSearch(){
 </script>
 <script>
 function switchTab(id){
-  document.querySelectorAll(".ptab").forEach((t,i)=>t.classList.toggle("active",["notes","sheet","schedule","suggest"][i]===id));
+  document.querySelectorAll(".ptab").forEach((t,i)=>t.classList.toggle("active",["sheet","schedule","suggest"][i]===id));
   document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
   const panel=document.getElementById("tab-"+id);
   if(!panel)return;

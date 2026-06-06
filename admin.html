@@ -507,6 +507,7 @@ a{color:inherit;text-decoration:none}
               </select>
             </div>
             <div class="form-group form-full"><label>محتوى الخبر</label><textarea id="newsContent" placeholder="اكتب تفاصيل الخبر هنا..."></textarea></div>
+            <div class="form-group form-full"><label>رابط درايف (اختياري)</label><input id="newsDriveUrl" placeholder="https://drive.google.com/..."></div>
             <div class="form-group form-full" id="mu-news"></div>
           </div>
           <div class="btn-row"><button class="btn btn-primary" id="addNews">+ نشر الخبر</button></div>
@@ -1205,8 +1206,9 @@ document.getElementById("addNote").onclick=async()=>{
 document.getElementById("addNews").onclick=async()=>{
   const d={title:newsTitle.value.trim(),type:newsType.value,content:newsContent.value.trim()};
   if(!d.title)return alert("اكتب عنوان الخبر");
+  const driveUrl=document.getElementById("newsDriveUrl").value.trim();if(driveUrl)d.driveUrl=driveUrl;
   const imgs=window._mu['news']?.get()||[];if(imgs.length){d.images=imgs;d.imageUrl=imgs[0];}
-  await addItem("news",d);newsTitle.value=newsContent.value="";window._mu['news']?.reset();alert("✅ تم نشر الخبر");
+  await addItem("news",d);newsTitle.value=newsContent.value="";document.getElementById("newsDriveUrl").value="";window._mu['news']?.reset();alert("✅ تم نشر الخبر");
 };
 document.getElementById("addAnn").onclick=async()=>{
   const d={title:annTitle.value.trim(),type:annType.value,content:annContent.value.trim()};
