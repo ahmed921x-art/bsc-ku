@@ -481,7 +481,7 @@ a{color:inherit;text-decoration:none}
   <!-- Values -->
   <div class="section">
     <div class="section-label" data-ar="دورنا" data-en="Our Role">دورنا</div>
-    <h2 data-ar="ما الذي نقدّمه؟" data-en="What Do We Offer?">ما الذي نقدّمه؟</h2>
+    <h2 data-ar="شنو دورنا؟" data-en="What Do We Offer?">شنو دورنا؟</h2>
     <div class="values-grid">
       <div class="value-card reveal">
         <span class="value-icon">🎓</span>
@@ -501,16 +501,6 @@ a{color:inherit;text-decoration:none}
     </div>
   </div>
 
-  <!-- Top Notes preview -->
-  <div class="section">
-    <div class="section-label" data-ar="مكتبة المراجعات" data-en="Resources Library">مكتبة المراجعات</div>
-    <h2 data-ar="أبرز النوتات" data-en="Featured Notes">أبرز النوتات</h2>
-    <div class="grid-auto" id="topNotesGrid">
-      <div class="skeleton" style="height:150px"></div>
-      <div class="skeleton" style="height:150px;animation-delay:.1s"></div>
-      <div class="skeleton" style="height:150px;animation-delay:.2s"></div>
-    </div>
-  </div>
   </div><!-- end tab-about -->
 
   <!-- TAB: عائلة النادي -->
@@ -558,16 +548,8 @@ function anim(el,t){if(!t){el.textContent="—";return}let c=0;const s=Math.max(
 (async()=>{
   const[notes,events,advisors]=await Promise.all([get("notes"),get("events"),get("advisors")]);
   anim(document.getElementById("statNotes"),notes.length);
-  anim(document.getElementById("statEvents"),events.length);
+  document.getElementById("statEvents").textContent="+50";
   anim(document.getElementById("statAdvisors"),advisors.length);
-  const top=notes.slice(0,3);
-  document.getElementById("topNotesGrid").innerHTML=top.length?top.map((n,i)=>`
-    <div class="card" style="animation-delay:${i*.1}s">
-      <div class="tag">📖 ${mn[n.major]||n.major||"عام"}</div>
-      <h3 style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${n.title||"Untitled"}</h3>
-      <p>${n.course||""}</p>
-      <div style="margin-top:1rem"><a style="display:inline-flex;align-items:center;gap:.4rem;padding:.45rem .95rem;background:rgba(99,102,241,.14);border:1px solid rgba(99,102,241,.3);border-radius:999px;font-size:.8rem;font-weight:700;color:#a5b4fc" href="${n.url||"#"}" target="_blank">📥 فتح</a></div>
-    </div>`).join(""):`<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted)">لا توجد نوتات بعد.</div>`;
   triggerReveal();
 })();
 </script>
@@ -632,7 +614,7 @@ async function loadTeamTab() {
         const arMaj=majorAr[m.major]||m.major||'', enMaj=majorEn[m.major]||m.major||'';
         html+=`<div class="member-card reveal" style="animation-delay:${(i*.04).toFixed(2)}s">
           ${m.photo?`<img class="member-avatar" src="${m.photo}" alt="${arName}" onerror="this.style.display='none'">`
-          :`<div class="member-avatar" style="background:linear-gradient(135deg,${col}33,${col}11);display:flex;align-items:center;justify-content:center;font-size:2rem;border:2px solid ${col}44">👤</div>`}
+          :`<div class="member-avatar" style="background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:2rem;border:2px solid rgba(255,255,255,.12)">👤</div>`}
           <div class="member-role" data-ar="${arRole}" data-en="${enRole}">${lang==='en'?enRole:arRole}</div>
           <h3 data-ar="${arName}" data-en="${enName}">${lang==='en'?enName:arName}</h3>
           <div style="display:flex;justify-content:center;margin-top:.5rem">
@@ -662,7 +644,7 @@ async function loadTeamTab() {
       groups2[cat].forEach((m,i)=>{
         const col=majorColors[m.major]||'#818cf8';
         html2+=`<div class="member-card" style="animation-delay:${(i*.05).toFixed(2)}s">
-          <div class="member-avatar" style="background:linear-gradient(135deg,${col}33,${col}11);display:flex;align-items:center;justify-content:center;font-size:2rem;border:2px solid ${col}44">👤</div>
+          <div class="member-avatar" style="background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:2rem;border:2px solid rgba(255,255,255,.12)">👤</div>
           <div class="member-role">${m.role}</div><h3>${m.name}</h3>
           <span style="font-size:.65rem;background:${col}22;color:${col};border:1px solid ${col}44;padding:2px 8px;border-radius:20px;font-weight:700">${m.major}</span>
         </div>`;

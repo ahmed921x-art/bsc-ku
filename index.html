@@ -820,6 +820,11 @@
     <strong id="statAdvisors">—</strong>
     <span data-ar="مرشد أكاديمي" data-en="Academic Advisor">مرشد أكاديمي</span>
   </div>
+  <div class="stat reveal">
+    <div class="stat-icon">🧬</div>
+    <strong>5</strong>
+    <span data-ar="تخصصات" data-en="Majors">تخصصات</span>
+  </div>
 </div>
 
 <div class="divider"></div>
@@ -840,21 +845,6 @@
   </div>
 </section>
 
-<!-- ====== LATEST NOTES ====== -->
-<section class="section">
-  <div class="section-head reveal">
-    <div>
-      <div class="section-label" data-ar="مكتبة المراجعات" data-en="Resources Library">مكتبة المراجعات</div>
-      <h2 data-ar="آخر النوتات المضافة" data-en="Latest Study Notes">آخر النوتات المضافة</h2>
-    </div>
-    <a class="see-all" href="notes.html" data-ar="عرض الكل ←" data-en="View All →">عرض الكل ←</a>
-  </div>
-  <div class="grid-3" id="latestNotesGrid">
-    <div class="skeleton" style="height:160px; border-radius:20px;"></div>
-    <div class="skeleton" style="height:160px; border-radius:20px; animation-delay:.15s"></div>
-    <div class="skeleton" style="height:160px; border-radius:20px; animation-delay:.3s"></div>
-  </div>
-</section>
 
 <div class="divider"></div>
 
@@ -1004,15 +994,17 @@ function animateCount(el, target) {
   renderEvents(evts);
   renderNotes(nts);
   animateCount(document.getElementById("statNotes"),    nc);
-  animateCount(document.getElementById("statEvents"),   ec);
+  document.getElementById("statEvents").textContent="+50";
   animateCount(document.getElementById("statAdvisors"), ac);
   try {
     const annSnap = await getDocs(query(collection(db,"announcements"), orderBy("createdAt","desc"), limit(1)));
     if(!annSnap.empty){
       const ann=annSnap.docs[0].data();
-      const b=document.getElementById("annBanner");
-      document.getElementById("annBannerText").textContent=(ann.type==="urgent"?"🚨 ":"📢 ")+(ann.title||"");
-      b.style.display="block";
+      if(ann.type!=="urgent"){
+        const b=document.getElementById("annBanner");
+        document.getElementById("annBannerText").textContent="📢 "+(ann.title||"");
+        b.style.display="block";
+      }
     }
   } catch(e){}
 })();
