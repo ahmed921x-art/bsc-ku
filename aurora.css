@@ -194,16 +194,9 @@ body { background: #1e1e1e !important; color: #f0f2ff !important; }
 
 /* ── Majors ── */
 .major-card { background: rgba(40,40,44,.82) !important; }
-.major-card:nth-child(1)::before { background: linear-gradient(135deg, rgba(129,140,248,.15), transparent) !important; }
-.major-card:nth-child(1):hover   { border-color: rgba(129,140,248,.5) !important; box-shadow: 0 32px 80px rgba(129,140,248,.15) !important; }
-.major-card:nth-child(2)::before { background: linear-gradient(135deg, rgba(52,211,153,.15), transparent) !important; }
-.major-card:nth-child(2):hover   { border-color: rgba(52,211,153,.5) !important; box-shadow: 0 32px 80px rgba(52,211,153,.12) !important; }
-.major-card:nth-child(3)::before { background: linear-gradient(135deg, rgba(99,102,241,.15), transparent) !important; }
-.major-card:nth-child(3):hover   { border-color: rgba(99,102,241,.5) !important; box-shadow: 0 32px 80px rgba(99,102,241,.12) !important; }
-.major-card:nth-child(4)::before { background: linear-gradient(135deg, rgba(56,189,248,.15), transparent) !important; }
-.major-card:nth-child(4):hover   { border-color: rgba(56,189,248,.5) !important; box-shadow: 0 32px 80px rgba(56,189,248,.12) !important; }
-.major-card:nth-child(5)::before { background: linear-gradient(135deg, rgba(244,114,182,.15), transparent) !important; }
-.major-card:nth-child(5):hover   { border-color: rgba(244,114,182,.5) !important; box-shadow: 0 32px 80px rgba(244,114,182,.1) !important; }
+/* Per-major colors (border/wash/stripe) are set on each card via --mc vars in majors.html.
+   No colored glow halo — plain dark shadow on hover. */
+.major-card:hover { box-shadow: 0 28px 70px rgba(0,0,0,.45) !important; }
 
 /* ── Footer ── */
 .footer {
