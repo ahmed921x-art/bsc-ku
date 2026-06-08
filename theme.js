@@ -302,9 +302,9 @@
       'Studies the diversity of animal organisms from invertebrates to vertebrates — their vital functions, behavior, environment, and evolution.',
     'يدرس التفاعلات الكيميائية في الكائنات الحية — البروتينات، الإنزيمات، التغذية، والكيمياء الإكلينيكية.':
       'Studies chemical reactions in living organisms — proteins, enzymes, nutrition, and clinical chemistry.',
-    'التخصصات المساندة': 'Supporting Majors',
+    'التخصصات المساندة': 'Minors',
     'التخصصات المساندة المتاحة لطلبة قسم العلوم البيولوجية':
-      'Supporting majors available to Biological Sciences students',
+      'Minors available to Biological Sciences students',
     'علم الأدلة الجنائية': 'Forensic Science',
     'يجمع بين علوم الأحياء والكيمياء والقانون لتحليل علم الأدلة الجنائية واستخدامها في التحقيقات الجنائية.':
       'Combines biology, chemistry, and law to analyze forensic evidence and use it in criminal investigations.',
@@ -319,7 +319,7 @@
     '📚 النوتات': '📚 Notes',
     '🗺️ صحيفة التخرج': '🗺️ Graduation Sheet',
     '📅 منشئ الجدول': '📅 Schedule Builder',
-    '🎓 صحيفة التخرج المساند': '🎓 Supporting Major Sheet',
+    '🎓 صحيفة التخرج المساند': '🎓 Minor Sheet',
     'نوتات التخصص': 'Major Notes',
     'المذكرات المتوفرة هي تجميع من طلاب القسم، ولا تُغني عن الكتاب المقرر أو حضور المحاضرات.':
       'The notes available are compiled by students and do not replace the textbook or attending lectures.',
@@ -330,7 +330,7 @@
     'متطلب إلزامي': 'University Requirement',
     'متطلب القسم': 'Department Requirement',
     'متطلب التخصص': 'Major Requirement',
-    'متطلب مساند': 'Supporting Requirement',
+    'متطلب مساند': 'Minor Requirement',
     'اختياري': 'Elective',
     'مكتمل ✓': 'Completed ✓',
     '⏳ جاري تحميل الميجرشيت...': '⏳ Loading graduation sheet...',
@@ -351,10 +351,10 @@
     'إجمالي المواد: ': 'Total Courses: ',
     'إجمالي الساعات: ': 'Total Credits: ',
     'المعدل المقدّر: ': 'Estimated GPA: ',
-    'صحيفة التخرج المساند': 'Supporting Major Sheet',
-    'صحيفة التخرج للتخصص المساند': 'Supporting Major Graduation Sheet',
+    'صحيفة التخرج المساند': 'Minor Sheet',
+    'صحيفة التخرج للتخصص المساند': 'Minor Graduation Sheet',
     'صحيفة التخرج للتخصص المساند — تُظهر المتطلبات اللازمة لإتمام التخصص المساند بنجاح.':
-      'The supporting major graduation sheet — shows the requirements needed to complete the supporting major successfully.',
+      'The minor graduation sheet — shows the requirements needed to complete the minor successfully.',
 
     // ── Rendered dynamic content (Firebase) ─────────────────
     'لا توجد فعاليات بعد.': 'No events yet.',
