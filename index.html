@@ -753,7 +753,7 @@
       <span class="grad" data-ar="نادي العلوم" data-en="Biological">نادي العلوم</span><br>
       <span class="accent" data-ar="البيولوجية" data-en="Sciences Club">البيولوجية</span>
     </h1>
-    <p class="hero-desc" data-ar="الحياة في أطيافها" data-en="Life Refracted through color">
+    <p class="hero-desc" data-ar="الحياة في أطيافها" data-en="Life Refracted Through Color">
       الحياة في أطيافها
     </p>
     <div class="hero-btns">
@@ -791,14 +791,14 @@
     <span data-ar="فعاليات النادي" data-en="Club Events">فعاليات النادي</span>
   </div>
   <div class="stat reveal">
-    <div class="stat-icon">🎓</div>
-    <strong id="statAdvisors">—</strong>
-    <span data-ar="مرشد أكاديمي" data-en="Academic Advisor">مرشد أكاديمي</span>
+    <div class="stat-icon">🧪</div>
+    <strong>8</strong>
+    <span data-ar="التخصصات المساندة" data-en="Supporting Majors">التخصصات المساندة</span>
   </div>
   <div class="stat reveal">
     <div class="stat-icon">🧬</div>
     <strong>5</strong>
-    <span data-ar="تخصصات" data-en="Majors">تخصصات</span>
+    <span data-ar="تخصصات رئيسية" data-en="Core Majors">تخصصات رئيسية</span>
   </div>
 </div>
 
@@ -1000,14 +1000,13 @@ function animateCount(el, target) {
 }
 
 (async()=>{
-  const [evts, nc, ec, ac] = await Promise.all([
+  const [evts, nc, ec] = await Promise.all([
     getLatest("events",3),
-    getCount("notes"), getCount("events"), getCount("advisors")
+    getCount("notes"), getCount("events")
   ]);
   renderEvents(evts);
   animateCount(document.getElementById("statNotes"),    nc);
   document.getElementById("statEvents").textContent="+50";
-  animateCount(document.getElementById("statAdvisors"), ac);
   try {
     const annSnap = await getDocs(query(collection(db,"announcements"), orderBy("createdAt","desc")));
     renderAnnouncements(annSnap.docs.map(d=>({id:d.id,...d.data()})));

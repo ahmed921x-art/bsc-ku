@@ -56,6 +56,20 @@ a{color:inherit;text-decoration:none}
 .page-hero p{font-size:1.05rem;color:var(--muted);max-width:520px;margin:0 auto}
 .main-content{position:relative;z-index:2;padding:0 6% 5rem}
 .events-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem}
+/* ── Featured (latest) event ── */
+.featured-event{margin-bottom:2rem}
+.event-featured{display:block;background:linear-gradient(135deg,rgba(16,185,129,.10),rgba(6,182,212,.05)),rgba(22,22,22,.82);backdrop-filter:blur(20px);border:1px solid rgba(16,185,129,.32);border-radius:28px;padding:2.5rem 2.75rem;position:relative;overflow:hidden;transition:all .4s var(--ease);animation:fu .7s ease both;text-decoration:none}
+.event-featured::after{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#10b981,#06b6d4)}
+.event-featured:hover{transform:translateY(-6px);box-shadow:0 30px 80px rgba(0,0,0,.45);border-color:rgba(16,185,129,.55)}
+.featured-label{display:inline-flex;align-items:center;gap:.5rem;font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#6ee7b7;margin-bottom:1rem}
+.featured-label::before{content:'';width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 12px #10b981;animation:blink 1.5s ease-in-out infinite}
+.event-featured .ev-date{display:inline-flex;align-items:center;gap:.4rem;font-size:.88rem;font-weight:700;color:#6ee7b7;background:rgba(16,185,129,.14);border:1px solid rgba(16,185,129,.3);border-radius:999px;padding:.38rem 1.05rem;margin-bottom:1.25rem}
+.event-featured h2{font-size:1.95rem;font-weight:800;color:var(--text);line-height:1.25;margin-bottom:.85rem}
+.event-featured p{font-size:1.02rem;color:var(--muted);line-height:1.7;max-width:65ch;margin-bottom:1.5rem}
+.event-featured .ev-foot{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;padding-top:1.25rem;border-top:1px solid var(--border)}
+.event-featured .ev-loc{display:flex;align-items:center;gap:.4rem;font-size:.95rem;color:var(--muted)}
+.event-featured .dl-btn{font-size:.9rem;padding:.6rem 1.4rem}
+@media(max-width:640px){.event-featured{padding:1.75rem 1.5rem}.event-featured h2{font-size:1.5rem}}
 .event-card{background:rgba(22,22,22,.75);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius-lg);padding:0;overflow:hidden;transition:all .4s var(--ease);position:relative;animation:fu .7s ease both}
 .event-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#10b981,#06b6d4);transform:scaleX(0);transform-origin:right;transition:transform .45s}
 .event-card:hover{transform:translateY(-8px);border-color:rgba(16,185,129,.35);box-shadow:0 24px 60px rgba(0,0,0,.4)}
@@ -388,6 +402,7 @@ a{color:inherit;text-decoration:none}
 </div>
 
 <main class="main-content">
+  <div class="featured-event" id="featuredEvent"></div>
   <div class="events-grid" id="eventsGrid">
     <div style="height:200px;background:rgba(255,255,255,.04);border-radius:20px;animation:sk 1.8s ease infinite"></div>
     <div style="height:200px;background:rgba(255,255,255,.04);border-radius:20px;animation:sk 1.8s ease .15s infinite"></div>
@@ -418,8 +433,23 @@ const db=getFirestore(app);
   let events=[];
   try{const s=await getDocs(query(collection(db,"events"),orderBy("createdAt","desc")));events=s.docs.map(d=>({id:d.id,...d.data()}))}catch{try{const s=await getDocs(collection(db,"events"));events=s.docs.map(d=>({id:d.id,...d.data()}))}catch{}}
   const g=document.getElementById("eventsGrid");
-  if(!events.length){g.innerHTML='<div class="empty-state"><span class="empty-icon">📅</span>لا توجد فعاليات حالياً. تابعونا للمزيد!</div>';return}
-  g.innerHTML=events.map((e,i)=>`
+  const fe=document.getElementById("featuredEvent");
+  if(!events.length){fe.innerHTML="";g.innerHTML='<div class="empty-state"><span class="empty-icon">📅</span>لا توجد فعاليات حالياً. تابعونا للمزيد!</div>';return}
+  // أحدث فعالية = مميّزة بالأعلى، والباقي مربعات تحت
+  const lead=events[0], rest=events.slice(1);
+  const isAr=document.documentElement.lang!=="en";
+  fe.innerHTML=`
+    <div class="event-featured reveal">
+      <div class="featured-label">${isAr?"آخر فعالية":"Latest Event"}</div>
+      <div class="ev-date">📅 ${lead.date||(isAr?"قريباً":"Soon")}</div>
+      <h2>${lead.title||(isAr?"فعالية":"Event")}</h2>
+      <p>${lead.description||""}</p>
+      <div class="ev-foot">
+        ${lead.location?`<span class="ev-loc">📍 ${lead.location}</span>`:""}
+        ${lead.url?`<a class="dl-btn" href="${lead.url}" target="_blank">${isAr?"التفاصيل ←":"Details ←"}</a>`:""}
+      </div>
+    </div>`;
+  g.innerHTML=rest.length?rest.map((e,i)=>`
     <div class="event-card reveal" style="animation-delay:${i*.08}s">
       <div class="event-header">
         <div class="event-date-badge">📅 ${e.date||"قريباً"}</div>
@@ -430,7 +460,7 @@ const db=getFirestore(app);
         <span class="event-loc">📍 ${e.location||""}</span>
         ${e.url?`<a class="dl-btn" href="${e.url}" target="_blank">التفاصيل ←</a>`:""}
       </div>
-    </div>`).join("");
+    </div>`).join(""):"";
   const obs=new IntersectionObserver(ents=>{ents.forEach(x=>{if(x.isIntersecting){x.target.classList.add("visible");obs.unobserve(x.target)}})},{threshold:.1});
   document.querySelectorAll(".reveal").forEach(el=>obs.observe(el));
 })();
