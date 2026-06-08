@@ -57,13 +57,13 @@ a{color:inherit;text-decoration:none}
 .main-content{position:relative;z-index:2;padding:0 6% 5rem}
 .advisors-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.25rem}
 .advisor-card{background:rgba(22,22,22,.75);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem 1.5rem;text-align:center;transition:all .4s var(--bounce);position:relative;overflow:hidden;animation:fu .7s ease both}
-.advisor-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#8b5cf6,#6366f1);transform:scaleX(0);transform-origin:right;transition:transform .45s}
-.advisor-card:hover{transform:translateY(-10px)scale(1.03);border-color:rgba(139,92,246,.4);box-shadow:0 24px 60px rgba(139,92,246,.2)}
+.advisor-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--mc-grad,linear-gradient(90deg,#8b5cf6,#6366f1));transform:scaleX(0);transform-origin:right;transition:transform .45s}
+.advisor-card:hover{transform:translateY(-10px)scale(1.03);border-color:var(--mc-bd,rgba(139,92,246,.4));box-shadow:0 24px 60px var(--mc-bg,rgba(139,92,246,.2))}
 .advisor-card:hover::after{transform:scaleX(1);transform-origin:left}
-.advisor-avatar{width:72px;height:72px;background:linear-gradient(135deg,rgba(99,102,241,.2),rgba(139,92,246,.2));border:2px solid rgba(139,92,246,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 1rem;transition:all .35s}
-.advisor-card:hover .advisor-avatar{border-color:rgba(139,92,246,.6);box-shadow:0 0 24px rgba(139,92,246,.3)}
+.advisor-avatar{width:72px;height:72px;background:linear-gradient(135deg,rgba(99,102,241,.2),rgba(139,92,246,.2));border:2px solid var(--mc-bd,rgba(139,92,246,.3));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 1rem;transition:all .35s}
+.advisor-card:hover .advisor-avatar{border-color:var(--mc,rgba(139,92,246,.6));box-shadow:0 0 24px var(--mc-bg,rgba(139,92,246,.3))}
 .advisor-card h3{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:.35rem}
-.advisor-major{font-size:.82rem;font-weight:700;color:#c4b5fd;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:999px;padding:.22rem .75rem;display:inline-block;margin-bottom:.6rem}
+.advisor-major{font-size:.82rem;font-weight:700;color:var(--mc,#c4b5fd);background:var(--mc-bg,rgba(139,92,246,.12));border:1px solid var(--mc-bd,rgba(139,92,246,.25));border-radius:999px;padding:.22rem .75rem;display:inline-block;margin-bottom:.6rem}
 .advisor-email{font-size:.82rem;color:var(--muted);word-break:break-all}
 .advisor-email a{color:#a5b4fc;transition:color .2s}
 .advisor-email a:hover{color:#c4b5fd}
@@ -307,16 +307,6 @@ a{color:inherit;text-decoration:none}
 <div class="particle" style="left:10%;animation-duration:20s;animation-delay:0s">🎓</div>
 <div class="particle" style="left:60%;animation-duration:23s;animation-delay:6s">🧬</div>
 
-<!-- ══════════════════════════════════
-     TOP BANNER
-════════════════════════════════════ -->
-<div class="top-banner" id="topBanner">
-  <div class="banner-inner">
-    <span class="banner-dot"></span>
-    <span class="banner-text" data-ar="نادي العلوم البيولوجية · جامعة الكويت · مجتمع علمي طلابي متميز" data-en="Biological Sciences Club · Kuwait University · A Distinguished Academic Community">نادي العلوم البيولوجية · جامعة الكويت · مجتمع علمي طلابي متميز</span>
-    <button class="banner-close" onclick="document.getElementById('topBanner').style.display='none'" aria-label="إغلاق">×</button>
-  </div>
-</div>
 </div>
 
 <header class="navbar" id="navbar">
@@ -402,6 +392,16 @@ a{color:inherit;text-decoration:none}
     <div style="height:200px;background:rgba(255,255,255,.04);border-radius:28px;animation-delay:.1s"></div>
     <div style="height:200px;background:rgba(255,255,255,.04);border-radius:28px;animation-delay:.2s"></div>
   </div>
+
+  <div style="text-align:center;margin:4.5rem 0 2rem">
+    <div class="page-badge" data-ar="لجنة الجداول" data-en="Schedule Committee">لجنة الجداول</div>
+    <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;letter-spacing:-.02em;color:#fff;margin-bottom:.5rem" data-ar="أعضاء لجنة الجداول الرسمية" data-en="Official Schedule Committee Members">أعضاء لجنة الجداول الرسمية</h2>
+    <p style="color:var(--muted);font-size:.92rem;max-width:480px;margin:0 auto" data-ar="تواصل مع أعضاء لجنة الجداول الرسمية في القسم للاستفسار حول الجداول الدراسية" data-en="Contact the department's official schedule committee members for inquiries about study schedules">تواصل مع أعضاء لجنة الجداول الرسمية في القسم للاستفسار حول الجداول الدراسية</p>
+  </div>
+  <div class="advisors-grid" id="committeeGrid">
+    <div style="height:160px;background:rgba(255,255,255,.04);border-radius:28px"></div>
+    <div style="height:160px;background:rgba(255,255,255,.04);border-radius:28px;animation-delay:.1s"></div>
+  </div>
 </main>
 
 <footer class="footer">
@@ -421,19 +421,41 @@ const app=initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDo
 const db=getFirestore(app);
 const mn={molecular:"البيولوجيا الجزيئية",micro:"مايكروبيولوجي",plant:"بيولوجيا النبات",animal:"بيولوجيا الحيوان",biochem:"الكيمياء الحيوية"};
 const icons={molecular:"🧬",micro:"🦠",plant:"🌱",animal:"🐾",biochem:"⚗️"};
+// الألوان الرسمية لكل تخصص
+const majorColors={
+  molecular:{c:"#FBE39B",bg:"rgba(251,227,155,.14)",bd:"rgba(251,227,155,.35)",grad:"linear-gradient(90deg,#FBE39B,#f59e0b)"},
+  micro:    {c:"#ef4444",bg:"rgba(239,68,68,.14)",  bd:"rgba(239,68,68,.35)",  grad:"linear-gradient(90deg,#ef4444,#f87171)"},
+  plant:    {c:"#CEF516",bg:"rgba(206,245,22,.14)", bd:"rgba(206,245,22,.35)", grad:"linear-gradient(90deg,#CEF516,#84cc16)"},
+  animal:   {c:"#9FE0F2",bg:"rgba(159,224,242,.14)",bd:"rgba(159,224,242,.35)",grad:"linear-gradient(90deg,#9FE0F2,#38bdf8)"},
+  biochem:  {c:"#E6A6F8",bg:"rgba(230,166,248,.14)",bd:"rgba(230,166,248,.35)",grad:"linear-gradient(90deg,#E6A6F8,#a78bfa)"},
+};
 const defaults=[{major:"molecular"},{major:"micro"},{major:"plant"},{major:"animal"},{major:"biochem"}];
 (async()=>{
   let advisors=[];
   try{const s=await getDocs(query(collection(db,"advisors"),orderBy("createdAt","desc")));advisors=s.docs.map(d=>({id:d.id,...d.data()}))}catch{try{const s=await getDocs(collection(db,"advisors"));advisors=s.docs.map(d=>({id:d.id,...d.data()}))}catch{}}
   const list=advisors.length?advisors:defaults;
   const g=document.getElementById("advisorsGrid");
-  g.innerHTML=list.map((a,i)=>`
-    <div class="advisor-card reveal" style="animation-delay:${i*.08}s">
+  g.innerHTML=list.map((a,i)=>{
+    const mc=majorColors[a.major];
+    const mcVars=mc?`--mc:${mc.c};--mc-bg:${mc.bg};--mc-bd:${mc.bd};--mc-grad:${mc.grad};`:"";
+    return `
+    <div class="advisor-card reveal" style="${mcVars}animation-delay:${i*.08}s">
       <div class="advisor-avatar">${icons[a.major]||"👤"}</div>
       <h3>${a.name||"مرشد أكاديمي"}</h3>
       <div class="advisor-major">${mn[a.major]||a.major||"تخصص"}</div>
       <div class="advisor-email">${a.email?`<a href="mailto:${a.email}">${a.email}</a>`:"يضاف من لوحة الأدمن"}</div>
-    </div>`).join("");
+    </div>`}).join("");
+
+  let committee=[];
+  try{const s=await getDocs(query(collection(db,"scheduleCommittee"),orderBy("createdAt","desc")));committee=s.docs.map(d=>({id:d.id,...d.data()}))}catch{try{const s=await getDocs(collection(db,"scheduleCommittee"));committee=s.docs.map(d=>({id:d.id,...d.data()}))}catch{}}
+  const cg=document.getElementById("committeeGrid");
+  cg.innerHTML=committee.length?committee.map((m,i)=>`
+    <div class="advisor-card reveal" style="animation-delay:${i*.08}s">
+      <div class="advisor-avatar">👨‍🏫</div>
+      <h3>${m.name||"عضو لجنة"}</h3>
+      <div class="advisor-email">${m.email?`<a href="mailto:${m.email}">${m.email}</a>`:"يضاف من لوحة الأدمن"}</div>
+    </div>`).join(""):'<p style="color:var(--muted);text-align:center;grid-column:1/-1">سيتم الإعلان عن أعضاء اللجنة قريباً.</p>';
+
   const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add("visible");obs.unobserve(x.target)}})},{threshold:.1});
   document.querySelectorAll(".reveal").forEach(el=>obs.observe(el));
 })();

@@ -30,6 +30,7 @@ service cloud.firestore {
     match /events/{id}        { allow read: if true; allow write: if isAdmin(); }
     match /notes/{id}         { allow read: if true; allow write: if isAdmin(); }
     match /advisors/{id}      { allow read: if true; allow write: if isAdmin(); }
+    match /scheduleCommittee/{id} { allow read: if true; allow write: if isAdmin(); }
     match /announcements/{id} { allow read: if true; allow write: if isAdmin(); }
     match /news/{id}          { allow read: if true; allow write: if isAdmin(); }
     match /studentGuide/{id}  { allow read: if true; allow write: if isAdmin(); }

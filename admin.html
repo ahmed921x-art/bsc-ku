@@ -409,6 +409,7 @@ a{color:inherit;text-decoration:none}
       <button class="nav-item" data-panel="majorsheet"><span class="ni">🗺️</span>الميجرشيت</button>
       <button class="nav-item" data-panel="supportsheet"><span class="ni">🎓</span>صحيفة المساند</button>
       <button class="nav-item" data-panel="advisors"><span class="ni">👨‍🏫</span>المرشدون</button>
+      <button class="nav-item" data-panel="committee"><span class="ni">📅</span>لجنة الجداول</button>
       <button class="nav-item" data-panel="resources"><span class="ni">📁</span>ملفات التخصصات</button>
       <button class="nav-item" data-panel="team"><span class="ni">👥</span>عائلة النادي</button>
       <div class="sidebar-label">الذكاء الاصطناعي</div>
@@ -864,6 +865,19 @@ a{color:inherit;text-decoration:none}
         <div class="items-list" id="advisorsList"></div>
       </div>
 
+      <!-- SCHEDULE COMMITTEE -->
+      <div class="panel" id="panel-committee">
+        <div class="panel-header"><h2>📅 لجنة الجداول</h2></div>
+        <div class="card"><h3>إضافة عضو في لجنة الجداول</h3>
+          <div class="form-grid">
+            <div class="form-group"><label>الاسم</label><input id="committeeName" placeholder="د. اسم العضو"></div>
+            <div class="form-group"><label>الإيميل</label><input id="committeeEmail" placeholder="name@ku.edu.kw"></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" id="addCommittee">+ إضافة العضو</button></div>
+        </div>
+        <div class="items-list" id="committeeList"></div>
+      </div>
+
       <!-- TEAM / CLUB FAMILY -->
       <div class="panel" id="panel-team">
         <div class="panel-header">
@@ -1242,6 +1256,11 @@ document.getElementById("addAdvisor").onclick=async()=>{
   const d={name:advisorName.value.trim(),email:advisorEmail.value.trim(),major:advisorMajor.value,office:advisorOffice.value.trim()};
   if(!d.name||!d.email)return alert("عبّي الاسم والإيميل");
   await addItem("advisors",d);advisorName.value=advisorEmail.value=advisorOffice.value="";alert("✅ تمت إضافة المرشد");
+};
+document.getElementById("addCommittee").onclick=async()=>{
+  const d={name:committeeName.value.trim(),email:committeeEmail.value.trim()};
+  if(!d.name)return alert("اكتب اسم العضو");
+  await addItem("scheduleCommittee",d);committeeName.value=committeeEmail.value="";alert("✅ تمت إضافة العضو");
 };
 // File upload helpers
 let uploadedFileUrl = '';
@@ -1990,8 +2009,8 @@ document.addEventListener("click",e=>{
 // LOAD ALL
 async function loadAll(){
   try{
-    const[notes,events,advisors,ann,resources,ai,chats,news,suggestions,scheds]=await Promise.all([
-      getItems("notes"),getItems("events"),getItems("advisors"),getItems("announcements"),
+    const[notes,events,advisors,committee,ann,resources,ai,chats,news,suggestions,scheds]=await Promise.all([
+      getItems("notes"),getItems("events"),getItems("advisors"),getItems("scheduleCommittee"),getItems("announcements"),
       getItems("majorResources"),getItems("aiKnowledge"),getItems("aiChats"),getItems("news"),getItems("suggestions"),
       getItems("schedules")
     ]);
@@ -2011,6 +2030,7 @@ async function loadAll(){
     renderItems("annList",ann,["title","type","content"],"announcements");
     renderItems("eventsList",events,["title","date","location"],"events");
     renderItems("advisorsList",advisors,["name","email","major"],"advisors");
+    renderItems("committeeList",committee,["name","email"],"scheduleCommittee");
     renderItems("resourcesList",resources,["title","major","type"],"majorResources");
     renderItems("aiList",ai,["title","keywords",""],"aiKnowledge");
     // ai chats
@@ -2090,6 +2110,10 @@ const EDIT_SCHEMA={
     {k:'email',l:'الإيميل'},
     {k:'major',l:'التخصص',t:'select',o:_MO},
     {k:'office',l:'المكتب / ساعات الاستقبال'},
+  ],
+  scheduleCommittee:[
+    {k:'name',l:'الاسم'},
+    {k:'email',l:'الإيميل'},
   ],
   aiKnowledge:[
     {k:'title',l:'عنوان المعلومة'},
