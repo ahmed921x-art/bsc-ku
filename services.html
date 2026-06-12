@@ -468,7 +468,7 @@ a{color:inherit;text-decoration:none}
     <a href="majors.html" data-ar="التخصصات" data-en="Majors">التخصصات</a>
     <a href="notes.html" data-ar="المراجعات" data-en="Study Resources">المراجعات</a>
     <a href="advisors.html" data-ar="المرشدون" data-en="Advisors">المرشدون</a>
-    <a href="events.html" data-ar="الفعاليات" data-en="Events">الفعاليات</a>
+    <a href="events.html" data-ar="الأنشطة" data-en="Activities">الأنشطة</a>
     <a href="about.html" data-ar="عن النادي" data-en="About">عن النادي</a>
     <a href="ask.html" data-ar="اسأل النادي" data-en="Ask Us">اسأل النادي</a>
   </nav>
@@ -512,7 +512,7 @@ a{color:inherit;text-decoration:none}
     <a href="majors.html" data-ar="🧬 التخصصات" data-en="🧬 Majors">🧬 التخصصات</a>
     <a href="notes.html" data-ar="📚 المراجعات" data-en="📚 Study Resources">📚 المراجعات</a>
     <a href="advisors.html" data-ar="🎓 المرشدون" data-en="🎓 Advisors">🎓 المرشدون</a>
-    <a href="events.html" data-ar="🎉 الفعاليات" data-en="🎉 Events">🎉 الفعاليات</a>
+    <a href="events.html" data-ar="🎉 الأنشطة" data-en="🎉 Activities">🎉 الأنشطة</a>
     <a href="about.html" data-ar="ℹ️ عن النادي" data-en="ℹ️ About">ℹ️ عن النادي</a>
     <a href="ask.html" data-ar="💬 اسأل النادي" data-en="💬 Ask Us">💬 اسأل النادي</a>
     <div class="mobile-divider"></div>
@@ -787,7 +787,7 @@ function fmtDate(ts){if(!ts)return{d:"—",m:""};const dt=ts.toDate?ts.toDate():
       return`<div class="news-card reveal" style="animation-delay:${i*.08}s">
         <div class="news-date-box"><span class="nd">${dt.d}</span><span class="nm">${dt.m}</span></div>
         <div class="news-body">
-          <div class="news-tag ${type}">${type==="urgent"?"🚨 عاجل":type==="event"?"🎤 فعالية":"📌 خبر"}</div>
+          <div class="news-tag ${type}">${type==="urgent"?"🚨 عاجل":type==="event"?"🎤 نشاط":"📌 خبر"}</div>
           <h3>${n.title||"خبر"}</h3>
           <p>${n.content||n.description||""}</p>
           ${n.driveUrl?`<a href="${n.driveUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:.35rem;margin-top:.6rem;padding:.38rem .9rem;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.28);border-radius:999px;font-size:.78rem;font-weight:700;color:#a5b4fc;text-decoration:none">📁 فتح الملف</a>`:""}

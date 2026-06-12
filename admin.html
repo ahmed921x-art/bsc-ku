@@ -404,7 +404,7 @@ a{color:inherit;text-decoration:none}
       <button class="nav-item" data-panel="noteSubs"><span class="ni">📬</span>نوتات الزوار <span id="subsNavBadge" style="display:none;margin-inline-start:auto;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;padding:.1rem .45rem;border-radius:99px"></span></button>
       <button class="nav-item" data-panel="news"><span class="ni">📰</span>الأخبار</button>
       <button class="nav-item" data-panel="announcements"><span class="ni">📢</span>الإعلانات</button>
-      <button class="nav-item" data-panel="events"><span class="ni">🎤</span>الفعاليات</button>
+      <button class="nav-item" data-panel="events"><span class="ni">🎤</span>الأنشطة</button>
       <button class="nav-item" data-panel="schedules"><span class="ni">📅</span>الجداول المقترحة</button>
       <button class="nav-item" data-panel="guide"><span class="ni">📖</span>دليل الطالب</button>
       <div class="sidebar-label">التخصصات</div>
@@ -430,7 +430,7 @@ a{color:inherit;text-decoration:none}
         <div class="panel-header"><h2>📊 لوحة التحكم</h2><p>نظرة عامة على محتوى الموقع</p></div>
         <div class="stats-row" id="dashStats">
           <div class="stat-card"><strong id="ds-notes">—</strong><span>نوتة</span></div>
-          <div class="stat-card"><strong id="ds-events">—</strong><span>فعالية</span></div>
+          <div class="stat-card"><strong id="ds-events">—</strong><span>نشاط</span></div>
           <div class="stat-card"><strong id="ds-advisors">—</strong><span>مرشد</span></div>
           <div class="stat-card"><strong id="ds-news">—</strong><span>خبر</span></div>
           <div class="stat-card"><strong id="ds-ann">—</strong><span>إعلان</span></div>
@@ -511,7 +511,7 @@ a{color:inherit;text-decoration:none}
             <div class="form-group"><label>نوع الخبر</label>
               <select id="newsType">
                 <option value="info">📌 خبر عام</option>
-                <option value="event">🎤 فعالية</option>
+                <option value="event">🎤 نشاط</option>
                 <option value="urgent">🚨 عاجل</option>
               </select>
             </div>
@@ -534,7 +534,7 @@ a{color:inherit;text-decoration:none}
               <select id="annType">
                 <option value="info">📌 عادي</option>
                 <option value="urgent">🚨 عاجل</option>
-                <option value="event">🎤 فعالية</option>
+                <option value="event">🎤 نشاط</option>
               </select>
             </div>
             <div class="form-group form-full"><label>تفاصيل (اختياري)</label><textarea id="annContent" placeholder="اكتب التفاصيل هنا..."></textarea></div>
@@ -547,17 +547,17 @@ a{color:inherit;text-decoration:none}
 
       <!-- EVENTS -->
       <div class="panel" id="panel-events">
-        <div class="panel-header"><h2>🎤 الفعاليات</h2><p>إضافة وإدارة فعاليات النادي</p></div>
-        <div class="card"><h3>إضافة فعالية</h3>
+        <div class="panel-header"><h2>🎤 الأنشطة</h2><p>إضافة وإدارة أنشطة النادي</p></div>
+        <div class="card"><h3>إضافة نشاط</h3>
           <div class="form-grid">
-            <div class="form-group"><label>اسم الفعالية</label><input id="eventTitle" placeholder="ورشة مهارات المختبر"></div>
+            <div class="form-group"><label>اسم النشاط</label><input id="eventTitle" placeholder="ورشة مهارات المختبر"></div>
             <div class="form-group"><label>التاريخ</label><input id="eventDate" placeholder="20 May 2026"></div>
             <div class="form-group"><label>الموقع</label><input id="eventLoc" placeholder="قاعة 101 - كلية العلوم"></div>
             <div class="form-group"><label>رابط التسجيل</label><input id="eventUrl" placeholder="https://..."></div>
-            <div class="form-group form-full"><label>وصف الفعالية</label><textarea id="eventDesc" placeholder="وصف مختصر..."></textarea></div>
+            <div class="form-group form-full"><label>وصف النشاط</label><textarea id="eventDesc" placeholder="وصف مختصر..."></textarea></div>
             <div class="form-group form-full" id="mu-event"></div>
           </div>
-          <div class="btn-row"><button class="btn btn-primary" id="addEvent">+ إضافة الفعالية</button></div>
+          <div class="btn-row"><button class="btn btn-primary" id="addEvent">+ إضافة النشاط</button></div>
         </div>
         <div class="items-list" id="eventsList"></div>
       </div>
@@ -1305,9 +1305,9 @@ document.getElementById("addAnn").onclick=async()=>{
 };
 document.getElementById("addEvent").onclick=async()=>{
   const d={title:eventTitle.value.trim(),date:eventDate.value.trim(),location:eventLoc.value.trim(),description:eventDesc.value.trim(),url:eventUrl.value.trim()};
-  if(!d.title)return alert("اكتب اسم الفعالية");
+  if(!d.title)return alert("اكتب اسم النشاط");
   const imgs=window._mu['event']?.get()||[];if(imgs.length){d.images=imgs;d.imageUrl=imgs[0];}
-  await addItem("events",d);eventTitle.value=eventDate.value=eventLoc.value=eventDesc.value=eventUrl.value="";window._mu['event']?.reset();alert("✅ تمت إضافة الفعالية");
+  await addItem("events",d);eventTitle.value=eventDate.value=eventLoc.value=eventDesc.value=eventUrl.value="";window._mu['event']?.reset();alert("✅ تمت إضافة النشاط");
 };
 document.getElementById("addAdvisor").onclick=async()=>{
   const d={name:advisorName.value.trim(),email:advisorEmail.value.trim(),major:advisorMajor.value,office:advisorOffice.value.trim()};
@@ -2148,7 +2148,7 @@ const EDIT_SCHEMA={
     {k:'url',l:'رابط الملف'},
   ],
   events:[
-    {k:'title',l:'اسم الفعالية'},
+    {k:'title',l:'اسم النشاط'},
     {k:'date',l:'التاريخ'},
     {k:'location',l:'الموقع'},
     {k:'description',l:'الوصف',t:'textarea'},
@@ -2156,12 +2156,12 @@ const EDIT_SCHEMA={
   ],
   news:[
     {k:'title',l:'عنوان الخبر'},
-    {k:'type',l:'النوع',t:'select',o:[{v:'info',l:'📌 خبر عام'},{v:'event',l:'🎤 فعالية'},{v:'urgent',l:'🚨 عاجل'}]},
+    {k:'type',l:'النوع',t:'select',o:[{v:'info',l:'📌 خبر عام'},{v:'event',l:'🎤 نشاط'},{v:'urgent',l:'🚨 عاجل'}]},
     {k:'content',l:'المحتوى',t:'textarea'},
   ],
   announcements:[
     {k:'title',l:'عنوان الإعلان'},
-    {k:'type',l:'النوع',t:'select',o:[{v:'info',l:'📌 عادي'},{v:'urgent',l:'🚨 عاجل'},{v:'event',l:'🎤 فعالية'}]},
+    {k:'type',l:'النوع',t:'select',o:[{v:'info',l:'📌 عادي'},{v:'urgent',l:'🚨 عاجل'},{v:'event',l:'🎤 نشاط'}]},
     {k:'content',l:'التفاصيل',t:'textarea'},
   ],
   advisors:[

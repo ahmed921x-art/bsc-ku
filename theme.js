@@ -96,7 +96,7 @@
     'الرئيسية': 'Home',
     'التخصصات': 'Majors',
     'المراجعات': 'Study Resources',
-    'الفعاليات': 'Events',
+    'الأنشطة': 'Activities',
     'المرشدون': 'Advisors',
     'الخدمات': 'Services',
     'عائلة النادي': 'Club Family',
@@ -115,7 +115,7 @@
     // ── Page Titles (title tags) ────────────────────────────
     'عن النادي | BSC KU': 'About | BSC KU',
     'المرشدون | BSC KU': 'Advisors | BSC KU',
-    'الفعاليات | BSC KU': 'Events | BSC KU',
+    'الأنشطة | BSC KU': 'Activities | BSC KU',
     'المراجعات | BSC KU': 'Study Resources | BSC KU',
     'الخدمات | BSC KU': 'Services | BSC KU',
     'عائلة النادي | BSC KU': 'Club Family | BSC KU',
@@ -126,7 +126,7 @@
     // ── Page Hero Badges ────────────────────────────────────
     'عن النادي': 'About the Club',
     'الإرشاد الأكاديمي': 'Academic Advising',
-    'الفعاليات': 'Events',
+    'الأنشطة': 'Activities',
     'مكتبة المراجعات': 'Resources Library',
     'خدمات النادي': 'Club Services',
     'المساعد الذكي': 'AI Assistant',
@@ -143,13 +143,13 @@
 
     // ── Stats ────────────────────────────────────────────────
     'مراجعة دراسية': 'Study Resources',
-    'فعاليات النادي': 'Club Events',
+    'أنشطة النادي': 'Club Activities',
     'مرشد أكاديمي': 'Academic Advisor',
-    'فعالية': 'Events',
+    'نشاط': 'Activities',
     'تخصصات': 'Majors',
 
     // ── Index Sections ──────────────────────────────────────
-    'آخر الفعاليات': 'Latest Events',
+    'آخر الأنشطة': 'Latest Activities',
     'آخر النوتات المضافة': 'Latest Study Notes',
     'عرض الكل ←': 'View All →',
     'تفاصيل كل تخصص ←': 'View All Majors →',
@@ -203,10 +203,10 @@
     'لا يوجد مرشدون بعد.': 'No advisors yet.',
 
     // ── Events Page ──────────────────────────────────────────
-    'فعاليات النادي': 'Club Events',
-    'تابع آخر فعالياتنا من محاضرات ورحلات علمية وورش عمل متخصصة':
+    'أنشطة النادي': 'Club Activities',
+    'تابع آخر أنشطتنا من محاضرات ورحلات علمية وورش عمل متخصصة':
       'Follow our latest events — lectures, field trips, and specialized workshops',
-    'لا توجد فعاليات حالياً. تابعونا للمزيد!': 'No events currently. Stay tuned for more!',
+    'لا توجد أنشطة حالياً. تابعونا للمزيد!': 'No activities currently. Stay tuned for more!',
     'قريباً': 'Coming Soon',
     'التفاصيل ←': 'Details →',
 
@@ -276,13 +276,13 @@
 
     // ── Ask Page ────────────────────────────────────────────
     'المساعد الذكي': 'AI Assistant',
-    'اسألني عن النوتات، الفعاليات، المرشدين الأكاديميين، أو أي شي يخص النادي':
-      'Ask me about notes, events, academic advisors, or anything related to the club',
+    'اسألني عن النوتات، الأنشطة، المرشدين الأكاديميين، أو أي شي يخص النادي':
+      'Ask me about notes, activities, academic advisors, or anything related to the club',
     '🤖 جاري تحميل قاعدة المعرفة...': '🤖 Loading knowledge base...',
     'مساعد BSC KU': 'BSC KU Assistant',
     'اسألني عن أي شي يخص النادي': 'Ask me anything about the club',
     '📚 النوتات': '📚 Notes',
-    '🎤 الفعاليات': '🎤 Events',
+    '🎤 الأنشطة': '🎤 Activities',
     '🎓 المرشدون': '🎓 Advisors',
     '🧬 التخصصات': '🧬 Majors',
     '🤝 الانضمام': '🤝 Joining',
@@ -357,7 +357,7 @@
       'The minor graduation sheet — shows the requirements needed to complete the minor successfully.',
 
     // ── Rendered dynamic content (Firebase) ─────────────────
-    'لا توجد فعاليات بعد.': 'No events yet.',
+    'لا توجد أنشطة بعد.': 'No activities yet.',
     'لا توجد نوتات بعد.': 'No notes yet.',
     'Untitled': 'Untitled',
 

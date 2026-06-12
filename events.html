@@ -14,15 +14,15 @@
   <meta property="og:site_name" content="BSC KU">
   <meta property="og:locale" content="ar_KW">
 
-<title>الفعاليات | BSC KU</title>
-<meta name="description" content="تابع آخر فعاليات نادي العلوم البيولوجية في جامعة الكويت — محاضرات، رحلات علمية، وورش عمل متخصصة.">
+<title>الأنشطة | BSC KU</title>
+<meta name="description" content="تابع آخر أنشطة نادي العلوم البيولوجية في جامعة الكويت — محاضرات، رحلات علمية، وورش عمل متخصصة.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="الفعاليات | BSC KU">
-<meta property="og:description" content="تابع آخر فعاليات نادي العلوم البيولوجية في جامعة الكويت — محاضرات، رحلات علمية، وورش عمل متخصصة.">
+<meta property="og:title" content="الأنشطة | BSC KU">
+<meta property="og:description" content="تابع آخر أنشطة نادي العلوم البيولوجية في جامعة الكويت — محاضرات، رحلات علمية، وورش عمل متخصصة.">
 <meta property="og:url" content="https://biosci-ku.com/events.html">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="الفعاليات | BSC KU">
-<meta name="twitter:description" content="تابع آخر فعاليات نادي العلوم البيولوجية في جامعة الكويت — محاضرات، رحلات علمية، وورش عمل متخصصة.">
+<meta name="twitter:title" content="الأنشطة | BSC KU">
+<meta name="twitter:description" content="تابع آخر أنشطة نادي العلوم البيولوجية في جامعة الكويت — محاضرات، رحلات علمية، وورش عمل متخصصة.">
 <meta name="twitter:image" content="https://biosci-ku.com/logo.png">
 <link href="navbar.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -352,7 +352,7 @@ a{color:inherit;text-decoration:none}
     <a href="majors.html" data-ar="التخصصات" data-en="Majors">التخصصات</a>
     <a href="notes.html" data-ar="المراجعات" data-en="Study Resources">المراجعات</a>
     <a href="advisors.html" data-ar="المرشدون" data-en="Advisors">المرشدون</a>
-    <a href="events.html" class="active" data-ar="الفعاليات" data-en="Events">الفعاليات</a>
+    <a href="events.html" class="active" data-ar="الأنشطة" data-en="Activities">الأنشطة</a>
     <a href="about.html" data-ar="عن النادي" data-en="About">عن النادي</a>
     <a href="ask.html" data-ar="اسأل النادي" data-en="Ask Us">اسأل النادي</a>
   </nav>
@@ -396,7 +396,7 @@ a{color:inherit;text-decoration:none}
     <a href="majors.html" data-ar="🧬 التخصصات" data-en="🧬 Majors">🧬 التخصصات</a>
     <a href="notes.html" data-ar="📚 المراجعات" data-en="📚 Study Resources">📚 المراجعات</a>
     <a href="advisors.html" data-ar="🎓 المرشدون" data-en="🎓 Advisors">🎓 المرشدون</a>
-    <a href="events.html" class="active" data-ar="🎉 الفعاليات" data-en="🎉 Events">🎉 الفعاليات</a>
+    <a href="events.html" class="active" data-ar="🎉 الأنشطة" data-en="🎉 Activities">🎉 الأنشطة</a>
     <a href="about.html" data-ar="ℹ️ عن النادي" data-en="ℹ️ About">ℹ️ عن النادي</a>
     <a href="ask.html" data-ar="💬 اسأل النادي" data-en="💬 Ask Us">💬 اسأل النادي</a>
     <div class="mobile-divider"></div>
@@ -409,9 +409,9 @@ a{color:inherit;text-decoration:none}
 
 
 <div class="page-hero">
-  <div class="page-badge" data-ar="الفعاليات" data-en="Events">الفعاليات</div>
-  <h1 data-ar="فعاليات النادي" data-en="Club Events">فعاليات النادي</h1>
-  <p data-ar="تابع آخر فعالياتنا من محاضرات ورحلات علمية وورش عمل متخصصة" data-en="Keep up with our latest and upcoming events, lectures, field trips, and workshops">تابع آخر فعالياتنا من محاضرات ورحلات علمية وورش عمل متخصصة</p>
+  <div class="page-badge" data-ar="الأنشطة" data-en="Activities">الأنشطة</div>
+  <h1 data-ar="أنشطة النادي" data-en="Club Activities">أنشطة النادي</h1>
+  <p data-ar="تابع آخر أنشطتنا من محاضرات ورحلات علمية وورش عمل متخصصة" data-en="Keep up with our latest and upcoming activities, lectures, field trips, and workshops">تابع آخر أنشطتنا من محاضرات ورحلات علمية وورش عمل متخصصة</p>
 </div>
 
 <main class="main-content">
@@ -447,15 +447,15 @@ const db=getFirestore(app);
   try{const s=await getDocs(query(collection(db,"events"),orderBy("createdAt","desc")));events=s.docs.map(d=>({id:d.id,...d.data()}))}catch{try{const s=await getDocs(collection(db,"events"));events=s.docs.map(d=>({id:d.id,...d.data()}))}catch{}}
   const g=document.getElementById("eventsGrid");
   const fe=document.getElementById("featuredEvent");
-  if(!events.length){fe.innerHTML="";g.innerHTML='<div class="empty-state"><span class="empty-icon">📅</span>لا توجد فعاليات حالياً. تابعونا للمزيد!</div>';return}
+  if(!events.length){fe.innerHTML="";g.innerHTML='<div class="empty-state"><span class="empty-icon">📅</span>لا توجد أنشطة حالياً. تابعونا للمزيد!</div>';return}
   // أحدث فعالية = مميّزة بالأعلى، والباقي مربعات تحت
   const lead=events[0], rest=events.slice(1);
   const isAr=document.documentElement.lang!=="en";
   fe.innerHTML=`
     <div class="event-featured reveal">
-      <div class="featured-label">${isAr?"آخر فعالية":"Latest Event"}</div>
+      <div class="featured-label">${isAr?"آخر نشاط":"Latest Activity"}</div>
       <div class="ev-date">📅 ${lead.date||(isAr?"قريباً":"Soon")}</div>
-      <h2>${lead.title||(isAr?"فعالية":"Event")}</h2>
+      <h2>${lead.title||(isAr?"نشاط":"Activity")}</h2>
       ${lead.imageUrl?`<img src="${lead.imageUrl}" alt="" style="width:100%;max-height:340px;object-fit:cover;border-radius:16px;margin-bottom:1.25rem" onerror="this.style.display='none'">`:``}
       <p>${lead.description||""}</p>
       <div class="ev-foot">
@@ -468,7 +468,7 @@ const db=getFirestore(app);
       ${e.imageUrl?`<img src="${e.imageUrl}" alt="" style="width:100%;height:180px;object-fit:cover" onerror="this.style.display='none'">`:``}
       <div class="event-header">
         <div class="event-date-badge">📅 ${e.date||"قريباً"}</div>
-        <h3>${e.title||"فعالية"}</h3>
+        <h3>${e.title||"نشاط"}</h3>
         <p>${e.description||""}</p>
       </div>
       <div class="event-footer">

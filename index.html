@@ -11,17 +11,17 @@
   <link rel="apple-touch-icon" href="favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BSC KU | نادي العلوم البيولوجية</title>
-  <meta name="description" content="نادي العلوم البيولوجية في جامعة الكويت — مراجعات دراسية، فعاليات، إرشاد أكاديمي، حاسبة معدل، وأدوات تساعد طلبة قسم العلوم البيولوجية.">
+  <meta name="description" content="نادي العلوم البيولوجية في جامعة الكويت — مراجعات دراسية، أنشطة، إرشاد أكاديمي، حاسبة معدل، وأدوات تساعد طلبة قسم العلوم البيولوجية.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="BSC KU | نادي العلوم البيولوجية">
-  <meta property="og:description" content="مجتمع علمي طلابي متميز في جامعة الكويت — مراجعات، فعاليات، وإرشاد أكاديمي.">
+  <meta property="og:description" content="مجتمع علمي طلابي متميز في جامعة الكويت — مراجعات، أنشطة، وإرشاد أكاديمي.">
   <meta property="og:url" content="https://biosci-ku.com/">
   <meta property="og:image" content="https://biosci-ku.com/logo.png">
   <meta property="og:site_name" content="BSC KU">
   <meta property="og:locale" content="ar_KW">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="BSC KU | نادي العلوم البيولوجية">
-  <meta name="twitter:description" content="مجتمع علمي طلابي متميز في جامعة الكويت — مراجعات، فعاليات، وإرشاد أكاديمي.">
+  <meta name="twitter:description" content="مجتمع علمي طلابي متميز في جامعة الكويت — مراجعات، أنشطة، وإرشاد أكاديمي.">
   <meta name="twitter:image" content="https://biosci-ku.com/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -684,7 +684,7 @@
     <a href="majors.html" data-ar="التخصصات" data-en="Majors">التخصصات</a>
     <a href="notes.html" data-ar="المراجعات" data-en="Study Resources">المراجعات</a>
     <a href="advisors.html" data-ar="المرشدون" data-en="Advisors">المرشدون</a>
-    <a href="events.html" data-ar="الفعاليات" data-en="Events">الفعاليات</a>
+    <a href="events.html" data-ar="الأنشطة" data-en="Activities">الأنشطة</a>
     <a href="about.html" data-ar="عن النادي" data-en="About">عن النادي</a>
     <a href="ask.html" data-ar="اسأل النادي" data-en="Ask Us">اسأل النادي</a>
   </nav>
@@ -737,7 +737,7 @@
     <a href="majors.html" data-ar="🧬 التخصصات" data-en="🧬 Majors">🧬 التخصصات</a>
     <a href="notes.html" data-ar="📚 المراجعات" data-en="📚 Study Resources">📚 المراجعات</a>
     <a href="advisors.html" data-ar="🎓 المرشدون" data-en="🎓 Advisors">🎓 المرشدون</a>
-    <a href="events.html" data-ar="🎉 الفعاليات" data-en="🎉 Events">🎉 الفعاليات</a>
+    <a href="events.html" data-ar="🎉 الأنشطة" data-en="🎉 Activities">🎉 الأنشطة</a>
     <a href="about.html" data-ar="ℹ️ عن النادي" data-en="ℹ️ About">ℹ️ عن النادي</a>
     <a href="ask.html" data-ar="💬 اسأل النادي" data-en="💬 Ask Us">💬 اسأل النادي</a>
     <div class="mobile-divider"></div>
@@ -758,7 +758,7 @@
       الحياة في أطيافها
     </p>
     <div class="hero-btns">
-      <a class="btn btn-primary" href="events.html" data-ar="🎉 الفعاليات" data-en="🎉 Events">🎉 الفعاليات</a>
+      <a class="btn btn-primary" href="events.html" data-ar="🎉 الأنشطة" data-en="🎉 Activities">🎉 الأنشطة</a>
       <a class="btn btn-ghost" href="notes.html" data-ar="📚 المراجعات" data-en="📚 Study Resources">📚 المراجعات</a>
     </div>
   </div>
@@ -789,7 +789,7 @@
   <div class="stat reveal">
     <div class="stat-icon">🎤</div>
     <strong id="statEvents">—</strong>
-    <span data-ar="فعاليات النادي" data-en="Club Events">فعاليات النادي</span>
+    <span data-ar="أنشطة النادي" data-en="Club Activities">أنشطة النادي</span>
   </div>
   <div class="stat reveal">
     <div class="stat-icon">🧪</div>
@@ -809,8 +809,8 @@
 <section class="section">
   <div class="section-head reveal">
     <div>
-      <div class="section-label" data-ar="الفعاليات" data-en="Events">الفعاليات</div>
-      <h2 data-ar="آخر الفعاليات" data-en="Latest Events">آخر الفعاليات</h2>
+      <div class="section-label" data-ar="الأنشطة" data-en="Activities">الأنشطة</div>
+      <h2 data-ar="آخر الأنشطة" data-en="Latest Activities">آخر الأنشطة</h2>
     </div>
     
   </div>
@@ -945,11 +945,11 @@ async function getCount(col) {
 
 function renderEvents(events) {
   const g = document.getElementById("latestEventsGrid");
-  if (!events.length) { g.innerHTML='<div class="empty-state">لا توجد فعاليات بعد.</div>'; return; }
+  if (!events.length) { g.innerHTML='<div class="empty-state">لا توجد أنشطة بعد.</div>'; return; }
   g.innerHTML = events.map((e,i)=>`
     <div class="card reveal" style="animation-delay:${i*.12+.08}s">
       <div class="event-date">📅 ${e.date||"قريباً"}</div>
-      <h3>${e.title||"فعالية"}</h3>
+      <h3>${e.title||"نشاط"}</h3>
       <p style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${e.description||""}</p>
       <div class="card-footer">
         <span>${e.location||""}</span>
