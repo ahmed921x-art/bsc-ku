@@ -402,6 +402,7 @@ a{color:inherit;text-decoration:none}
 
   
 <link href="aurora.css" rel="stylesheet">
+<script src="splash.js"></script>
 </head>
 <body>
 <div class="bg-canvas"></div><div class="bg-grid"></div>
@@ -498,6 +499,16 @@ a{color:inherit;text-decoration:none}
 </div>
 
 <main class="main-content">
+
+  <!-- شارك نوتتك -->
+  <div class="share-cta">
+    <div class="share-cta-text">
+      <strong data-ar="عندك نوتة أو تلخيص؟ 📚" data-en="Have a note or summary? 📚">عندك نوتة أو تلخيص؟ 📚</strong>
+      <span data-ar="شاركها مع زملائك — نراجعها وننشرها في المكتبة" data-en="Share it with your classmates — we review it and publish it in the library">شاركها مع زملائك — نراجعها وننشرها في المكتبة</span>
+    </div>
+    <button class="share-cta-btn" id="shareNoteBtn" data-ar="📤 أرسل نوتتك" data-en="📤 Submit Your Note">📤 أرسل نوتتك</button>
+  </div>
+
   <div class="toolbar">
     <input class="filter-input" id="noteSearch" type="text" placeholder="🔍  ابحث عن مادة (بالاسم أو الرقم) أو عن نوتة...">
   </div>
@@ -511,6 +522,94 @@ a{color:inherit;text-decoration:none}
   </div>
 </main>
 
+<!-- نافذة إرسال نوتة -->
+<div class="sn-overlay" id="snOverlay" hidden>
+  <div class="sn-modal" role="dialog" aria-modal="true" aria-labelledby="snHeading">
+    <button class="sn-close" id="snClose" aria-label="إغلاق">✕</button>
+    <h3 id="snHeading" data-ar="📤 أرسل نوتتك" data-en="📤 Submit Your Note">📤 أرسل نوتتك</h3>
+    <p class="sn-sub" data-ar="ارفع ملفك على Google Drive وحط الرابط هنا — بعد مراجعة النادي بننشره في المكتبة." data-en="Upload your file to Google Drive and paste the link here — after the club reviews it, it will be published in the library.">ارفع ملفك على Google Drive وحط الرابط هنا — بعد مراجعة النادي بننشره في المكتبة.</p>
+    <div class="sn-grid">
+      <label><span data-ar="اسمك (اختياري)" data-en="Your name (optional)">اسمك (اختياري)</span><input id="snName" maxlength="60" placeholder="عشان ننسب النوتة لك"></label>
+      <label><span data-ar="للتواصل (اختياري)" data-en="Contact (optional)">للتواصل (اختياري)</span><input id="snContact" maxlength="80" placeholder="إيميل أو انستغرام"></label>
+      <label><span data-ar="التخصص" data-en="Major">التخصص</span><select id="snMajor"></select></label>
+      <label><span data-ar="المادة" data-en="Course">المادة</span><select id="snCourse"></select></label>
+      <label id="snCourseOtherWrap" hidden><span data-ar="اسم المادة" data-en="Course name">اسم المادة</span><input id="snCourseOther" maxlength="100" placeholder="رقم المادة واسمها"></label>
+      <label><span data-ar="عنوان النوتة *" data-en="Note title *">عنوان النوتة *</span><input id="snTitle" maxlength="120" placeholder="مثال: تلخيص الميد الأول"></label>
+      <label><span data-ar="نوع الملف" data-en="File type">نوع الملف</span>
+        <select id="snType"><option>Summary</option><option>Midterm</option><option>Final</option><option>Slides</option><option>Lab</option><option>Past Exam</option></select>
+      </label>
+      <label><span data-ar="الفصل (اختياري)" data-en="Term (optional)">الفصل (اختياري)</span><input id="snTerm" maxlength="40" placeholder="2026 - الفصل الثاني"></label>
+      <label class="sn-full"><span data-ar="رابط Google Drive *" data-en="Google Drive link *">رابط Google Drive *</span><input id="snUrl" dir="ltr" placeholder="https://drive.google.com/..."></label>
+    </div>
+    <p class="sn-hint" data-ar="⚠️ تأكد أن مشاركة الملف مفتوحة: Anyone with the link → Viewer" data-en="⚠️ Make sure the file sharing is set to: Anyone with the link → Viewer">⚠️ تأكد أن مشاركة الملف مفتوحة: Anyone with the link → Viewer</p>
+    <div class="sn-msg" id="snMsg" hidden></div>
+    <button class="sn-submit" id="snSubmit" data-ar="إرسال للمراجعة" data-en="Send for Review">إرسال للمراجعة</button>
+  </div>
+</div>
+
+<style>
+  .share-cta{
+    display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+    padding:1.1rem 1.4rem;margin-bottom:1.25rem;border-radius:18px;
+    background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(139,92,246,.08));
+    border:1px solid rgba(99,102,241,.3);
+  }
+  .share-cta-text{display:flex;flex-direction:column;gap:.2rem}
+  .share-cta-text strong{font-size:1.05rem}
+  .share-cta-text span{font-size:.85rem;color:var(--muted)}
+  .share-cta-btn{
+    padding:.7rem 1.5rem;border:none;border-radius:12px;cursor:pointer;
+    font-family:inherit;font-weight:700;font-size:.95rem;color:#fff;
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    transition:transform .2s var(--ease),box-shadow .2s var(--ease);
+  }
+  .share-cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(99,102,241,.4)}
+  [data-theme="light"] .share-cta{background:rgba(99,102,241,.07)!important;border-color:rgba(99,102,241,.25)!important}
+
+  .sn-overlay{
+    position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;
+    padding:1rem;background:rgba(2,3,8,.75);backdrop-filter:blur(6px);
+  }
+  .sn-overlay[hidden]{display:none}
+  .sn-modal{
+    position:relative;width:100%;max-width:620px;max-height:90vh;overflow-y:auto;
+    background:#0b0d18;border:1px solid rgba(255,255,255,.12);border-radius:22px;
+    padding:1.8rem 1.6rem;
+  }
+  [data-theme="light"] .sn-modal{background:#fff;border-color:rgba(99,102,241,.2)}
+  .sn-close{
+    position:absolute;top:1rem;inset-inline-start:1rem;width:34px;height:34px;border-radius:10px;
+    border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-size:.9rem;
+  }
+  .sn-modal h3{font-size:1.25rem;margin-bottom:.35rem;padding-inline-start:2.4rem}
+  .sn-sub{font-size:.85rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.7}
+  .sn-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}
+  .sn-grid label{display:flex;flex-direction:column;gap:.35rem;font-size:.8rem;font-weight:700;color:var(--muted)}
+  .sn-grid .sn-full{grid-column:1/-1}
+  .sn-grid input,.sn-grid select{
+    padding:.65rem .8rem;border-radius:10px;border:1px solid var(--border);
+    background:var(--surface);color:var(--text);font-family:inherit;font-size:.9rem;outline:none;
+  }
+  .sn-grid input:focus,.sn-grid select:focus{border-color:#6366f1}
+  [data-theme="light"] .sn-grid input,[data-theme="light"] .sn-grid select{background:#f8fafc;color:#161616}
+  .sn-grid select option{background:#0b0d18;color:#f1f5f9}
+  [data-theme="light"] .sn-grid select option{background:#fff;color:#161616}
+  .sn-hint{font-size:.78rem;color:#fcd34d;margin:.9rem 0 0;line-height:1.6}
+  [data-theme="light"] .sn-hint{color:#b45309}
+  .sn-msg{margin-top:.9rem;padding:.7rem 1rem;border-radius:10px;font-size:.85rem;font-weight:700}
+  .sn-msg.err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#fca5a5}
+  .sn-msg.ok{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.35);color:#6ee7b7}
+  [data-theme="light"] .sn-msg.err{color:#b91c1c}
+  [data-theme="light"] .sn-msg.ok{color:#047857}
+  .sn-submit{
+    width:100%;margin-top:1.1rem;padding:.85rem;border:none;border-radius:12px;cursor:pointer;
+    font-family:inherit;font-weight:800;font-size:1rem;color:#fff;
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  }
+  .sn-submit:disabled{opacity:.55;cursor:not-allowed}
+  @media(max-width:560px){.sn-grid{grid-template-columns:1fr}.share-cta{justify-content:center;text-align:center}}
+</style>
+
 <footer class="footer">
   <div class="footer-brand"><img src="logo.png" alt="BSC KU"><div class="footer-copy"><strong data-ar="BSC KU — نادي العلوم البيولوجية" data-en="BSC KU — Biological Sciences Club">BSC KU — نادي العلوم البيولوجية</strong><span data-ar="© 2025 جامعة الكويت · جميع الحقوق محفوظة" data-en="© 2025 Kuwait University · All Rights Reserved">© 2025 جامعة الكويت · جميع الحقوق محفوظة</span></div></div>
   <div class="footer-socials">
@@ -523,7 +622,7 @@ a{color:inherit;text-decoration:none}
 <script type="module" src="urgent-ann.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, orderBy, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { CATALOG_SEED, SUPPORT_CATALOG_SEED } from "./catalog-seed.js";
 const app=initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"});
 const db=getFirestore(app);
@@ -691,6 +790,75 @@ document.getElementById("majorChips").addEventListener("click",e=>{
   render();
 });
 document.getElementById("noteSearch").addEventListener("input",e=>{state.query=e.target.value;render();});
+
+// ── إرسال نوتة من الزوار ──
+const snOverlay=document.getElementById("snOverlay");
+const snMsg=document.getElementById("snMsg");
+const allCoursesOf=k=>{
+  const main=(CATALOG_SEED[k]&&CATALOG_SEED[k].courses)||[];
+  const sup=(SUPPORT_CATALOG_SEED[k]&&SUPPORT_CATALOG_SEED[k].courses)||[];
+  const seen=new Set(main.map(c=>c.code));
+  return [...main,...sup.filter(c=>!seen.has(c.code))];
+};
+function snFillCourses(k){
+  const sel=document.getElementById("snCourse");
+  const list=allCoursesOf(k);
+  sel.innerHTML=list.map(c=>`<option value="${esc(c.code)} — ${esc(c.nameAr)}">${esc(c.code)} — ${esc(c.nameAr)}</option>`).join("")
+    +'<option value="__other">📌 مادة أخرى غير موجودة بالقائمة</option>';
+  document.getElementById("snCourseOtherWrap").hidden=true;
+}
+function snShowMsg(type,text){snMsg.hidden=false;snMsg.className="sn-msg "+type;snMsg.textContent=text;}
+function snOpen(){
+  const mSel=document.getElementById("snMajor");
+  if(!mSel.options.length){
+    mSel.innerHTML=MAJORS.map(m=>`<option value="${m.key}">${m.icon} ${m.name}</option>`).join("");
+    snFillCourses(MAJORS[0].key);
+    mSel.addEventListener("change",()=>snFillCourses(mSel.value));
+    document.getElementById("snCourse").addEventListener("change",function(){
+      document.getElementById("snCourseOtherWrap").hidden=this.value!=="__other";
+    });
+  }
+  snMsg.hidden=true;
+  snOverlay.hidden=false;
+  document.body.style.overflow="hidden";
+}
+function snClose(){snOverlay.hidden=true;document.body.style.overflow="";}
+document.getElementById("shareNoteBtn").addEventListener("click",snOpen);
+document.getElementById("snClose").addEventListener("click",snClose);
+snOverlay.addEventListener("click",e=>{if(e.target===snOverlay)snClose();});
+
+document.getElementById("snSubmit").addEventListener("click",async function(){
+  const title=document.getElementById("snTitle").value.trim();
+  const url=document.getElementById("snUrl").value.trim();
+  let course=document.getElementById("snCourse").value;
+  if(course==="__other")course=document.getElementById("snCourseOther").value.trim();
+  if(!title)return snShowMsg("err","اكتب عنوان النوتة.");
+  if(!course)return snShowMsg("err","اختر المادة أو اكتب اسمها.");
+  if(!/^https:\/\/(drive|docs)\.google\.com\//.test(url))return snShowMsg("err","حط رابط Google Drive صحيح (يبدأ بـ https://drive.google.com).");
+  // حد بسيط ضد التكرار: إرسال واحد كل دقيقة
+  const last=+localStorage.getItem("bscku_sn_last")||0;
+  if(Date.now()-last<60000)return snShowMsg("err","استنى دقيقة قبل ما ترسل نوتة ثانية.");
+  this.disabled=true;
+  try{
+    await addDoc(collection(db,"noteSubmissions"),{
+      title,course,url,
+      major:document.getElementById("snMajor").value,
+      type:document.getElementById("snType").value,
+      term:document.getElementById("snTerm").value.trim()||"General",
+      name:document.getElementById("snName").value.trim(),
+      contact:document.getElementById("snContact").value.trim(),
+      status:"pending",
+      createdAt:serverTimestamp()
+    });
+    localStorage.setItem("bscku_sn_last",Date.now());
+    snShowMsg("ok","✅ وصلتنا نوتتك! بعد مراجعة النادي بتنشر في المكتبة. شكراً لك 💙");
+    ["snTitle","snUrl","snTerm","snCourseOther"].forEach(id=>document.getElementById(id).value="");
+    setTimeout(snClose,3500);
+  }catch(e){
+    snShowMsg("err","صار خطأ أثناء الإرسال، حاول مرة ثانية.");
+  }
+  this.disabled=false;
+});
 
 // ── LOAD ──
 render(); // render the catalog immediately (works even before notes load)

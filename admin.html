@@ -356,6 +356,7 @@ a{color:inherit;text-decoration:none}
 
   
 <link href="aurora.css" rel="stylesheet">
+<script src="splash.js"></script>
 </head>
 <body>
 
@@ -400,6 +401,7 @@ a{color:inherit;text-decoration:none}
       <div class="sidebar-label">المحتوى</div>
       <button class="nav-item active" data-panel="dashboard"><span class="ni">📊</span>لوحة التحكم</button>
       <button class="nav-item" data-panel="notes"><span class="ni">📚</span>النوتات</button>
+      <button class="nav-item" data-panel="noteSubs"><span class="ni">📬</span>نوتات الزوار <span id="subsNavBadge" style="display:none;margin-inline-start:auto;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;padding:.1rem .45rem;border-radius:99px"></span></button>
       <button class="nav-item" data-panel="news"><span class="ni">📰</span>الأخبار</button>
       <button class="nav-item" data-panel="announcements"><span class="ni">📢</span>الإعلانات</button>
       <button class="nav-item" data-panel="events"><span class="ni">🎤</span>الفعاليات</button>
@@ -492,6 +494,12 @@ a{color:inherit;text-decoration:none}
         </div>
 
         <div class="items-list" id="notesList"></div>
+      </div>
+
+      <!-- NOTE SUBMISSIONS (من الزوار) -->
+      <div class="panel" id="panel-noteSubs">
+        <div class="panel-header"><h2>📬 نوتات الزوار</h2><p>نوتات أرسلها الزوار من صفحة المراجعات — اقبلها لتنشر في المكتبة أو ارفضها</p></div>
+        <div class="items-list" id="subsList"></div>
       </div>
 
       <!-- NEWS -->
@@ -1225,6 +1233,55 @@ function renderItems(elId,items,fields,col){
 }
 window.delItem_=delItem;
 window.updateItem_=updateItem;
+
+// نوتات الزوار (noteSubmissions): عرض + قبول/رفض
+const escSub=s=>(s==null?"":String(s)).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+let _subsCache={};
+function renderSubmissions(subs){
+  _subsCache=Object.fromEntries(subs.map(s=>[s.id,s]));
+  const pending=subs.filter(s=>(s.status||"pending")==="pending");
+  const badge=document.getElementById("subsNavBadge");
+  if(badge){badge.textContent=pending.length;badge.style.display=pending.length?"inline-block":"none";}
+  const el=document.getElementById("subsList");if(!el)return;
+  if(!subs.length){el.innerHTML='<p style="color:var(--muted);padding:1rem">ما فيه نوتات مرسلة من الزوار حالياً.</p>';return;}
+  const STATUS={pending:['⏳ بانتظار المراجعة','#f59e0b'],approved:['✅ مقبولة ومنشورة','#10b981'],rejected:['❌ مرفوضة','#ef4444']};
+  const ordered=[...subs].sort((a,b)=>((a.status||"pending")==="pending"?0:1)-((b.status||"pending")==="pending"?0:1));
+  el.innerHTML=ordered.map(s=>{
+    const st=s.status||"pending";const[label,color]=STATUS[st]||STATUS.pending;
+    const sender=[s.name&&`👤 ${escSub(s.name)}`,s.contact&&`📞 ${escSub(s.contact)}`].filter(Boolean).join(" · ");
+    return `<div class="list-item" style="border-inline-start:3px solid ${color}">
+      <div class="list-item-body">
+        <h4>${escSub(s.title)||"نوتة"} <span style="font-size:.72rem;font-weight:800;color:${color}">${label}</span></h4>
+        <p>${[escSub(s.course),MN[s.major]||escSub(s.major),escSub(s.type),s.term&&s.term!=="General"?escSub(s.term):""].filter(Boolean).join(" · ")}</p>
+        ${sender?`<p style="margin-top:.25rem;font-size:.78rem">${sender}</p>`:""}
+      </div>
+      <div class="list-item-actions" style="flex-wrap:wrap">
+        <a class="btn btn-sm" style="background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);color:#a5b4fc;text-decoration:none" href="${escSub(s.url)}" target="_blank" rel="noopener">📥 فتح الملف</a>
+        ${st==="pending"?`
+          <button class="btn btn-sm" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);color:#6ee7b7" onclick="approveSub_('${s.id}')">✅ قبول ونشر</button>
+          <button class="btn btn-sm" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5" onclick="rejectSub_('${s.id}')">❌ رفض</button>
+        `:""}
+        <button class="btn btn-danger btn-sm" onclick="delItem_('noteSubmissions','${s.id}')">حذف</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+window.approveSub_=async id=>{
+  const s=_subsCache[id];if(!s)return;
+  if(!confirm(`قبول ونشر «${s.title||"النوتة"}» في مكتبة المراجعات؟`))return;
+  await addDoc(collection(db,"notes"),{
+    title:s.title||"نوتة",course:s.course||"",major:s.major||"",
+    type:s.type||"Summary",term:s.term||"General",url:s.url||"",
+    submittedBy:s.name||"",createdAt:serverTimestamp()
+  });
+  await setDoc(doc(db,"noteSubmissions",id),{status:"approved",reviewedAt:serverTimestamp()},{merge:true});
+  alert("✅ تم النشر في المكتبة");loadAll();
+};
+window.rejectSub_=async id=>{
+  if(!confirm("رفض هذه النوتة؟ (تظل محفوظة هنا ويمكن حذفها)"))return;
+  await setDoc(doc(db,"noteSubmissions",id),{status:"rejected",reviewedAt:serverTimestamp()},{merge:true});
+  loadAll();
+};
 
 // ADD HANDLERS
 document.getElementById("addNote").onclick=async()=>{
@@ -2010,10 +2067,10 @@ document.addEventListener("click",e=>{
 // LOAD ALL
 async function loadAll(){
   try{
-    const[notes,events,advisors,committee,ann,resources,ai,chats,news,suggestions,scheds]=await Promise.all([
+    const[notes,events,advisors,committee,ann,resources,ai,chats,news,suggestions,scheds,subs]=await Promise.all([
       getItems("notes"),getItems("events"),getItems("advisors"),getItems("scheduleCommittee"),getItems("announcements"),
       getItems("majorResources"),getItems("aiKnowledge"),getItems("aiChats"),getItems("news"),getItems("suggestions"),
-      getItems("schedules")
+      getItems("schedules"),getItems("noteSubmissions")
     ]);
     // stats
     document.getElementById("ds-notes").textContent=notes.length;
@@ -2027,6 +2084,7 @@ async function loadAll(){
     renderSchedulesList(scheds);
     // render
     renderItems("notesList",notes,["title","course","term"],"notes");
+    renderSubmissions(subs);
     renderItems("newsList",news,["title","type",""],"news");
     renderItems("annList",ann,["title","type","content"],"announcements");
     renderItems("eventsList",events,["title","date","location"],"events");
