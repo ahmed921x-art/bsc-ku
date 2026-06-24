@@ -1307,26 +1307,19 @@ buildGuideFilters();
 renderGuide("all");
 
 /* ===== GRADUATION PROGRESS ===== */
-const GRAD_MAJORS={molecular:{ar:"البيولوجيا الجزيئية",icon:"🧬"},micro:{ar:"مايكروبيولوجي",icon:"🦠"},plant:{ar:"بيولوجيا النبات",icon:"🌱"},animal:{ar:"بيولوجيا الحيوان",icon:"🐾"},biochem:{ar:"الكيمياء الحيوية",icon:"⚗️"},forensic:{ar:"الأدلة الجنائية",icon:"🔍"},agri:{ar:"النبات الزراعي",icon:"🌾"},biotech:{ar:"التقنية الحيوية",icon:"🧪"}};
+const GRAD_MAJORS={molecular:{ar:"البيولوجيا الجزيئية",icon:"🧬"},micro:{ar:"مايكروبيولوجي",icon:"🦠"},plant:{ar:"بيولوجيا النبات",icon:"🌱"},animal:{ar:"بيولوجيا الحيوان",icon:"🐾"},biochem:{ar:"الكيمياء الحيوية",icon:"⚗️"}};
 const GRAD_TYPE_COLORS={required:{bg:"rgba(16,185,129,.12)",border:"rgba(16,185,129,.35)",text:"#6ee7b7",label:"إلزامي"},dept:{bg:"rgba(59,130,246,.12)",border:"rgba(59,130,246,.35)",text:"#93c5fd",label:"قسم"},major:{bg:"rgba(245,158,11,.12)",border:"rgba(245,158,11,.35)",text:"#fcd34d",label:"تخصص"},support:{bg:"rgba(239,68,68,.08)",border:"rgba(239,68,68,.25)",text:"#fca5a5",label:"مساند"},elective:{bg:"rgba(139,92,246,.12)",border:"rgba(139,92,246,.35)",text:"#c4b5fd",label:"اختياري"}};
 
 let gradMajor=null,gradBatch=null,gradCourses=[],gradCompleted=new Set(),gradAllBatches={};
-
-(function initGradBtns(){
-  const wrap=document.getElementById("gradMajorBtns");
-  if(!wrap)return;
-  const saved=localStorage.getItem("bscku_major");
-  wrap.innerHTML=Object.entries(GRAD_MAJORS).map(([k,v])=>`<button onclick="selectGradMajor('${k}')" class="pref-btn${k===saved?' selected':''}" style="padding:.6rem 1rem;font-size:.82rem">${v.icon} ${v.ar}</button>`).join("");
-  if(saved)selectGradMajor(saved);
-})();
 
 window.selectGradMajor=async function(key){
   gradMajor=key;
   document.querySelectorAll("#gradMajorBtns .pref-btn").forEach(b=>b.classList.toggle("selected",b.textContent.includes(GRAD_MAJORS[key].ar)));
   try{
-    const {getApps}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+    const {initializeApp,getApps}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
     const {getFirestore,doc,getDoc}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-    const fdb=getFirestore(getApps()[0]);
+    const fbApp=getApps().length?getApps()[0]:initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"});
+    const fdb=getFirestore(fbApp);
     const d=await getDoc(doc(fdb,"majorSheets",key));
     if(!d.exists()){gradCourses=[];renderGrad();return;}
     const data=d.data();
@@ -1412,6 +1405,15 @@ window.toggleGradCourse=function(code){
   localStorage.setItem("bscku_done_"+gradMajor+(gradBatch?"_"+gradBatch:""),JSON.stringify([...gradCompleted]));
   renderGrad();
 };
+
+// Init graduation buttons (after all functions are defined)
+(function(){
+  const wrap=document.getElementById("gradMajorBtns");
+  if(!wrap)return;
+  const saved=localStorage.getItem("bscku_major");
+  wrap.innerHTML=Object.entries(GRAD_MAJORS).map(([k,v])=>`<button onclick="selectGradMajor('${k}')" class="pref-btn${k===saved?' selected':''}" style="padding:.6rem 1rem;font-size:.82rem">${v.icon} ${v.ar}</button>`).join("");
+  if(saved)selectGradMajor(saved);
+})();
 
 /* ===== REVEAL ===== */
 function trigReveal(){
