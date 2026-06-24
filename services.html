@@ -1312,31 +1312,133 @@ const GRAD_TYPE_COLORS={required:{bg:"rgba(16,185,129,.12)",border:"rgba(16,185,
 
 let gradMajor=null,gradBatch=null,gradCourses=[],gradCompleted=new Set(),gradAllBatches={};
 
-window.selectGradMajor=async function(key){
+// Hardcoded graduation data from official KU sheets 2025/2026
+const _common=[
+  {code:"0310-101",nameAr:"مهارات الاتصال اللغوية",hours:3,type:"required"},
+  {code:"0330-100",nameAr:"تاريخ الكويت الحديث والمعاصر",hours:3,type:"required"},
+  {code:"0940-142",nameAr:"الإسلام والمجتمع الحديث",hours:3,type:"required"},
+  {code:"0940-145",nameAr:"الإسلام وقضايا العصر والتكنولوجيا",hours:3,type:"required"},
+  {code:"1360-103",nameAr:"حكومة وسياسة الكويت",hours:3,type:"required"},
+  {code:"UNIV-E1",nameAr:"اختياري: العلوم الاجتماعية والإنسانية",hours:3,type:"elective"},
+  {code:"UNIV-E2",nameAr:"اختياري: اللغات والاتصال",hours:3,type:"elective"},
+  {code:"UNIV-E3",nameAr:"اختياري: الثقافة الوطنية والعربية",hours:3,type:"elective"},
+  {code:"0410-103",nameAr:"رياضة حيوية",hours:3,type:"dept"},
+  {code:"0420-110",nameAr:"كيمياء عامة",hours:3,type:"dept"},
+  {code:"0420-111",nameAr:"مختبر كيمياء عامة",hours:1,type:"dept"},
+  {code:"0420-114",nameAr:"كيمياء عضوية",hours:3,type:"dept"},
+  {code:"0430-121",nameAr:"فيزياء عامة 1",hours:3,type:"dept"},
+  {code:"0430-125",nameAr:"مختبر فيزياء عامة",hours:1,type:"dept"},
+  {code:"0480-102",nameAr:"إحصاء علوم الحياة",hours:4,type:"dept"},
+  {code:"0490-101",nameAr:"بيولوجيا 1",hours:3,type:"dept"},
+  {code:"0490-102",nameAr:"بيولوجيا 2",hours:3,type:"dept"},
+  {code:"0490-103",nameAr:"بيولوجيا 3",hours:3,type:"dept"},
+  {code:"0490-105",nameAr:"علم الكائنات الدقيقة",hours:3,type:"dept"},
+  {code:"0490-271",nameAr:"مبادئ الكيمياء الحيوية",hours:4,type:"dept"},
+  {code:"0490-281",nameAr:"مقدمة في البيولوجيا الجزيئية",hours:3,type:"dept"},
+];
+const GRAD_DATA={
+  animal:[
+    {code:"0493-200",nameAr:"التركيب والوظيفة في بيولوجيا الحيوان",hours:3,type:"major"},
+    {code:"0493-202",nameAr:"مبادئ في بيولوجيا الحيوان",hours:3,type:"major"},
+    {code:"0493-205",nameAr:"التنوع الحيواني ١: اللافقريات",hours:3,type:"major"},
+    {code:"0493-206",nameAr:"التنوع الحيواني ٢: الحبليات",hours:3,type:"major"},
+    {code:"0493-306",nameAr:"علم البيئة",hours:3,type:"major"},
+    {code:"0493-312",nameAr:"علم وظائف أعضاء الحيوانات",hours:3,type:"major"},
+    {code:"0493-320",nameAr:"علم الوراثة",hours:3,type:"major"},
+    {code:"0493-301",nameAr:"علم الأنسجة وكيمياء الأنسجة",hours:3,type:"major"},
+    {code:"0493-303",nameAr:"وظائف أعضاء الخلية",hours:3,type:"major"},
+    {code:"0493-307",nameAr:"علم الحيوان الاقتصادي",hours:3,type:"elective"},
+    {code:"0493-308",nameAr:"مبادئ بيئة الكويت",hours:3,type:"elective"},
+    {code:"0493-330",nameAr:"علم الحيوان وتقنية تصنيفه",hours:3,type:"elective"},
+    {code:"0493-401",nameAr:"بيئة الحياة والمحافظة عليها",hours:3,type:"elective"},
+    {code:"0493-406",nameAr:"علم وظائف أعضاء الحيوان الفقاري",hours:3,type:"elective"},
+    {code:"0493-409",nameAr:"الطفيليات",hours:3,type:"elective"},
+    {code:"0493-415",nameAr:"الجماعات",hours:3,type:"elective"},
+    {code:"0493-417",nameAr:"البيولوجيا الجزيئية",hours:3,type:"elective"},
+    {code:"0493-494",nameAr:"تطبيقات في بيولوجيا الحيوان",hours:3,type:"elective"},
+    {code:"MINOR-A",nameAr:"التخصص المساند",hours:24,type:"support"},
+  ],
+  plant:[
+    {code:"0494-102",nameAr:"التركيب والوظيفة في النبات",hours:3,type:"major"},
+    {code:"0494-211",nameAr:"مبادئ علم النبات",hours:3,type:"major"},
+    {code:"0494-221",nameAr:"مبادئ علم الحشرات",hours:3,type:"major"},
+    {code:"0494-231",nameAr:"مبادئ علم الوراثة",hours:3,type:"major"},
+    {code:"0494-251",nameAr:"مبادئ علم تصنيف النبات",hours:3,type:"major"},
+    {code:"0494-261",nameAr:"مبادئ علم البيئة النباتية",hours:3,type:"major"},
+    {code:"0494-271",nameAr:"مقدمة فسيولوجيا حياة نباتية",hours:3,type:"major"},
+    {code:"0494-E1",nameAr:"اختياري تخصص النبات 1",hours:3,type:"elective"},
+    {code:"0494-E2",nameAr:"اختياري تخصص النبات 2",hours:3,type:"elective"},
+    {code:"0494-E3",nameAr:"اختياري تخصص النبات 3",hours:3,type:"elective"},
+    {code:"0494-E4",nameAr:"اختياري تخصص النبات 4",hours:3,type:"elective"},
+    {code:"0494-E5",nameAr:"اختياري تخصص النبات 5",hours:3,type:"elective"},
+    {code:"0494-E6",nameAr:"اختياري تخصص النبات 6",hours:3,type:"elective"},
+    {code:"0494-E7",nameAr:"اختياري تخصص النبات 7",hours:2,type:"elective"},
+    {code:"0494-E8",nameAr:"اختياري تخصص النبات 8",hours:3,type:"elective"},
+    {code:"MINOR-P",nameAr:"التخصص المساند",hours:24,type:"support"},
+  ],
+  micro:[
+    {code:"0495-107",nameAr:"تقنيات دقيقة ومجهرية",hours:3,type:"major"},
+    {code:"0495-203",nameAr:"الأحياء الدقيقة والميكروبيولوجية",hours:3,type:"major"},
+    {code:"0495-204",nameAr:"علم الفطريات",hours:3,type:"major"},
+    {code:"0495-205",nameAr:"علم البكتيريا",hours:3,type:"major"},
+    {code:"0495-206",nameAr:"علم الطفيليات",hours:3,type:"major"},
+    {code:"0495-207",nameAr:"الطحالب الدقيقة والبروتوزوا",hours:3,type:"major"},
+    {code:"0495-382",nameAr:"علم المناعة",hours:3,type:"major"},
+    {code:"0495-E1",nameAr:"اختياري تخصص الميكرو 1",hours:3,type:"elective"},
+    {code:"0495-E2",nameAr:"اختياري تخصص الميكرو 2",hours:3,type:"elective"},
+    {code:"0495-E3",nameAr:"اختياري تخصص الميكرو 3",hours:3,type:"elective"},
+    {code:"0495-E4",nameAr:"اختياري تخصص الميكرو 4",hours:3,type:"elective"},
+    {code:"0495-E5",nameAr:"اختياري تخصص الميكرو 5",hours:3,type:"elective"},
+    {code:"0495-E6",nameAr:"اختياري تخصص الميكرو 6",hours:3,type:"elective"},
+    {code:"0495-E7",nameAr:"اختياري تخصص الميكرو 7",hours:2,type:"elective"},
+    {code:"MINOR-M",nameAr:"التخصص المساند",hours:24,type:"support"},
+  ],
+  biochem:[
+    {code:"0496-217",nameAr:"الكيمياء الحيوية الفيزيائية",hours:4,type:"major"},
+    {code:"0496-219",nameAr:"الكيمياء الحيوية الحركية",hours:3,type:"major"},
+    {code:"0496-300",nameAr:"مختبر الكيمياء الحيوية 1",hours:3,type:"major"},
+    {code:"0496-315",nameAr:"الكيمياء الحيوية 1",hours:3,type:"major"},
+    {code:"0496-337",nameAr:"الإنزيمات",hours:3,type:"major"},
+    {code:"0496-372",nameAr:"الكيمياء الحيوية والتفاعلات الحيوية",hours:3,type:"major"},
+    {code:"0496-415",nameAr:"مختبر الكيمياء الحيوية 2",hours:3,type:"major"},
+    {code:"0496-420",nameAr:"الكيمياء الحيوية الإكلينيكية",hours:3,type:"major"},
+    {code:"0496-425",nameAr:"الحيوية الإكلينيكية",hours:3,type:"major"},
+    {code:"0496-454",nameAr:"مقدمة في الهندسة الوراثية",hours:3,type:"major"},
+    {code:"0496-482",nameAr:"موضوع خاص في الكيمياء الحيوية",hours:3,type:"major"},
+    {code:"0496-E1",nameAr:"اختياري تخصص الكيمياء الحيوية 1",hours:4,type:"elective"},
+    {code:"0496-E2",nameAr:"اختياري تخصص الكيمياء الحيوية 2",hours:4,type:"elective"},
+    {code:"MINOR-B",nameAr:"التخصص المساند",hours:24,type:"support"},
+  ],
+  molecular:[
+    {code:"0497-283",nameAr:"زراعة الأنسجة الحيوية",hours:3,type:"major"},
+    {code:"0497-291",nameAr:"تقنيات في الكيمياء الحيوية",hours:3,type:"major"},
+    {code:"0497-320",nameAr:"علم الوراثة",hours:3,type:"major"},
+    {code:"0497-371",nameAr:"بيولوجيا خلوية جزيئية",hours:3,type:"major"},
+    {code:"0497-383",nameAr:"بيولوجيا الخلية الجزيئية",hours:4,type:"major"},
+    {code:"0497-390",nameAr:"الحيوية الجزيئية",hours:4,type:"major"},
+    {code:"0497-401",nameAr:"علم المناعة الخلوية والجزيئية",hours:3,type:"major"},
+    {code:"0497-433",nameAr:"مختبر البيولوجيا الجزيئية",hours:2,type:"major"},
+    {code:"0497-453",nameAr:"أساسيات البيولوجيا الجزيئية",hours:3,type:"major"},
+    {code:"0497-490",nameAr:"موضوع في البيولوجيا الجزيئية",hours:3,type:"major"},
+    {code:"0497-493",nameAr:"أساسيات تكنولوجيا حيوية",hours:3,type:"major"},
+    {code:"0497-494",nameAr:"تطبيقات في البيولوجيا الجزيئية",hours:3,type:"major"},
+    {code:"0497-E1",nameAr:"اختياري تخصص البيولوجيا الجزيئية 1",hours:3,type:"elective"},
+    {code:"0497-E2",nameAr:"اختياري تخصص البيولوجيا الجزيئية 2",hours:3,type:"elective"},
+    {code:"0497-E3",nameAr:"اختياري تخصص البيولوجيا الجزيئية 3",hours:3,type:"elective"},
+    {code:"0497-E4",nameAr:"اختياري تخصص البيولوجيا الجزيئية 4",hours:3,type:"elective"},
+    {code:"MINOR-J",nameAr:"التخصص المساند",hours:24,type:"support"},
+  ],
+};
+
+window.selectGradMajor=function(key){
   gradMajor=key;
   document.querySelectorAll("#gradMajorBtns .pref-btn").forEach(b=>b.classList.toggle("selected",b.textContent.includes(GRAD_MAJORS[key].ar)));
-  try{
-    const {initializeApp,getApps}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-    const {getFirestore,doc,getDoc}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-    const fbApp=getApps().length?getApps()[0]:initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"});
-    const fdb=getFirestore(fbApp);
-    const d=await getDoc(doc(fdb,"majorSheets",key));
-    if(!d.exists()){gradCourses=[];renderGrad();return;}
-    const data=d.data();
-    if(data.batches&&Object.keys(data.batches).length>0){
-      gradAllBatches=data.batches;
-      const sorted=Object.keys(gradAllBatches).sort((a,b)=>b.localeCompare(a,undefined,{numeric:true}));
-      gradBatch=sorted[0];
-      gradCourses=(gradAllBatches[gradBatch]&&gradAllBatches[gradBatch].courses)||[];
-      renderGradBatchBar(sorted);
-    }else{
-      gradBatch=null;gradAllBatches={};
-      gradCourses=data.courses||[];
-      document.getElementById("gradBatchBar").style.display="none";
-    }
-    gradCompleted=new Set(JSON.parse(localStorage.getItem("bscku_done_"+key+(gradBatch?"_"+gradBatch:""))||"[]"));
-    renderGrad();
-  }catch(e){console.warn("grad load:",e);gradCourses=[];renderGrad();}
+  gradBatch=null;gradAllBatches={};
+  document.getElementById("gradBatchBar").style.display="none";
+  const majorCourses=GRAD_DATA[key]||[];
+  gradCourses=[..._common,...majorCourses];
+  gradCompleted=new Set(JSON.parse(localStorage.getItem("bscku_grad_"+key)||"[]"));
+  renderGrad();
 };
 
 function renderGradBatchBar(batches){
@@ -1402,7 +1504,7 @@ window.setGradFilter=function(f){gradFilter=f;renderGrad();};
 window.toggleGradCourse=function(code){
   if(gradCompleted.has(code))gradCompleted.delete(code);
   else gradCompleted.add(code);
-  localStorage.setItem("bscku_done_"+gradMajor+(gradBatch?"_"+gradBatch:""),JSON.stringify([...gradCompleted]));
+  localStorage.setItem("bscku_grad_"+gradMajor,JSON.stringify([...gradCompleted]));
   renderGrad();
 };
 
