@@ -537,6 +537,7 @@ a{color:inherit;text-decoration:none}
     <button class="stab" onclick="switchTab('news')" data-ar="📰 الأخبار" data-en="📰 News">📰 الأخبار</button>
     <button class="stab" onclick="switchTab('sched')" data-ar="📅 الجداول المقترحة" data-en="📅 Suggested Schedules">📅 الجداول المقترحة</button>
     <button class="stab" onclick="switchTab('guide')" data-ar="📖 دليل الطالب" data-en="📖 Student Guide">📖 دليل الطالب</button>
+    <button class="stab" onclick="switchTab('grad')" data-ar="🎓 إنجاز التخرج" data-en="🎓 Graduation Progress">🎓 إنجاز التخرج</button>
   </div>
 
   <!-- ===== GPA ===== -->
@@ -692,6 +693,79 @@ a{color:inherit;text-decoration:none}
     <div class="sched-grid" id="schedGrid"></div>
   </div>
 
+  <!-- ===== GRADUATION PROGRESS ===== -->
+  <div class="service-panel" id="panel-grad">
+    <div class="section-label" data-ar="إنجاز التخرج" data-en="Graduation Progress">إنجاز التخرج</div>
+    <div class="section-h2" data-ar="تتبّع تقدمك نحو التخرج" data-en="Track your graduation progress">تتبّع تقدمك نحو التخرج</div>
+
+    <div class="gpa-wrap reveal" style="max-width:860px">
+      <!-- Major Selector -->
+      <div style="margin-bottom:1.5rem">
+        <div style="font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:.7rem" data-ar="اختر تخصصك:" data-en="Select your major:">اختر تخصصك:</div>
+        <div id="gradMajorBtns" style="display:flex;flex-wrap:wrap;gap:.5rem"></div>
+      </div>
+
+      <!-- Batch Selector -->
+      <div id="gradBatchBar" style="display:none;margin-bottom:1.5rem">
+        <div style="font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:.5rem">اختر الدفعة:</div>
+        <div id="gradBatchBtns" style="display:flex;flex-wrap:wrap;gap:.5rem"></div>
+      </div>
+
+      <!-- Progress Ring + Stats -->
+      <div id="gradDashboard" style="display:none">
+        <div style="display:flex;align-items:center;gap:2rem;flex-wrap:wrap;margin-bottom:2rem">
+          <!-- Circular Progress -->
+          <div style="position:relative;width:160px;height:160px;flex-shrink:0;margin:0 auto">
+            <svg viewBox="0 0 120 120" style="width:100%;height:100%;transform:rotate(-90deg)">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="10"/>
+              <circle id="gradRing" cx="60" cy="60" r="52" fill="none" stroke="url(#gradGrad)" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
+              <defs><linearGradient id="gradGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#10b981"/></linearGradient></defs>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <span id="gradPct" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:2.2rem;font-weight:900;background:linear-gradient(135deg,#6366f1,#10b981);-webkit-background-clip:text;background-clip:text;color:transparent">0%</span>
+              <span style="font-size:.7rem;color:var(--muted);font-weight:600" data-ar="مكتمل" data-en="Complete">مكتمل</span>
+            </div>
+          </div>
+
+          <!-- Stats Cards -->
+          <div style="flex:1;min-width:240px;display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+            <div class="res-card accent">
+              <span class="res-label" data-ar="مواد مكتملة" data-en="Completed">مواد مكتملة</span>
+              <span class="res-val" id="gradDone">0</span>
+            </div>
+            <div class="res-card">
+              <span class="res-label" data-ar="مواد متبقية" data-en="Remaining">مواد متبقية</span>
+              <span class="res-val" id="gradLeft">0</span>
+            </div>
+            <div class="res-card accent2">
+              <span class="res-label" data-ar="ساعات مكتملة" data-en="Hours Done">ساعات مكتملة</span>
+              <span class="res-val" id="gradHrsDone">0</span>
+            </div>
+            <div class="res-card">
+              <span class="res-label" data-ar="ساعات متبقية" data-en="Hours Left">ساعات متبقية</span>
+              <span class="res-val" id="gradHrsLeft">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course Checklist -->
+        <div style="border-top:1px solid var(--border);padding-top:1.5rem">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
+            <div style="font-size:.88rem;font-weight:700;color:var(--text)" data-ar="قائمة المواد" data-en="Course List">قائمة المواد</div>
+            <div style="display:flex;gap:.4rem" id="gradTypeFilter"></div>
+          </div>
+          <div id="gradCourseList" style="display:flex;flex-direction:column;gap:.4rem"></div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div id="gradEmpty" style="text-align:center;padding:3rem 1rem;color:var(--muted)">
+        <div style="font-size:2.5rem;margin-bottom:.75rem">🎓</div>
+        <p data-ar="اختر تخصصك لبدء تتبّع إنجاز التخرج" data-en="Select your major to start tracking graduation progress">اختر تخصصك لبدء تتبّع إنجاز التخرج</p>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== GUIDE ===== -->
   <div class="service-panel" id="panel-guide">
     <div class="section-label">دليل الطالب</div>
@@ -786,7 +860,7 @@ function fmtDate(ts){if(!ts)return{d:"—",m:""};const dt=ts.toDate?ts.toDate():
 <script>
 /* ===== TABS ===== */
 function switchTab(id){
-  document.querySelectorAll(".stab").forEach((t,i)=>{t.classList.toggle("active",["gpa","news","sched","guide"][i]===id)});
+  document.querySelectorAll(".stab").forEach((t,i)=>{t.classList.toggle("active",["gpa","news","sched","guide","grad"][i]===id)});
   document.querySelectorAll(".service-panel").forEach(p=>p.classList.remove("active"));
   document.getElementById("panel-"+id).classList.add("active");
   trigReveal();
@@ -1231,6 +1305,113 @@ function filterGuide(sec,btn){
 
 buildGuideFilters();
 renderGuide("all");
+
+/* ===== GRADUATION PROGRESS ===== */
+const GRAD_MAJORS={molecular:{ar:"البيولوجيا الجزيئية",icon:"🧬"},micro:{ar:"مايكروبيولوجي",icon:"🦠"},plant:{ar:"بيولوجيا النبات",icon:"🌱"},animal:{ar:"بيولوجيا الحيوان",icon:"🐾"},biochem:{ar:"الكيمياء الحيوية",icon:"⚗️"},forensic:{ar:"الأدلة الجنائية",icon:"🔍"},agri:{ar:"النبات الزراعي",icon:"🌾"},biotech:{ar:"التقنية الحيوية",icon:"🧪"}};
+const GRAD_TYPE_COLORS={required:{bg:"rgba(16,185,129,.12)",border:"rgba(16,185,129,.35)",text:"#6ee7b7",label:"إلزامي"},dept:{bg:"rgba(59,130,246,.12)",border:"rgba(59,130,246,.35)",text:"#93c5fd",label:"قسم"},major:{bg:"rgba(245,158,11,.12)",border:"rgba(245,158,11,.35)",text:"#fcd34d",label:"تخصص"},support:{bg:"rgba(239,68,68,.08)",border:"rgba(239,68,68,.25)",text:"#fca5a5",label:"مساند"},elective:{bg:"rgba(139,92,246,.12)",border:"rgba(139,92,246,.35)",text:"#c4b5fd",label:"اختياري"}};
+
+let gradMajor=null,gradBatch=null,gradCourses=[],gradCompleted=new Set(),gradAllBatches={};
+
+(function initGradBtns(){
+  const wrap=document.getElementById("gradMajorBtns");
+  if(!wrap)return;
+  const saved=localStorage.getItem("bscku_major");
+  wrap.innerHTML=Object.entries(GRAD_MAJORS).map(([k,v])=>`<button onclick="selectGradMajor('${k}')" class="pref-btn${k===saved?' selected':''}" style="padding:.6rem 1rem;font-size:.82rem">${v.icon} ${v.ar}</button>`).join("");
+  if(saved)selectGradMajor(saved);
+})();
+
+window.selectGradMajor=async function(key){
+  gradMajor=key;
+  document.querySelectorAll("#gradMajorBtns .pref-btn").forEach(b=>b.classList.toggle("selected",b.textContent.includes(GRAD_MAJORS[key].ar)));
+  try{
+    const {getApps}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+    const {getFirestore,doc,getDoc}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+    const fdb=getFirestore(getApps()[0]);
+    const d=await getDoc(doc(fdb,"majorSheets",key));
+    if(!d.exists()){gradCourses=[];renderGrad();return;}
+    const data=d.data();
+    if(data.batches&&Object.keys(data.batches).length>0){
+      gradAllBatches=data.batches;
+      const sorted=Object.keys(gradAllBatches).sort((a,b)=>b.localeCompare(a,undefined,{numeric:true}));
+      gradBatch=sorted[0];
+      gradCourses=(gradAllBatches[gradBatch]&&gradAllBatches[gradBatch].courses)||[];
+      renderGradBatchBar(sorted);
+    }else{
+      gradBatch=null;gradAllBatches={};
+      gradCourses=data.courses||[];
+      document.getElementById("gradBatchBar").style.display="none";
+    }
+    gradCompleted=new Set(JSON.parse(localStorage.getItem("bscku_done_"+key+(gradBatch?"_"+gradBatch:""))||"[]"));
+    renderGrad();
+  }catch(e){console.warn("grad load:",e);gradCourses=[];renderGrad();}
+};
+
+function renderGradBatchBar(batches){
+  const bar=document.getElementById("gradBatchBar");
+  const btns=document.getElementById("gradBatchBtns");
+  bar.style.display="block";
+  btns.innerHTML=batches.map(b=>`<button onclick="selectGradBatch('${b}')" style="padding:.4rem 1rem;border-radius:999px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s;${b===gradBatch?'background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:1px solid #6366f1':'background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--border)'}">دفعة ${b}</button>`).join("");
+}
+
+window.selectGradBatch=function(batch){
+  gradBatch=batch;
+  gradCourses=(gradAllBatches[batch]&&gradAllBatches[batch].courses)||[];
+  gradCompleted=new Set(JSON.parse(localStorage.getItem("bscku_done_"+gradMajor+"_"+batch)||"[]"));
+  renderGradBatchBar(Object.keys(gradAllBatches).sort((a,b)=>b.localeCompare(a,undefined,{numeric:true})));
+  renderGrad();
+};
+
+let gradFilter="all";
+
+function renderGrad(){
+  const dashboard=document.getElementById("gradDashboard");
+  const empty=document.getElementById("gradEmpty");
+  if(!gradCourses.length){dashboard.style.display="none";empty.style.display="block";return;}
+  dashboard.style.display="block";empty.style.display="none";
+
+  const total=gradCourses.length;
+  const done=gradCourses.filter(c=>gradCompleted.has(c.code)).length;
+  const pct=total?Math.round(done/total*100):0;
+  const totalHrs=gradCourses.reduce((s,c)=>s+(c.hours||3),0);
+  const doneHrs=gradCourses.filter(c=>gradCompleted.has(c.code)).reduce((s,c)=>s+(c.hours||3),0);
+
+  document.getElementById("gradPct").textContent=pct+"%";
+  document.getElementById("gradDone").textContent=done;
+  document.getElementById("gradLeft").textContent=total-done;
+  document.getElementById("gradHrsDone").textContent=doneHrs;
+  document.getElementById("gradHrsLeft").textContent=totalHrs-doneHrs;
+
+  const circ=326.73;
+  document.getElementById("gradRing").style.strokeDashoffset=circ-(circ*pct/100);
+
+  // Type filter buttons
+  const types=[...new Set(gradCourses.map(c=>c.type).filter(Boolean))];
+  const filterWrap=document.getElementById("gradTypeFilter");
+  filterWrap.innerHTML=`<button onclick="setGradFilter('all')" style="padding:.3rem .7rem;border-radius:999px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;border:1px solid ${gradFilter==='all'?'rgba(99,102,241,.5)':'var(--border)'};background:${gradFilter==='all'?'rgba(99,102,241,.15)':'transparent'};color:${gradFilter==='all'?'#a5b4fc':'var(--muted)'};transition:all .2s">الكل</button>`+
+    types.map(t=>{const c=GRAD_TYPE_COLORS[t]||GRAD_TYPE_COLORS.dept;return`<button onclick="setGradFilter('${t}')" style="padding:.3rem .7rem;border-radius:999px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;border:1px solid ${gradFilter===t?c.border:'var(--border)'};background:${gradFilter===t?c.bg:'transparent'};color:${gradFilter===t?c.text:'var(--muted)'};transition:all .2s">${c.label}</button>`}).join("");
+
+  const filtered=gradFilter==="all"?gradCourses:gradCourses.filter(c=>c.type===gradFilter);
+  const list=document.getElementById("gradCourseList");
+  list.innerHTML=filtered.map(c=>{
+    const isDone=gradCompleted.has(c.code);
+    const col=GRAD_TYPE_COLORS[c.type]||GRAD_TYPE_COLORS.dept;
+    return`<div onclick="toggleGradCourse('${c.code}')" style="display:flex;align-items:center;gap:.75rem;padding:.65rem 1rem;background:${isDone?'rgba(16,185,129,.08)':col.bg};border:1px solid ${isDone?'rgba(16,185,129,.25)':col.border};border-radius:10px;cursor:pointer;transition:all .2s;opacity:${isDone?'.65':'1'};user-select:none">
+      <div style="width:22px;height:22px;border-radius:6px;border:2px solid ${isDone?'#10b981':col.border};background:${isDone?'#10b981':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:.7rem;color:#fff">${isDone?'✓':''}</div>
+      <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:.78rem;font-weight:900;color:${isDone?'#6ee7b7':col.text};min-width:75px;flex-shrink:0">${c.code}</span>
+      <span style="font-size:.85rem;font-weight:600;flex:1;color:${isDone?'var(--muted)':'var(--text)'};${isDone?'text-decoration:line-through':''}">${c.nameAr}</span>
+      <span style="font-size:.7rem;color:var(--muted);flex-shrink:0">${c.hours||3} س</span>
+      <span style="font-size:.65rem;font-weight:700;padding:.15rem .45rem;border-radius:999px;background:${col.bg};color:${col.text};flex-shrink:0">${col.label}</span>
+    </div>`}).join("");
+}
+
+window.setGradFilter=function(f){gradFilter=f;renderGrad();};
+
+window.toggleGradCourse=function(code){
+  if(gradCompleted.has(code))gradCompleted.delete(code);
+  else gradCompleted.add(code);
+  localStorage.setItem("bscku_done_"+gradMajor+(gradBatch?"_"+gradBatch:""),JSON.stringify([...gradCompleted]));
+  renderGrad();
+};
 
 /* ===== REVEAL ===== */
 function trigReveal(){
