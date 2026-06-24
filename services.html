@@ -1430,14 +1430,38 @@ const GRAD_DATA={
   ],
 };
 
-window.selectGradMajor=function(key){
+window.selectGradMajor=async function(key){
   gradMajor=key;
   document.querySelectorAll("#gradMajorBtns .pref-btn").forEach(b=>b.classList.toggle("selected",b.textContent.includes(GRAD_MAJORS[key].ar)));
   gradBatch=null;gradAllBatches={};
   document.getElementById("gradBatchBar").style.display="none";
-  const majorCourses=GRAD_DATA[key]||[];
-  gradCourses=[..._common,...majorCourses];
-  gradCompleted=new Set(JSON.parse(localStorage.getItem("bscku_grad_"+key)||"[]"));
+  let fbCourses=[];
+  try{
+    const {initializeApp,getApps}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+    const {getFirestore,doc,getDoc}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+    const fbApp=getApps().length?getApps()[0]:initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"});
+    const fdb=getFirestore(fbApp);
+    const d=await getDoc(doc(fdb,"majorSheets",key));
+    if(d.exists()){
+      const data=d.data();
+      if(data.batches&&Object.keys(data.batches).length>0){
+        gradAllBatches=data.batches;
+        const sorted=Object.keys(gradAllBatches).sort((a,b)=>b.localeCompare(a,undefined,{numeric:true}));
+        gradBatch=sorted[0];
+        fbCourses=(gradAllBatches[gradBatch]&&gradAllBatches[gradBatch].courses)||[];
+        renderGradBatchBar(sorted);
+      }else{
+        fbCourses=data.courses||[];
+      }
+    }
+  }catch(e){console.warn("grad firebase:",e);}
+  if(fbCourses.length){
+    gradCourses=fbCourses;
+    gradCompleted=new Set(JSON.parse(localStorage.getItem("bscku_done_"+key+(gradBatch?"_"+gradBatch:""))||"[]"));
+  }else{
+    gradCourses=[..._common,...(GRAD_DATA[key]||[])];
+    gradCompleted=new Set(JSON.parse(localStorage.getItem("bscku_grad_"+key)||"[]"));
+  }
   renderGrad();
 };
 
@@ -1504,7 +1528,8 @@ window.setGradFilter=function(f){gradFilter=f;renderGrad();};
 window.toggleGradCourse=function(code){
   if(gradCompleted.has(code))gradCompleted.delete(code);
   else gradCompleted.add(code);
-  localStorage.setItem("bscku_grad_"+gradMajor,JSON.stringify([...gradCompleted]));
+  const storageKey=gradBatch?("bscku_done_"+gradMajor+"_"+gradBatch):("bscku_grad_"+gradMajor);
+  localStorage.setItem(storageKey,JSON.stringify([...gradCompleted]));
   renderGrad();
 };
 
