@@ -812,22 +812,28 @@ function renderTree(){
   sheetCourses.forEach(c=>{const r=LY[c.code]||0;(rows[r]||(rows[r]=[])).push(c)});
   const layerKeys=Object.keys(rows).map(Number).sort((a,b)=>a-b);
 
-  /* ── SORT each row — Barycenter heuristic, 14 passes ── */
+  /* ── SORT — Barycenter + greedy adjacent-swap to minimize crossings ── */
   const tempX={};
 
-  // Layer 0: sort by avg layer-depth of children (nodes with shallow children → left)
+  // helpers: count crossings between two adjacent layers
+  function countCross(topRow,botRow){
+    const tIdx={},bIdx={};
+    topRow.forEach((c,i)=>{tIdx[c.code]=i});
+    botRow.forEach((c,i)=>{bIdx[c.code]=i});
+    const edges=[];
+    botRow.forEach(c=>{(c.prereqs||[]).forEach(p=>{
+      if(tIdx[p]!=null)edges.push([tIdx[p],bIdx[c.code]]);
+    })});
+    let cross=0;
+    for(let i=0;i<edges.length;i++)for(let j=i+1;j<edges.length;j++){
+      if((edges[i][0]-edges[j][0])*(edges[i][1]-edges[j][1])<0)cross++;
+    }
+    return cross;
+  }
+
+  // initial: barycenter sort
   layerKeys.forEach((r,ri)=>{
-    if(ri===0){
-      rows[r].sort((a,b)=>{
-        const avgCL=c=>{
-          const ch=sheetCourses.filter(x=>(x.prereqs||[]).includes(c.code));
-          if(!ch.length)return 99;
-          return ch.reduce((s,x)=>s+(LY[x.code]||0),0)/ch.length;
-        };
-        const diff=avgCL(a)-avgCL(b);
-        return Math.abs(diff)<0.4?a.code.localeCompare(b.code):diff;
-      });
-    }else{
+    if(ri>0){
       rows[r].sort((a,b)=>{
         const med=c=>{
           const prs=(c.prereqs||[]).filter(p=>by[p]&&tempX[p]!=null);
@@ -841,8 +847,8 @@ function renderTree(){
     rows[r].forEach((c,i)=>{tempX[c.code]=i;});
   });
 
-  // 14 alternating passes
-  for(let pass=0;pass<14;pass++){
+  // 24 alternating barycenter passes
+  for(let pass=0;pass<24;pass++){
     const keys=pass%2===0?layerKeys.slice(1):[...layerKeys.slice(0,-1)].reverse();
     keys.forEach(r=>{
       rows[r].sort((a,b)=>{
@@ -860,17 +866,25 @@ function renderTree(){
     });
   }
 
-  // Final pass: re-sort layer 0 by actual child positions
-  rows[layerKeys[0]].sort((a,b)=>{
-    const med=c=>{
-      const ch=sheetCourses.filter(x=>(x.prereqs||[]).includes(c.code)&&tempX[x.code]!=null);
-      if(!ch.length)return tempX[c.code]??99;
-      const xs=ch.map(x=>tempX[x.code]).sort((p,q)=>p-q);
-      return xs[Math.floor(xs.length/2)];
-    };
-    return med(a)-med(b);
-  });
-  rows[layerKeys[0]].forEach((c,i)=>{tempX[c.code]=i;});
+  // greedy adjacent-swap: swap neighbors if it reduces crossings
+  for(let round=0;round<10;round++){
+    let improved=false;
+    layerKeys.forEach((r,ri)=>{
+      const row=rows[r];
+      if(row.length<2)return;
+      const topRow=ri>0?rows[layerKeys[ri-1]]:null;
+      const botRow=ri<layerKeys.length-1?rows[layerKeys[ri+1]]:null;
+      for(let i=0;i<row.length-1;i++){
+        const before=(topRow?countCross(topRow,row):0)+(botRow?countCross(row,botRow):0);
+        const tmp=row[i];row[i]=row[i+1];row[i+1]=tmp;
+        row.forEach((c,j)=>{tempX[c.code]=j;});
+        const after=(topRow?countCross(topRow,row):0)+(botRow?countCross(row,botRow):0);
+        if(after<before){improved=true;}
+        else{const tmp2=row[i];row[i]=row[i+1];row[i+1]=tmp2;row.forEach((c,j)=>{tempX[c.code]=j;});}
+      }
+    });
+    if(!improved)break;
+  }
 
   /* ── PIXEL POSITIONS ── */
   const NW=124, NH=54, HG=18, VG=88;
@@ -903,13 +917,8 @@ function renderTree(){
     major:"rgba(245,158,11,.65)",support:"rgba(239,68,68,.6)",elective:"rgba(139,92,246,.65)",
   };
 
-  /* ── RENDER NODES + LEVEL LABELS ── */
+  /* ── RENDER NODES ── */
   let html='';
-  layerKeys.forEach((r,ri)=>{
-    const y=24+ri*(NH+VG);
-    html+=`<div class="tree-level-label" style="top:${y+NH/2-8}px">المستوى ${ri+1}</div>`;
-    if(ri>0) html+=`<div class="tree-level-line" style="top:${y-(VG/2)}px"></div>`;
-  });
   sheetCourses.forEach(c=>{
     const p=pos[c.code];if(!p)return;
     const done=completedCodes.has(c.code);
