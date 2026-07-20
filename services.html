@@ -977,23 +977,33 @@ function calcAll(){
   saveState();
   const rows=document.querySelectorAll(".course-row2");
   let totalPts=0,totalHrs=0;
+  // Cumulative-only totals: a retaken course's hours were already counted in
+  // "الوحدات المسجّلة السابقة" the first time it was taken, so only the point
+  // improvement (new - old) feeds the cumulative GPA, not its hours again.
+  let cumPts=0,cumHrs=0;
   rows.forEach(r=>{
     const sel=r.querySelectorAll("select");
     const hrs=parseFloat(r.querySelectorAll("input")[1].value)||0;
     const g=sel[0].value;
     const prev=sel[1].value;
     let pts=GRADES[g]||0;
+    const isRetake=prev&&prev!=="غير معادة"&&GRADES[prev]!==null;
     // If repeated course (prevGrade set), only count if new grade is better
-    if(prev&&prev!=="غير معادة"&&GRADES[prev]!==null){
+    if(isRetake){
       pts=Math.max(GRADES[g]||0,GRADES[prev]||0);
     }
     totalPts+=pts*hrs;totalHrs+=hrs;
+    if(isRetake){
+      cumPts+=(pts-GRADES[prev])*hrs;
+    }else{
+      cumPts+=pts*hrs;cumHrs+=hrs;
+    }
   });
   const semGPA=totalHrs>0?(totalPts/totalHrs):0;
   const prevH=parseFloat(document.getElementById("prevHours").value)||0;
   const prevG=parseFloat(document.getElementById("prevGPA").value)||0;
-  const totalH=prevH+totalHrs;
-  const cumGPA=totalH>0?((prevG*prevH+semGPA*totalHrs)/totalH):semGPA;
+  const totalH=prevH+cumHrs;
+  const cumGPA=totalH>0?((prevG*prevH+cumPts)/totalH):semGPA;
   document.getElementById("curHours").textContent=totalHrs;
   document.getElementById("curPoints").textContent=totalPts.toFixed(2);
   document.getElementById("semGPA").textContent=semGPA.toFixed(2);
