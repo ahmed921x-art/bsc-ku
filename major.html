@@ -86,6 +86,17 @@ a{color:inherit;text-decoration:none}
 .tree-node.locked{opacity:.35;cursor:not-allowed;filter:grayscale(.5)}
 .tree-node.locked:hover{transform:none}
 .tree-node.highlighted{box-shadow:0 0 0 2.5px #a5b4fc,0 0 18px rgba(163,182,252,.4)}
+.tree-level-label{position:absolute;right:10px;font-size:.58rem;font-weight:800;color:rgba(165,180,252,.32);letter-spacing:.06em;user-select:none;z-index:1;white-space:nowrap;direction:rtl}
+.tree-level-line{position:absolute;left:0;right:0;border-top:1px dashed rgba(255,255,255,.04);z-index:0;pointer-events:none}
+.prereq-tree-wrap{scrollbar-width:thin;scrollbar-color:rgba(99,102,241,.25) rgba(255,255,255,.03)}
+.prereq-tree-wrap::-webkit-scrollbar{height:7px;width:7px}
+.prereq-tree-wrap::-webkit-scrollbar-track{background:rgba(255,255,255,.03);border-radius:4px}
+.prereq-tree-wrap::-webkit-scrollbar-thumb{background:rgba(99,102,241,.22);border-radius:4px}
+.prereq-tree-wrap::-webkit-scrollbar-thumb:hover{background:rgba(99,102,241,.4)}
+.tree-controls{display:flex;gap:.35rem;align-items:center;justify-content:flex-end;margin-bottom:.65rem}
+.tree-zoom-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;user-select:none;font-family:system-ui}
+.tree-zoom-btn:hover{color:#a5b4fc;background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.3)}
+.tree-zoom-level{font-size:.7rem;color:var(--muted);font-weight:700;min-width:36px;text-align:center}
 
 .tn-required{color:#6ee7b7;background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.35)}
 .tn-dept{color:#93c5fd;background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.35)}
@@ -500,6 +511,12 @@ a{color:inherit;text-decoration:none}
         <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div>اختياري</div>
         <div class="legend-item"><div class="legend-dot" style="background:#6ee7b7;opacity:.5"></div>مكتمل ✓</div>
       </div>
+      <div class="tree-controls">
+        <button class="tree-zoom-btn" onclick="zoomTree(-1)" title="تصغير">−</button>
+        <span class="tree-zoom-level" id="zoomLevel">100%</span>
+        <button class="tree-zoom-btn" onclick="zoomTree(1)" title="تكبير">+</button>
+        <button class="tree-zoom-btn" onclick="zoomTree(0)" title="إعادة ضبط" style="font-size:.7rem">↺</button>
+      </div>
       <div class="prereq-tree-wrap">
         <div class="prereq-canvas" id="treeCanvas">
           <svg class="prereq-svg" id="treeSvg"></svg>
@@ -747,6 +764,18 @@ function isUnlocked(course){
 }
 function saveCompleted(){localStorage.setItem("bscku_done_"+major+(currentBatch?"_"+currentBatch:""),JSON.stringify([...completedCodes]))}
 
+let _treeScale=1;
+window.zoomTree=function(dir){
+  const canvas=document.getElementById('treeCanvas');
+  if(!canvas)return;
+  if(dir===0)_treeScale=1;
+  else _treeScale=Math.max(.35,Math.min(1.6,_treeScale+dir*.15));
+  canvas.style.transform=`scale(${_treeScale})`;
+  canvas.style.transformOrigin='top right';
+  const lbl=document.getElementById('zoomLevel');
+  if(lbl)lbl.textContent=Math.round(_treeScale*100)+'%';
+};
+
 function renderTree(){
   const container=document.getElementById("treeContainer");
   const svg=document.getElementById("treeSvg");
@@ -783,22 +812,28 @@ function renderTree(){
   sheetCourses.forEach(c=>{const r=LY[c.code]||0;(rows[r]||(rows[r]=[])).push(c)});
   const layerKeys=Object.keys(rows).map(Number).sort((a,b)=>a-b);
 
-  /* ── SORT each row — Barycenter heuristic, 14 passes ── */
+  /* ── SORT — Barycenter + greedy adjacent-swap to minimize crossings ── */
   const tempX={};
 
-  // Layer 0: sort by avg layer-depth of children (nodes with shallow children → left)
+  // helpers: count crossings between two adjacent layers
+  function countCross(topRow,botRow){
+    const tIdx={},bIdx={};
+    topRow.forEach((c,i)=>{tIdx[c.code]=i});
+    botRow.forEach((c,i)=>{bIdx[c.code]=i});
+    const edges=[];
+    botRow.forEach(c=>{(c.prereqs||[]).forEach(p=>{
+      if(tIdx[p]!=null)edges.push([tIdx[p],bIdx[c.code]]);
+    })});
+    let cross=0;
+    for(let i=0;i<edges.length;i++)for(let j=i+1;j<edges.length;j++){
+      if((edges[i][0]-edges[j][0])*(edges[i][1]-edges[j][1])<0)cross++;
+    }
+    return cross;
+  }
+
+  // initial: barycenter sort
   layerKeys.forEach((r,ri)=>{
-    if(ri===0){
-      rows[r].sort((a,b)=>{
-        const avgCL=c=>{
-          const ch=sheetCourses.filter(x=>(x.prereqs||[]).includes(c.code));
-          if(!ch.length)return 99;
-          return ch.reduce((s,x)=>s+(LY[x.code]||0),0)/ch.length;
-        };
-        const diff=avgCL(a)-avgCL(b);
-        return Math.abs(diff)<0.4?a.code.localeCompare(b.code):diff;
-      });
-    }else{
+    if(ri>0){
       rows[r].sort((a,b)=>{
         const med=c=>{
           const prs=(c.prereqs||[]).filter(p=>by[p]&&tempX[p]!=null);
@@ -812,8 +847,8 @@ function renderTree(){
     rows[r].forEach((c,i)=>{tempX[c.code]=i;});
   });
 
-  // 14 alternating passes
-  for(let pass=0;pass<14;pass++){
+  // 24 alternating barycenter passes
+  for(let pass=0;pass<24;pass++){
     const keys=pass%2===0?layerKeys.slice(1):[...layerKeys.slice(0,-1)].reverse();
     keys.forEach(r=>{
       rows[r].sort((a,b)=>{
@@ -831,23 +866,31 @@ function renderTree(){
     });
   }
 
-  // Final pass: re-sort layer 0 by actual child positions
-  rows[layerKeys[0]].sort((a,b)=>{
-    const med=c=>{
-      const ch=sheetCourses.filter(x=>(x.prereqs||[]).includes(c.code)&&tempX[x.code]!=null);
-      if(!ch.length)return tempX[c.code]??99;
-      const xs=ch.map(x=>tempX[x.code]).sort((p,q)=>p-q);
-      return xs[Math.floor(xs.length/2)];
-    };
-    return med(a)-med(b);
-  });
-  rows[layerKeys[0]].forEach((c,i)=>{tempX[c.code]=i;});
+  // greedy adjacent-swap: swap neighbors if it reduces crossings
+  for(let round=0;round<10;round++){
+    let improved=false;
+    layerKeys.forEach((r,ri)=>{
+      const row=rows[r];
+      if(row.length<2)return;
+      const topRow=ri>0?rows[layerKeys[ri-1]]:null;
+      const botRow=ri<layerKeys.length-1?rows[layerKeys[ri+1]]:null;
+      for(let i=0;i<row.length-1;i++){
+        const before=(topRow?countCross(topRow,row):0)+(botRow?countCross(row,botRow):0);
+        const tmp=row[i];row[i]=row[i+1];row[i+1]=tmp;
+        row.forEach((c,j)=>{tempX[c.code]=j;});
+        const after=(topRow?countCross(topRow,row):0)+(botRow?countCross(row,botRow):0);
+        if(after<before){improved=true;}
+        else{const tmp2=row[i];row[i]=row[i+1];row[i+1]=tmp2;row.forEach((c,j)=>{tempX[c.code]=j;});}
+      }
+    });
+    if(!improved)break;
+  }
 
   /* ── PIXEL POSITIONS ── */
-  const NW=140, NH=66, HG=30, VG=130;
+  const NW=124, NH=54, HG=18, VG=88;
   const maxN=Math.max(...layerKeys.map(r=>rows[r].length));
-  const CW=Math.max(1200,maxN*(NW+HG)+100);
-  const CH=layerKeys.length*(NH+VG)+80;
+  const CW=Math.max(1000,maxN*(NW+HG)+120);
+  const CH=layerKeys.length*(NH+VG)+60;
 
   const pos={};
   layerKeys.forEach((r,ri)=>{
@@ -931,23 +974,8 @@ function renderTree(){
   Object.keys(outMap).forEach(p=>outMap[p].sort((a,b)=>pos[a].cx-pos[b].cx));
   Object.keys(inMap).forEach(c=>inMap[c].sort((a,b)=>pos[a].cx-pos[b].cx));
 
-  const SPAN=Math.min(NW-30,90); // horizontal spread of connection points
+  const SPAN=Math.min(NW-24,80);
   const slotX=(node,idx,n)=> n<=1 ? node.cx : node.cx-SPAN/2+SPAN*(idx/(n-1));
-
-  // Orthogonal (right-angle) connector with softly-rounded corners, routed
-  // through a horizontal channel midway between the two layers — the classic
-  // course-map / flowchart look.
-  function orthPath(x1,y1,x2,y2){
-    if(Math.abs(x2-x1)<1) return `M${x1.toFixed(1)},${y1.toFixed(1)} L${x2.toFixed(1)},${y2.toFixed(1)}`;
-    const cy=(y1+y2)/2, dir=x2>x1?1:-1;
-    const r=Math.max(0,Math.min(10,Math.abs(x2-x1)/2,cy-y1,y2-cy));
-    return `M${x1.toFixed(1)},${y1.toFixed(1)} `+
-      `L${x1.toFixed(1)},${(cy-r).toFixed(1)} `+
-      `Q${x1.toFixed(1)},${cy.toFixed(1)} ${(x1+dir*r).toFixed(1)},${cy.toFixed(1)} `+
-      `L${(x2-dir*r).toFixed(1)},${cy.toFixed(1)} `+
-      `Q${x2.toFixed(1)},${cy.toFixed(1)} ${x2.toFixed(1)},${(cy+r).toFixed(1)} `+
-      `L${x2.toFixed(1)},${y2.toFixed(1)}`;
-  }
 
   sheetCourses.forEach(child=>{
     const pC=pos[child.code];if(!pC)return;
@@ -960,9 +988,11 @@ function renderTree(){
       const outs=outMap[pcode];
       const x1=slotX(pP,outs.indexOf(child.code),outs.length), y1=pP.bot;
       const x2=slotX(pC,ci,ins.length), y2=pC.top-2;
-      svgH+=`<path d="${orthPath(x1,y1,x2,y2)}"
-        fill="none" stroke="${col}" stroke-width="2.2" stroke-opacity=".8"
-        stroke-linejoin="round" stroke-linecap="round" marker-end="url(#${mid})"/>`;
+      const dy=y2-y1;
+      const cy1=y1+dy*0.38, cy2=y2-dy*0.38;
+      svgH+=`<path d="M${x1.toFixed(1)},${y1.toFixed(1)} C${x1.toFixed(1)},${cy1.toFixed(1)} ${x2.toFixed(1)},${cy2.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}"
+        fill="none" stroke="${col}" stroke-width="1.8" stroke-opacity=".6"
+        stroke-linecap="round" marker-end="url(#${mid})"/>`;
     });
   });
   svg.innerHTML=svgH;

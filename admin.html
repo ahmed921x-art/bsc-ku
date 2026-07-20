@@ -410,6 +410,7 @@ a{color:inherit;text-decoration:none}
       <div class="sidebar-label">التخصصات</div>
       <button class="nav-item" data-panel="majorsheet"><span class="ni">🗺️</span>الميجرشيت</button>
       <button class="nav-item" data-panel="supportsheet"><span class="ni">🎓</span>صحيفة المساند</button>
+      <button class="nav-item" data-panel="gradcalc"><span class="ni">📊</span>حاسبة التخرج</button>
       <button class="nav-item" data-panel="advisors"><span class="ni">👨‍🏫</span>المرشدون</button>
       <button class="nav-item" data-panel="committee"><span class="ni">📅</span>لجنة الجداول</button>
       <button class="nav-item" data-panel="resources"><span class="ni">📁</span>ملفات التخصصات</button>
@@ -849,6 +850,72 @@ a{color:inherit;text-decoration:none}
           </div>
           <div class="btn-row" style="margin-top:1rem">
             <button class="btn btn-green" id="saveSupportSheet2">💾 حفظ التعديلات</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRADUATION CALC -->
+      <div class="panel" id="panel-gradcalc">
+        <div class="panel-header"><h2>📊 حاسبة التخرج</h2><p>عدّل مواد وإعدادات التخرج لكل تخصص — تظهر في ميزة "إنجاز التخرج" بصفحة الخدمات</p></div>
+        <div class="card">
+          <h3>اختر التخصص</h3>
+          <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.25rem" id="gcMajorBtns"></div>
+        </div>
+        <div id="gcEditor" style="display:none">
+          <!-- SETTINGS -->
+          <div class="card">
+            <h3>⚙️ إعدادات التخصص <span id="gcMajorName" style="color:var(--ink);font-size:.85rem;margin-right:.5rem"></span></h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>إجمالي وحدات التخرج المطلوبة</label>
+                <input type="number" id="gcTotalUnits" placeholder="130" min="100" max="200" value="130">
+              </div>
+              <div class="form-group">
+                <label>وحدات المتطلبات الجامعية</label>
+                <input type="number" id="gcUnivUnits" placeholder="24" min="0" max="50" value="24">
+              </div>
+              <div class="form-group">
+                <label>وحدات متطلبات القسم المشتركة</label>
+                <input type="number" id="gcDeptUnits" placeholder="37" min="0" max="60" value="37">
+              </div>
+              <div class="form-group">
+                <label>وحدات التخصص المساند</label>
+                <input type="number" id="gcMinorUnits" placeholder="24" min="0" max="40" value="24">
+              </div>
+            </div>
+          </div>
+
+          <!-- COURSES -->
+          <div class="card">
+            <h3>📋 مواد التخرج</h3>
+            <div style="display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap">
+              <button class="btn btn-green" onclick="gcAddCourse()">+ إضافة مادة</button>
+              <button class="btn btn-ghost" onclick="gcAddBulk()">📥 إضافة دفعة مواد</button>
+              <button class="btn btn-primary" onclick="gcSave()">💾 حفظ الكل</button>
+              <span id="gcStatus" style="font-size:.82rem;color:var(--muted);display:flex;align-items:center"></span>
+            </div>
+            <!-- Type filter -->
+            <div style="display:flex;gap:.35rem;margin-bottom:.75rem;flex-wrap:wrap" id="gcFilterBtns">
+              <button onclick="gcSetFilter('all')" class="btn btn-ghost" style="padding:.3rem .75rem;font-size:.75rem" id="gcf-all">الكل</button>
+              <button onclick="gcSetFilter('required')" class="btn btn-ghost" style="padding:.3rem .75rem;font-size:.75rem">جامعة</button>
+              <button onclick="gcSetFilter('dept')" class="btn btn-ghost" style="padding:.3rem .75rem;font-size:.75rem">قسم</button>
+              <button onclick="gcSetFilter('major')" class="btn btn-ghost" style="padding:.3rem .75rem;font-size:.75rem">تخصص</button>
+              <button onclick="gcSetFilter('elective')" class="btn btn-ghost" style="padding:.3rem .75rem;font-size:.75rem">اختياري</button>
+              <button onclick="gcSetFilter('support')" class="btn btn-ghost" style="padding:.3rem .75rem;font-size:.75rem">مساند</button>
+            </div>
+            <div style="display:grid;grid-template-columns:100px 1fr 70px 110px 36px;gap:.5rem;padding:0 4px;margin-bottom:.5rem">
+              <span style="font-size:.7rem;font-weight:700;color:var(--muted)">الرمز</span>
+              <span style="font-size:.7rem;font-weight:700;color:var(--muted)">اسم المادة</span>
+              <span style="font-size:.7rem;font-weight:700;color:var(--muted)">الساعات</span>
+              <span style="font-size:.7rem;font-weight:700;color:var(--muted)">النوع</span>
+              <span></span>
+            </div>
+            <div id="gcCourseList" style="display:flex;flex-direction:column;gap:.4rem;max-height:60vh;overflow-y:auto"></div>
+            <div style="margin-top:1rem;padding:.75rem 1rem;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:10px;display:flex;gap:1.5rem;flex-wrap:wrap">
+              <span style="font-size:.85rem;color:var(--muted)">إجمالي المواد: <strong style="color:#a5b4fc" id="gcTotalCourses">0</strong></span>
+              <span style="font-size:.85rem;color:var(--muted)">إجمالي الساعات: <strong style="color:#6ee7b7" id="gcTotalHours">0</strong></span>
+              <span style="font-size:.85rem;color:var(--muted)">وحدات التخرج: <strong style="color:#fcd34d" id="gcGradUnits">130</strong></span>
+            </div>
           </div>
         </div>
       </div>
@@ -2355,7 +2422,111 @@ function renderSupportCourses(){
 // reload support courses when panel opens
 document.addEventListener('click',e=>{
   if(e.target.closest('[data-panel="supportsheet"]'))setTimeout(()=>loadSupportCourses(currentSupportMajor),100);
+  if(e.target.closest('[data-panel="gradcalc"]'))setTimeout(gcInit,100);
 });
+
+// ── GRADUATION CALC ADMIN ──
+const GC_MAJORS={molecular:"البيولوجيا الجزيئية",micro:"الميكروبيولوجيا",plant:"بيولوجيا النبات",animal:"بيولوجيا الحيوان",biochem:"الكيمياء الحيوية"};
+const GC_TYPES={required:"إلزامي جامعة",dept:"قسم مشترك",major:"تخصص",elective:"اختياري",support:"مساند"};
+let gcMajor=null,gcCourses=[],gcFilter="all",gcSettings={totalUnits:130,univUnits:24,deptUnits:37,minorUnits:24};
+
+function gcInit(){
+  const wrap=document.getElementById("gcMajorBtns");
+  if(!wrap||wrap.children.length)return;
+  wrap.innerHTML=Object.entries(GC_MAJORS).map(([k,v])=>`<button class="btn btn-ghost" onclick="gcSelectMajor('${k}')">${v}</button>`).join("");
+}
+
+window.gcSelectMajor=async function(key){
+  gcMajor=key;
+  document.querySelectorAll("#gcMajorBtns .btn").forEach(b=>{
+    const isActive=b.textContent===GC_MAJORS[key];
+    b.className="btn "+(isActive?"btn-primary":"btn-ghost");
+  });
+  document.getElementById("gcMajorName").textContent=GC_MAJORS[key];
+  document.getElementById("gcEditor").style.display="block";
+  document.getElementById("gcStatus").textContent="⏳ جاري التحميل...";
+  try{
+    const d=await getDoc(doc(db,"gradCourses",key));
+    if(d.exists()){
+      const data=d.data();
+      gcCourses=data.courses||[];
+      gcSettings={totalUnits:data.totalUnits||130,univUnits:data.univUnits||24,deptUnits:data.deptUnits||37,minorUnits:data.minorUnits||24};
+    }else{gcCourses=[];gcSettings={totalUnits:130,univUnits:24,deptUnits:37,minorUnits:24};}
+  }catch{gcCourses=[];gcSettings={totalUnits:130,univUnits:24,deptUnits:37,minorUnits:24};}
+  document.getElementById("gcTotalUnits").value=gcSettings.totalUnits;
+  document.getElementById("gcUnivUnits").value=gcSettings.univUnits;
+  document.getElementById("gcDeptUnits").value=gcSettings.deptUnits;
+  document.getElementById("gcMinorUnits").value=gcSettings.minorUnits;
+  document.getElementById("gcStatus").textContent="";
+  gcFilter="all";
+  gcRender();
+};
+
+window.gcSetFilter=function(f){
+  gcFilter=f;
+  document.querySelectorAll("#gcFilterBtns .btn").forEach(b=>b.className="btn btn-ghost");
+  event.target.className="btn btn-primary";
+  gcRender();
+};
+
+function gcRender(){
+  const list=document.getElementById("gcCourseList");
+  const typeOpts=Object.entries(GC_TYPES).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
+  const filtered=gcFilter==="all"?gcCourses:gcCourses.filter(c=>c.type===gcFilter);
+  const typeBG={required:"rgba(99,102,241,.06)",dept:"rgba(59,130,246,.06)",major:"rgba(245,158,11,.06)",elective:"rgba(139,92,246,.06)",support:"rgba(239,68,68,.06)"};
+  list.innerHTML=filtered.map(c=>{
+    const ri=gcCourses.indexOf(c);
+    const bg=typeBG[c.type]||"rgba(255,255,255,.03)";
+    return`<div style="display:grid;grid-template-columns:100px 1fr 70px 110px 36px;gap:.5rem;align-items:center;padding:.4rem;background:${bg};border:1px solid var(--border);border-radius:8px">
+    <input value="${c.code||''}" onchange="gcUpd(${ri},'code',this.value)" placeholder="الرمز" style="padding:.5rem .6rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.8rem;font-family:'Tajawal',system-ui">
+    <input value="${(c.nameAr||'').replace(/"/g,'&quot;')}" onchange="gcUpd(${ri},'nameAr',this.value)" placeholder="اسم المادة" style="padding:.5rem .6rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.8rem;font-family:'Tajawal',system-ui">
+    <input type="number" value="${c.hours||3}" onchange="gcUpd(${ri},'hours',+this.value)" min="1" max="9" style="padding:.5rem .4rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.8rem;text-align:center;font-family:'Tajawal',system-ui">
+    <select onchange="gcUpd(${ri},'type',this.value)" style="padding:.5rem .4rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.78rem;font-family:'Tajawal',system-ui">${typeOpts.replace(`value="${c.type||'major'}"`,`value="${c.type||'major'}" selected`)}</select>
+    <button onclick="gcDel(${ri})" style="width:32px;height:32px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:6px;color:#f87171;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center">×</button>
+  </div>`}).join("");
+  document.getElementById("gcTotalCourses").textContent=gcCourses.length;
+  const totalHrs=gcCourses.reduce((s,c)=>s+(c.hours||0),0);
+  document.getElementById("gcTotalHours").textContent=totalHrs;
+  document.getElementById("gcGradUnits").textContent=document.getElementById("gcTotalUnits").value||130;
+}
+
+window.gcUpd=function(i,field,val){gcCourses[i][field]=val;};
+window.gcDel=function(i){if(!confirm("حذف هذه المادة؟"))return;gcCourses.splice(i,1);gcRender();};
+window.gcAddCourse=function(){gcCourses.push({code:"",nameAr:"",hours:3,type:"major"});gcRender();
+  setTimeout(()=>{const list=document.getElementById("gcCourseList");list.scrollTop=list.scrollHeight;},50);
+};
+
+window.gcAddBulk=function(){
+  const text=prompt("الصق المواد (سطر لكل مادة بالصيغة: الرمز | اسم المادة | الساعات | النوع)\nمثال:\n0493-200 | التركيب والوظيفة | 3 | major\n0493-205 | التنوع الحيواني | 3 | major");
+  if(!text)return;
+  text.split("\n").forEach(line=>{
+    const parts=line.split("|").map(s=>s.trim());
+    if(parts.length>=2){
+      gcCourses.push({code:parts[0]||"",nameAr:parts[1]||"",hours:parseInt(parts[2])||3,type:parts[3]||"major"});
+    }
+  });
+  gcRender();
+};
+
+window.gcSave=async function(){
+  if(!gcMajor)return;
+  const status=document.getElementById("gcStatus");
+  status.textContent="⏳ جاري الحفظ...";status.style.color="#f59e0b";
+  try{
+    await setDoc(doc(db,"gradCourses",gcMajor),{
+      courses:gcCourses,
+      totalUnits:parseInt(document.getElementById("gcTotalUnits").value)||130,
+      univUnits:parseInt(document.getElementById("gcUnivUnits").value)||24,
+      deptUnits:parseInt(document.getElementById("gcDeptUnits").value)||37,
+      minorUnits:parseInt(document.getElementById("gcMinorUnits").value)||24,
+      updatedAt:serverTimestamp()
+    });
+    status.textContent="✅ تم الحفظ!";status.style.color="#6ee7b7";
+    setTimeout(()=>{status.textContent="";},3000);
+  }catch(e){
+    status.textContent="❌ خطأ: "+e.message;status.style.color="#f87171";
+  }
+};
 
 // ── PHOTO UPLOAD (Base64) ──
 (function(){
