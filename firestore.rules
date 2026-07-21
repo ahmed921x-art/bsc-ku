@@ -1,18 +1,18 @@
 rules_version = '2';
 
-// ════════════════════════════════════════════════════════════════
-//  BSC KU — Firestore Security Rules
-//  انسخ محتوى هذا الملف إلى:
-//  Firebase Console → Firestore Database → Rules → Publish
+// ====================================================================
+//  BSC KU - Firestore Security Rules
+//  Paste this file's content into:
+//  Firebase Console -> Firestore Database -> Rules -> Publish
 //
-//  ⚠️ مهم: جرّب القواعد في "Rules Playground" قبل النشر،
-//     لأن أي خطأ هنا قد يعطّل قراءة/كتابة الموقع المباشر.
-// ════════════════════════════════════════════════════════════════
+//  Important: try the rules in "Rules Playground" before publishing,
+//  since a mistake here can break the live site's read/write access.
+// ====================================================================
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // قائمة إيميلات الأدمن (نفس القائمة الموجودة في admin.html)
+    // Admin email allowlist (same list used in admin.html)
     function isAdmin() {
       return request.auth != null &&
         request.auth.token.email in [
@@ -23,7 +23,7 @@ service cloud.firestore {
         ];
     }
 
-    // ── المحتوى العام: يقرأه الجميع، يكتبه الأدمن فقط ──
+    // Public content: readable by everyone, writable by admins only.
     // events, notes, advisors, announcements, news, studentGuide,
     // majorSheets, supportSheets, teamMembers, majorResources,
     // aiKnowledge, schedules
@@ -41,41 +41,41 @@ service cloud.firestore {
     match /aiKnowledge/{id}   { allow read: if true; allow write: if isAdmin(); }
     match /schedules/{id}     { allow read: if true; allow write: if isAdmin(); }
 
-    // ── محتوى ينشئه المستخدم (بدون تسجيل دخول) ──
+    // User-generated content (no login required to create).
 
-    // سجل محادثات المساعد الذكي: أي زائر يقدر يضيف، والأدمن فقط يقرأ/يحذف.
+    // AI assistant chat log: any visitor can add one, admin reads/deletes.
     match /aiChats/{id} {
       allow create: if true;
       allow read, update, delete: if isAdmin();
     }
 
-    // اقتراحات تعديل المواد: إنشاء للجميع، قراءة/حذف للأدمن.
+    // Course-catalog edit suggestions: create for everyone, admin reviews.
     match /suggestions/{id} {
       allow create: if true;
       allow read, update, delete: if isAdmin();
     }
 
-    // نوتات يرسلها الزوار من صفحة المراجعات لمراجعة الأدمن قبل نشرها في notes/.
+    // Notes submitted by visitors, pending admin review before publishing to notes/.
     match /noteSubmissions/{id} {
       allow create: if true;
       allow read, update, delete: if isAdmin();
     }
 
-    // تقييمات المواد: إنشاء وقراءة للجميع (الموقع يعرض المعتمدة "approved" فقط بالواجهة)،
-    // تحديث الحالة (قبول/رفض) وحذف للأدمن فقط.
+    // Course ratings: create + read for everyone (the site only renders
+    // status=="approved" ones client-side), status changes + delete admin-only.
     match /courseRatings/{id} {
       allow create: if true;
       allow read: if true;
       allow update, delete: if isAdmin();
     }
 
-    // حفظ بيانات حاسبة المعدل (لكل جهاز عبر deviceId) — لا تحتوي بيانات حساسة.
+    // GPA calculator save data (per-device via deviceId) - no sensitive data.
     match /gpaData/{deviceId} {
       allow read, write: if true;
     }
 
-    // عدّاد الزيارات: أي زائر يقدر يزيد العدّاد +1 فقط (ما يقدر يكتب رقم عشوائي).
-    // siteStats/total = الإجمالي ، dailyVisits/{YYYY-MM-DD} = زيارات اليوم.
+    // Visit counters: any visitor can bump the count by exactly +1.
+    // siteStats/total = all-time total, dailyVisits/{YYYY-MM-DD} = today's count.
     match /siteStats/{id} {
       allow read: if true;
       allow create: if request.resource.data.count == 1;
@@ -87,7 +87,7 @@ service cloud.firestore {
       allow update: if request.resource.data.count == resource.data.count + 1;
     }
 
-    // ── أي شيء آخر: ممنوع افتراضياً ──
+    // Everything else: denied by default.
     match /{document=**} {
       allow read, write: if false;
     }
