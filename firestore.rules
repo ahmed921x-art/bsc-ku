@@ -1,13 +1,7 @@
 rules_version = '2';
 
-// ====================================================================
-//  BSC KU - Firestore Security Rules
-//  Paste this file's content into:
-//  Firebase Console -> Firestore Database -> Rules -> Publish
-//
-//  Important: try the rules in "Rules Playground" before publishing,
-//  since a mistake here can break the live site's read/write access.
-// ====================================================================
+// BSC KU Firestore Security Rules
+// Paste into Firebase Console, Firestore Database, Rules, Publish.
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -82,39 +76,38 @@ service cloud.firestore {
 
     // User-generated content (no login required to create).
 
-    // AI assistant chat log: any visitor can add one, admin reads/deletes.
+    // AI chat log: anyone can add, admin reads/deletes.
     match /aiChats/{id} {
       allow create: if true;
       allow read, update, delete: if isAdmin();
     }
 
-    // Course-catalog edit suggestions: create for everyone, admin reviews.
+    // Course suggestions: create for everyone, admin reviews.
     match /suggestions/{id} {
       allow create: if true;
       allow read, update, delete: if isAdmin();
     }
 
-    // Notes submitted by visitors, pending admin review before publishing to notes/.
+    // Visitor note uploads, pending admin review.
     match /noteSubmissions/{id} {
       allow create: if true;
       allow read, update, delete: if isAdmin();
     }
 
-    // Course ratings: create + read for everyone (the site only renders
-    // status=="approved" ones client-side), status changes + delete admin-only.
+    // Course ratings: create + read for everyone.
+    // Site only shows approved ones. Status change/delete is admin-only.
     match /courseRatings/{id} {
       allow create: if true;
       allow read: if true;
       allow update, delete: if isAdmin();
     }
 
-    // GPA calculator save data (per-device via deviceId) - no sensitive data.
+    // GPA calculator save data, keyed by device id.
     match /gpaData/{deviceId} {
       allow read, write: if true;
     }
 
-    // Visit counters: any visitor can bump the count by exactly +1.
-    // siteStats/total = all-time total, dailyVisits/{YYYY-MM-DD} = today's count.
+    // Visit counters, bumped by exactly +1 per visit.
     match /siteStats/{id} {
       allow read: if true;
       allow create: if request.resource.data.count == 1;
