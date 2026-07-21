@@ -78,10 +78,10 @@ a{color:inherit;text-decoration:none}
 .prev-field label{font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.05em}
 .prev-field input{padding:.7rem 1rem;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.95rem;outline:none;transition:border-color .25s;width:100%}
 .prev-field input:focus{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.06)}
-.col-headers2{display:grid;grid-template-columns:1fr 100px 130px 160px 36px;gap:.6rem;padding:0 4px;margin-bottom:.5rem}
+.col-headers2{display:grid;grid-template-columns:1fr 100px 160px 130px 36px;gap:.6rem;padding:0 4px;margin-bottom:.5rem}
 .col-headers2 span{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
 .courses-list2{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1rem}
-.course-row2{display:grid;grid-template-columns:1fr 100px 130px 160px 36px;gap:.6rem;align-items:center;padding:.5rem;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;transition:border-color .2s}
+.course-row2{display:grid;grid-template-columns:1fr 100px 160px 130px 36px;gap:.6rem;align-items:center;padding:.5rem;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;transition:border-color .2s}
 .course-row2:hover{border-color:rgba(99,102,241,.25)}
 .course-row2 input,.course-row2 select{padding:.6rem .85rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.85rem;outline:none;transition:border-color .2s;width:100%}
 .course-row2 input:focus,.course-row2 select:focus{border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.05)}
@@ -566,7 +566,7 @@ a{color:inherit;text-decoration:none}
 
       <!-- COURSES -->
       <div class="col-headers2">
-        <span>اسم المادة</span><span>الوحدات</span><span>الدرجة</span><span>درجة قبل الإعادة</span><span></span>
+        <span>اسم المادة</span><span>الوحدات</span><span>قبل الإعادة</span><span>بعد الإعادة</span><span></span>
       </div>
       <div class="courses-list2" id="coursesList2"></div>
       <div class="gpa-actions2">
@@ -899,8 +899,12 @@ function saveState(){
   const rows=document.querySelectorAll(".course-row2");
   const courses=[];
   rows.forEach(r=>{
-    const inputs=r.querySelectorAll("input,select");
-    courses.push({name:inputs[0].value,hrs:inputs[1].value,grade:inputs[2].value,prevGrade:inputs[3].value});
+    courses.push({
+      name:r.querySelector(".course-name").value,
+      hrs:r.querySelector(".course-hrs").value,
+      grade:r.querySelector(".course-grade").value,
+      prevGrade:r.querySelector(".course-prevgrade").value
+    });
   });
   semesters[activeSem].courses=courses;
   semesters[activeSem].prevHours=document.getElementById("prevHours").value;
@@ -1038,10 +1042,10 @@ function addCourse2(name="",hrs=3,grade="A",prevGrade="غير معادة"){
   const row=document.createElement("div");
   row.className="course-row2";row.id=id;
   row.innerHTML=`
-    <input type="text" placeholder="اسم المادة (اختياري)" value="${name}">
-    <input type="number" value="${hrs}" min="1" max="6" step="1" oninput="calcAll()">
-    <select onchange="calcAll()">${gradeOpts}</select>
-    <select onchange="calcAll()">${prevOpts}</select>
+    <input class="course-name" type="text" placeholder="اسم المادة (اختياري)" value="${name}">
+    <input class="course-hrs" type="number" value="${hrs}" min="1" max="6" step="1" oninput="calcAll()">
+    <select class="course-prevgrade" onchange="calcAll()">${prevOpts}</select>
+    <select class="course-grade" onchange="calcAll()">${gradeOpts}</select>
     <button class="del-btn" onclick="document.getElementById('${id}').remove();calcAll()">×</button>`;
   document.getElementById("coursesList2").appendChild(row);
   calcAll();
@@ -1051,23 +1055,34 @@ function calcAll(){
   saveState();
   const rows=document.querySelectorAll(".course-row2");
   let totalPts=0,totalHrs=0;
+  let retakeHrs=0,retakeOldPts=0; // hours & old-grade points of repeated courses — already counted once in prevHours/prevGPA
   rows.forEach(r=>{
-    const sel=r.querySelectorAll("select");
-    const hrs=parseFloat(r.querySelectorAll("input")[1].value)||0;
-    const g=sel[0].value;
-    const prev=sel[1].value;
+    const hrs=parseFloat(r.querySelector(".course-hrs").value)||0;
+    const g=r.querySelector(".course-grade").value;
+    const prev=r.querySelector(".course-prevgrade").value;
     let pts=GRADES[g]||0;
     // If repeated course (prevGrade set), only count if new grade is better
     if(prev&&prev!=="غير معادة"&&GRADES[prev]!==null){
       pts=Math.max(GRADES[g]||0,GRADES[prev]||0);
+      retakeHrs+=hrs;
+      retakeOldPts+=(GRADES[prev]||0)*hrs;
     }
     totalPts+=pts*hrs;totalHrs+=hrs;
   });
   const semGPA=totalHrs>0?(totalPts/totalHrs):0;
   const prevH=parseFloat(document.getElementById("prevHours").value)||0;
   const prevG=parseFloat(document.getElementById("prevGPA").value)||0;
-  const totalH=prevH+totalHrs;
-  const cumGPA=totalH>0?((prevG*prevH+semGPA*totalHrs)/totalH):semGPA;
+  // Repeated courses' hours/points are already inside prevHours/prevGPA from their first attempt —
+  // subtract that old contribution so it isn't double-counted, then merge in this semester's totals.
+  let totalH,cumGPA;
+  if(prevH>0){
+    totalH=prevH+totalHrs-retakeHrs;
+    const cumPts=prevG*prevH-retakeOldPts+totalPts;
+    cumGPA=totalH>0?(cumPts/totalH):semGPA;
+  }else{
+    totalH=totalHrs;
+    cumGPA=semGPA;
+  }
   document.getElementById("curHours").textContent=totalHrs;
   document.getElementById("curPoints").textContent=totalPts.toFixed(2);
   document.getElementById("semGPA").textContent=semGPA.toFixed(2);
