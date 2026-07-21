@@ -27,19 +27,58 @@ service cloud.firestore {
     // events, notes, advisors, announcements, news, studentGuide,
     // majorSheets, supportSheets, teamMembers, majorResources,
     // aiKnowledge, schedules
-    match /events/{id}        { allow read: if true; allow write: if isAdmin(); }
-    match /notes/{id}         { allow read: if true; allow write: if isAdmin(); }
-    match /advisors/{id}      { allow read: if true; allow write: if isAdmin(); }
-    match /scheduleCommittee/{id} { allow read: if true; allow write: if isAdmin(); }
-    match /announcements/{id} { allow read: if true; allow write: if isAdmin(); }
-    match /news/{id}          { allow read: if true; allow write: if isAdmin(); }
-    match /studentGuide/{id}  { allow read: if true; allow write: if isAdmin(); }
-    match /majorSheets/{id}   { allow read: if true; allow write: if isAdmin(); }
-    match /supportSheets/{id} { allow read: if true; allow write: if isAdmin(); }
-    match /teamMembers/{id}   { allow read: if true; allow write: if isAdmin(); }
-    match /majorResources/{id}{ allow read: if true; allow write: if isAdmin(); }
-    match /aiKnowledge/{id}   { allow read: if true; allow write: if isAdmin(); }
-    match /schedules/{id}     { allow read: if true; allow write: if isAdmin(); }
+    match /events/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /notes/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /advisors/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /scheduleCommittee/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /announcements/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /news/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /studentGuide/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /majorSheets/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /supportSheets/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /teamMembers/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /majorResources/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /aiKnowledge/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /schedules/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
 
     // User-generated content (no login required to create).
 
