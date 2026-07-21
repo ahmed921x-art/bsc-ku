@@ -121,6 +121,30 @@ a{color:inherit;text-decoration:none}
 .col-headers{display:grid;grid-template-columns:1fr 140px 140px 40px;gap:.75rem;margin-bottom:.5rem;padding:0 2px}
 .col-headers span{font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 
+/* ====== RATINGS ====== */
+.rate-search-wrap{position:relative}
+.rate-search-input{width:100%;padding:.85rem 1.1rem;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.92rem;outline:none;transition:border-color .25s}
+.rate-search-input:focus{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.06)}
+.rate-sug{position:absolute;top:calc(100% + 6px);right:0;left:0;background:#161616;border:1px solid var(--border2);border-radius:12px;max-height:280px;overflow-y:auto;z-index:20;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.rate-sug-item{padding:.7rem 1rem;font-size:.85rem;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);transition:background .15s}
+.rate-sug-item:last-child{border-bottom:none}
+.rate-sug-item:hover{background:rgba(99,102,241,.12)}
+.rate-sug-code{display:inline-block;font-weight:800;color:#a5b4fc;margin-inline-end:.5rem}
+.star-picker{display:flex;gap:.35rem;font-size:1.8rem;line-height:1;cursor:pointer}
+.star-picker span{color:rgba(255,255,255,.15);transition:color .15s,transform .15s}
+.star-picker span.on{color:#fbbf24}
+.star-picker span:hover{transform:scale(1.15)}
+.rating-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:1.25rem 1.4rem}
+.rating-card-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.5rem}
+.rating-card-title{font-weight:800;font-size:.95rem}
+.rating-card-code{color:#a5b4fc;font-weight:800;margin-inline-end:.4rem}
+.rating-stars{color:#fbbf24;font-size:.95rem;white-space:nowrap}
+.rating-count{font-size:.75rem;color:var(--muted)}
+.rating-comments{margin-top:.6rem;display:flex;flex-direction:column;gap:.5rem}
+.rating-comment{font-size:.82rem;color:var(--muted);background:rgba(255,255,255,.03);border-radius:8px;padding:.55rem .8rem;line-height:1.6}
+.rating-comment .rc-stars{color:#fbbf24;margin-inline-end:.4rem;font-size:.78rem}
+.ratings-empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
+
 /* ====== NEWS ====== */
 .news-grid{display:flex;flex-direction:column;gap:1rem}
 .news-card{background:rgba(22,22,22,.75);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;display:flex;gap:1.25rem;align-items:flex-start;transition:all .4s var(--ease);position:relative;overflow:hidden;animation:fu .6s ease both}
@@ -538,6 +562,7 @@ a{color:inherit;text-decoration:none}
     <button class="stab" onclick="switchTab('sched')" data-ar="📅 الجداول المقترحة" data-en="📅 Suggested Schedules">📅 الجداول المقترحة</button>
     <button class="stab" onclick="switchTab('guide')" data-ar="📖 دليل الطالب" data-en="📖 Student Guide">📖 دليل الطالب</button>
     <button class="stab" onclick="switchTab('grad')" data-ar="🎓 إنجاز التخرج" data-en="🎓 Graduation Progress">🎓 إنجاز التخرج</button>
+    <button class="stab" onclick="switchTab('ratings')" data-ar="⭐ تقييم المواد" data-en="⭐ Rate Courses">⭐ تقييم المواد</button>
   </div>
 
   <!-- ===== GPA ===== -->
@@ -776,6 +801,41 @@ a{color:inherit;text-decoration:none}
     <div class="sched-grid" id="guideGrid"></div>
   </div>
 
+  <!-- ===== COURSE RATINGS ===== -->
+  <div class="service-panel" id="panel-ratings">
+    <div class="section-label" data-ar="تقييم المواد" data-en="Rate Courses">تقييم المواد</div>
+    <div class="section-h2" data-ar="قيّم المواد وشوف تقييمات زملائك" data-en="Rate courses & see your peers' ratings">قيّم المواد وشوف تقييمات زملائك</div>
+
+    <div class="gpa-wrap reveal" style="max-width:760px">
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:1.25rem" data-ar="التقييم على المادة نفسها فقط (بدون ذكر أسماء الدكاترة) — يمر على مراجعة النادي قبل ما يُنشر." data-en="Ratings are about the course itself only (no instructor names) — reviewed by the club before publishing.">التقييم على المادة نفسها فقط (بدون ذكر أسماء الدكاترة) — يمر على مراجعة النادي قبل ما يُنشر.</p>
+
+      <div class="rate-search-wrap">
+        <input class="rate-search-input" id="rateSearch" placeholder="🔍 ابحث عن المادة اللي تبي تقيّمها..." autocomplete="off">
+        <div class="rate-sug" id="rateSug" style="display:none"></div>
+      </div>
+
+      <div id="rateForm" style="display:none;margin-top:1.25rem">
+        <div id="rateSelectedCourse" style="font-weight:800;margin-bottom:.75rem"></div>
+        <div class="star-picker" id="starPicker">
+          <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+        </div>
+        <textarea id="rateComment" placeholder="رأيك بالمادة (اختياري) — صعوبة، حمل المادة، نصايح..." style="width:100%;min-height:80px;margin-top:.9rem;padding:.75rem 1rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.88rem;resize:vertical"></textarea>
+        <div style="display:flex;gap:.75rem;margin-top:.9rem;flex-wrap:wrap">
+          <button class="btn-calc" onclick="submitRating()">📤 إرسال التقييم</button>
+          <button class="btn-reset" onclick="cancelRating()">إلغاء</button>
+        </div>
+        <div id="rateMsg" style="margin-top:.6rem;font-size:.82rem;min-height:1.2em"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:2.5rem">
+      <div class="section-label" data-ar="تقييمات الطلبة" data-en="Student Ratings">تقييمات الطلبة</div>
+      <div class="section-h2" style="font-size:1.2rem" data-ar="تصفّح تقييمات المواد" data-en="Browse course ratings">تصفّح تقييمات المواد</div>
+      <input class="rate-search-input" id="rateBrowseFilter" placeholder="🔍 فلترة حسب اسم أو رمز المادة..." autocomplete="off" style="margin-bottom:1.25rem;max-width:420px">
+      <div id="ratingsBrowseList" style="display:grid;gap:1rem"></div>
+    </div>
+  </div>
+
 </main>
 
 <footer class="footer">
@@ -803,7 +863,7 @@ a{color:inherit;text-decoration:none}
 <script type="module" src="urgent-ann.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, orderBy, doc, getDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"});
 const db=getFirestore(app);
 const months=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
@@ -855,12 +915,158 @@ function fmtDate(ts){if(!ts)return{d:"—",m:""};const dt=ts.toDate?ts.toDate():
     if(typeof renderGuide==="function")renderGuide("all");
   }catch(e){console.warn("guide load:",e);}
 })();
+
+// ===== COURSE RATINGS =====
+(function(){
+  const escR=s=>(s==null?"":String(s)).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+  let allCourses=[];    // flattened, deduped catalog across all majors
+  let sugMap={};
+  let selectedCourse=null;
+  let selectedStars=0;
+  let allRatings=[];    // approved ratings only, cached for the browse filter
+
+  async function loadCatalog(){
+    const majors=["molecular","micro","plant","animal","biochem"];
+    const seen=new Set();
+    for(const m of majors){
+      try{
+        const snap=await getDoc(doc(db,"majorSheets",m));
+        if(!snap.exists())continue;
+        (snap.data().courses||[]).forEach(c=>{
+          if(!c.code||seen.has(c.code))return;
+          seen.add(c.code);
+          allCourses.push({code:c.code,nameAr:c.nameAr||"",nameEn:c.nameEn||""});
+        });
+      }catch(e){}
+    }
+  }
+
+  function setupRateSearch(){
+    const inp=document.getElementById("rateSearch");
+    const sug=document.getElementById("rateSug");
+    if(!inp||!sug)return;
+    inp.addEventListener("input",()=>{
+      const q=inp.value.trim().toLowerCase();
+      if(!q||!allCourses.length){sug.style.display="none";return}
+      const matches=allCourses.filter(c=>`${c.code} ${c.nameAr} ${c.nameEn}`.toLowerCase().includes(q)).slice(0,8);
+      if(!matches.length){sug.style.display="none";return}
+      sugMap={};matches.forEach((c,i)=>sugMap[i]=c);
+      sug.innerHTML=matches.map((c,i)=>`<div class="rate-sug-item" onclick="window._selectRatingCourse(${i})"><span class="rate-sug-code">${escR(c.code)}</span>${escR(c.nameAr)}${c.nameEn?" — "+escR(c.nameEn):""}</div>`).join("");
+      sug.style.display="block";
+    });
+    document.addEventListener("click",e=>{if(!sug.contains(e.target)&&e.target!==inp)sug.style.display="none"});
+  }
+
+  function paintStars(){
+    document.querySelectorAll("#starPicker span").forEach(s=>{
+      s.classList.toggle("on",+s.dataset.v<=selectedStars);
+    });
+  }
+  function setupStarPicker(){
+    const picker=document.getElementById("starPicker");
+    if(!picker)return;
+    picker.querySelectorAll("span").forEach(s=>{
+      s.addEventListener("click",()=>{selectedStars=+s.dataset.v;paintStars();});
+    });
+  }
+
+  window._selectRatingCourse=function(i){
+    selectedCourse=sugMap[i];
+    if(!selectedCourse)return;
+    document.getElementById("rateSelectedCourse").textContent=`${selectedCourse.code} — ${selectedCourse.nameAr}`;
+    document.getElementById("rateForm").style.display="block";
+    document.getElementById("rateSearch").value="";
+    document.getElementById("rateSug").style.display="none";
+    selectedStars=0;paintStars();
+    document.getElementById("rateComment").value="";
+    document.getElementById("rateMsg").textContent="";
+  };
+
+  window.cancelRating=function(){
+    selectedCourse=null;
+    document.getElementById("rateForm").style.display="none";
+  };
+
+  window.submitRating=async function(){
+    const msg=document.getElementById("rateMsg");
+    if(!selectedCourse)return;
+    if(!selectedStars){msg.style.color="#f87171";msg.textContent="اختر عدد النجوم أولاً.";return}
+    const last=+localStorage.getItem("bscku_lastRatingSubmit")||0;
+    if(Date.now()-last<60000){msg.style.color="#f87171";msg.textContent="استنى دقيقة قبل ما ترسل تقييم ثاني.";return}
+    const btn=document.querySelector("#rateForm .btn-calc");
+    if(btn)btn.disabled=true;
+    try{
+      await addDoc(collection(db,"courseRatings"),{
+        courseCode:selectedCourse.code,
+        courseNameAr:selectedCourse.nameAr,
+        courseNameEn:selectedCourse.nameEn||"",
+        rating:selectedStars,
+        comment:(document.getElementById("rateComment").value||"").trim().slice(0,500),
+        status:"pending",
+        createdAt:serverTimestamp()
+      });
+      localStorage.setItem("bscku_lastRatingSubmit",String(Date.now()));
+      msg.style.color="#6ee7b7";
+      msg.textContent="✅ شكراً! تقييمك بانتظار مراجعة النادي قبل النشر.";
+      setTimeout(()=>{document.getElementById("rateForm").style.display="none";selectedCourse=null;},2200);
+    }catch(e){
+      msg.style.color="#f87171";msg.textContent="⚠️ صار خطأ، حاول مرة ثانية.";
+    }finally{
+      if(btn)btn.disabled=false;
+    }
+  };
+
+  function renderRatingsBrowse(q){
+    const el=document.getElementById("ratingsBrowseList");
+    if(!el)return;
+    const groups={};
+    allRatings.forEach(r=>{
+      const key=r.courseCode||"?";
+      if(!groups[key])groups[key]={code:key,nameAr:r.courseNameAr||"",nameEn:r.courseNameEn||"",ratings:[]};
+      groups[key].ratings.push(r);
+    });
+    let list=Object.values(groups);
+    if(q)list=list.filter(g=>`${g.code} ${g.nameAr} ${g.nameEn}`.toLowerCase().includes(q));
+    list.sort((a,b)=>b.ratings.length-a.ratings.length);
+    if(!list.length){el.innerHTML='<div class="ratings-empty">لا توجد تقييمات منشورة بعد.</div>';return}
+    el.innerHTML=list.map(g=>{
+      const avg=g.ratings.reduce((s,r)=>s+(+r.rating||0),0)/g.ratings.length;
+      const full=Math.round(avg);
+      const stars="★".repeat(full)+"☆".repeat(5-full);
+      const comments=g.ratings.filter(r=>r.comment).slice(0,5).map(r=>
+        `<div class="rating-comment"><span class="rc-stars">${"★".repeat(+r.rating||0)}</span>${escR(r.comment)}</div>`
+      ).join("");
+      return `<div class="rating-card">
+        <div class="rating-card-head">
+          <div class="rating-card-title"><span class="rating-card-code">${escR(g.code)}</span>${escR(g.nameAr)}</div>
+          <div><span class="rating-stars">${stars}</span> <span class="rating-count">${avg.toFixed(1)} · ${g.ratings.length} تقييم</span></div>
+        </div>
+        ${comments?`<div class="rating-comments">${comments}</div>`:""}
+      </div>`;
+    }).join("");
+  }
+
+  async function loadRatingsBrowse(){
+    try{
+      const snap=await getDocs(collection(db,"courseRatings"));
+      allRatings=snap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.status==="approved");
+    }catch(e){allRatings=[]}
+    renderRatingsBrowse("");
+    const filterInp=document.getElementById("rateBrowseFilter");
+    if(filterInp)filterInp.addEventListener("input",()=>renderRatingsBrowse(filterInp.value.trim().toLowerCase()));
+  }
+
+  setupRateSearch();
+  setupStarPicker();
+  loadCatalog();
+  loadRatingsBrowse();
+})();
 </script>
 
 <script>
 /* ===== TABS ===== */
 function switchTab(id){
-  document.querySelectorAll(".stab").forEach((t,i)=>{t.classList.toggle("active",["gpa","news","sched","guide","grad"][i]===id)});
+  document.querySelectorAll(".stab").forEach((t,i)=>{t.classList.toggle("active",["gpa","news","sched","guide","grad","ratings"][i]===id)});
   document.querySelectorAll(".service-panel").forEach(p=>p.classList.remove("active"));
   document.getElementById("panel-"+id).classList.add("active");
   trigReveal();
