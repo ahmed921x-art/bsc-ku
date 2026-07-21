@@ -1285,7 +1285,20 @@ async function loadNoteCourses(majorKey){
 document.getElementById("noteMajor").addEventListener("change",function(){loadNoteCourses(this.value);});
 
 // FIREBASE HELPERS
-async function getItems(col){try{const s=await getDocs(query(collection(db,col),orderBy("createdAt","desc")));return s.docs.map(d=>({id:d.id,...d.data()}))}catch{const s=await getDocs(collection(db,col));return s.docs.map(d=>({id:d.id,...d.data()}))}}
+async function getItems(col){
+  try{
+    const s=await getDocs(query(collection(db,col),orderBy("createdAt","desc")));
+    return s.docs.map(d=>({id:d.id,...d.data()}))
+  }catch(e1){
+    try{
+      const s=await getDocs(collection(db,col));
+      return s.docs.map(d=>({id:d.id,...d.data()}))
+    }catch(e2){
+      console.warn(`getItems("${col}") failed:`,e2.code||e2.message||e2);
+      return [];
+    }
+  }
+}
 async function addItem(col,data){await addDoc(collection(db,col),{...data,createdAt:serverTimestamp()});loadAll()}
 async function delItem(col,id){if(confirm("متأكد من الحذف؟")){await deleteDoc(doc(db,col,id));loadAll()}}
 async function updateItem(col,id,data){await setDoc(doc(db,col,id),{...data,updatedAt:serverTimestamp()},{merge:true});loadAll()}
