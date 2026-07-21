@@ -55,6 +55,12 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // نوتات يرسلها الزوار من صفحة المراجعات لمراجعة الأدمن قبل نشرها في notes/.
+    match /noteSubmissions/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
     // تقييمات المواد: إنشاء وقراءة للجميع (الموقع يعرض المعتمدة "approved" فقط بالواجهة)،
     // تحديث الحالة (قبول/رفض) وحذف للأدمن فقط.
     match /courseRatings/{id} {
