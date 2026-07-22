@@ -926,17 +926,23 @@ function fmtDate(ts){if(!ts)return{d:"—",m:""};const dt=ts.toDate?ts.toDate():
   let allRatings=[];    // approved ratings only, cached for the browse filter
 
   async function loadCatalog(){
-    const majors=["molecular","micro","plant","animal","biochem"];
+    const majors=["molecular","micro","plant","animal","biochem","forensic","agri","biotech"];
     const seen=new Set();
+    const addCourses=(courses)=>{
+      (courses||[]).forEach(c=>{
+        if(!c.code||seen.has(c.code))return;
+        seen.add(c.code);
+        allCourses.push({code:c.code,nameAr:c.nameAr||"",nameEn:c.nameEn||""});
+      });
+    };
     for(const m of majors){
       try{
         const snap=await getDoc(doc(db,"majorSheets",m));
-        if(!snap.exists())continue;
-        (snap.data().courses||[]).forEach(c=>{
-          if(!c.code||seen.has(c.code))return;
-          seen.add(c.code);
-          allCourses.push({code:c.code,nameAr:c.nameAr||"",nameEn:c.nameEn||""});
-        });
+        if(snap.exists())addCourses(snap.data().courses);
+      }catch(e){}
+      try{
+        const snap2=await getDoc(doc(db,"supportSheets",m));
+        if(snap2.exists())addCourses(snap2.data().courses);
       }catch(e){}
     }
   }
