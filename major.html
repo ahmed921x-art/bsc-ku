@@ -556,12 +556,32 @@ a{color:inherit;text-decoration:none}
     <div class="section-label">صحيفة التخصص المساند</div>
     <div class="section-h2">صحيفة التخصص للتخصص المساند</div>
     <div id="supportSheetImageWrap" style="display:none;margin-bottom:1.5rem"></div>
-    <div class="schedule-builder reveal" style="max-width:640px">
-      <p style="font-size:.875rem;color:var(--muted);margin-bottom:1.5rem">
-        صحيفة التخصص للتخصص المساند — تُظهر المتطلبات اللازمة لإتمام التخصص المساند بنجاح.
-      </p>
-      <div id="graduateSheetContainer" style="padding:2rem;text-align:center;color:var(--muted)">
-        ⏳ جاري تحميل صحيفة التخصص...
+    <p style="font-size:.875rem;color:var(--muted);margin-bottom:1.5rem">
+      صحيفة التخصص للتخصص المساند — تُظهر المتطلبات اللازمة لإتمام التخصص المساند بنجاح. اضغط على أي مادة لتعليمها كمكتملة. المواد المقفلة تحتاج مسبقاتها أولاً.
+    </p>
+    <div id="graduateSheetContainer" style="padding:2rem;text-align:center;color:var(--muted)">
+      ⏳ جاري تحميل صحيفة التخصص...
+    </div>
+    <div class="tree-container reveal" id="supTreeWrap" style="display:none">
+      <div class="tree-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>متطلب إلزامي</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>متطلب القسم</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>متطلب التخصص</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>متطلب مساند</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div>اختياري</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#6ee7b7;opacity:.5"></div>مكتمل ✓</div>
+      </div>
+      <div class="tree-controls">
+        <button class="tree-zoom-btn" onclick="zoomSupTree(-1)" title="تصغير">−</button>
+        <span class="tree-zoom-level" id="supZoomLevel">100%</span>
+        <button class="tree-zoom-btn" onclick="zoomSupTree(1)" title="تكبير">+</button>
+        <button class="tree-zoom-btn" onclick="zoomSupTree(0)" title="إعادة ضبط" style="font-size:.7rem">↺</button>
+      </div>
+      <div class="prereq-tree-wrap">
+        <div class="prereq-canvas" id="supTreeCanvas">
+          <svg class="prereq-svg" id="supTreeSvg"></svg>
+          <div id="supTreeContainer"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -593,6 +613,8 @@ document.title=m.ar+" | BSC KU";
 
 let sheetCourses=[];
 let completedCodes=new Set();
+let supCourses=[];
+let supCompletedCodes=new Set();
 let currentBatch=null;
 let allBatches={};
 const typeClass={required:"tn-required",dept:"tn-dept",major:"tn-major",support:"tn-support",elective:"tn-elective"};
@@ -693,33 +715,20 @@ function renderSheetImage(){
       };
     }
     const courses=d.exists()?(d.data().courses||[]):[];
+    supCourses=courses;
     if(!courses.length){
       container.innerHTML='<div class="empty-state" style="padding:2.5rem 1rem"><div style="font-size:2rem;margin-bottom:.75rem">📋</div><p>لم تُضف صحيفة التخصص المساند بعد.</p></div>';
       return;
     }
-    const typeColor={required:"rgba(16,185,129,.15)",dept:"rgba(59,130,246,.15)",major:"rgba(245,158,11,.15)",support:"rgba(239,68,68,.12)",elective:"rgba(139,92,246,.15)"};
-    const typeText={required:"#6ee7b7",dept:"#93c5fd",major:"#fcd34d",support:"#fca5a5",elective:"#c4b5fd"};
-    const typeLabel={required:"إلزامي",dept:"قسم",major:"تخصص",support:"مساند",elective:"اختياري"};
+    supCompletedCodes=new Set(JSON.parse(localStorage.getItem("bscku_done_support_"+major)||"[]"));
     const total=courses.reduce((s,c)=>s+(c.hours||0),0);
     container.innerHTML=`
-      <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.25rem">
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap">
         <div style="padding:.45rem 1rem;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);border-radius:12px;font-size:.82rem;font-weight:700;color:#a5b4fc">${courses.length} مادة</div>
         <div style="padding:.45rem 1rem;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);border-radius:12px;font-size:.82rem;font-weight:700;color:#6ee7b7">${total} ساعة</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:.5rem">
-        ${courses.map((c,i)=>`
-          <div style="display:flex;align-items:center;gap:.75rem;padding:.65rem 1rem;
-            background:${typeColor[c.type]||'rgba(255,255,255,.04)'};border:1px solid var(--border);
-            border-radius:10px;animation:fu .35s ease ${i*.04}s both">
-            <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:.78rem;font-weight:900;
-              color:${typeText[c.type]||'#a5b4fc'};min-width:82px;flex-shrink:0">${c.code}</span>
-            <span style="font-size:.88rem;font-weight:600;flex:1;line-height:1.3">${c.nameAr}</span>
-            ${c.nameEn?`<span style="font-size:.72rem;color:var(--muted);flex-shrink:0">${c.nameEn}</span>`:''}
-            <span style="font-size:.72rem;color:var(--muted);white-space:nowrap;flex-shrink:0">${c.hours||3} ساعات</span>
-            <span style="font-size:.68rem;font-weight:700;border-radius:999px;padding:.15rem .5rem;flex-shrink:0;
-              background:${typeColor[c.type]||'rgba(255,255,255,.08)'};color:${typeText[c.type]||'#a5b4fc'}">${typeLabel[c.type]||''}</span>
-          </div>`).join('')}
       </div>`;
+    document.getElementById("supTreeWrap").style.display="block";
+    renderSupTree();
   }catch{
     container.innerHTML='<div class="empty-state" style="padding:2.5rem 1rem"><div style="font-size:2rem;margin-bottom:.75rem">📋</div><p>لم تُضف صحيفة التخصص المساند بعد.</p></div>';
   }
@@ -751,18 +760,8 @@ window.selectBatch=function(batch){
 };
 
 const canonCode=c=>String(c||"").replace(/\s+/g,"").toLowerCase();
-function isUnlocked(course){
-  if(!course.prereqs||!course.prereqs.length)return true;
-  const done=new Set([...completedCodes].map(canonCode));
-  const present=new Set(sheetCourses.map(c=>canonCode(c.code)));
-  // a prereq only blocks if it exists as a course in this sheet (otherwise it's
-  // an external/general requirement the student can't tick here) AND isn't done.
-  return course.prereqs.every(p=>{
-    const cp=canonCode(p);
-    return !present.has(cp) || done.has(cp);
-  });
-}
 function saveCompleted(){localStorage.setItem("bscku_done_"+major+(currentBatch?"_"+currentBatch:""),JSON.stringify([...completedCodes]))}
+function saveSupCompleted(){localStorage.setItem("bscku_done_support_"+major,JSON.stringify([...supCompletedCodes]))}
 
 let _treeScale=1;
 window.zoomTree=function(dir){
@@ -776,16 +775,63 @@ window.zoomTree=function(dir){
   if(lbl)lbl.textContent=Math.round(_treeScale*100)+'%';
 };
 
+let _supTreeScale=1;
+window.zoomSupTree=function(dir){
+  const canvas=document.getElementById('supTreeCanvas');
+  if(!canvas)return;
+  if(dir===0)_supTreeScale=1;
+  else _supTreeScale=Math.max(.35,Math.min(1.6,_supTreeScale+dir*.15));
+  canvas.style.transform=`scale(${_supTreeScale})`;
+  canvas.style.transformOrigin='top right';
+  const lbl=document.getElementById('supZoomLevel');
+  if(lbl)lbl.textContent=Math.round(_supTreeScale*100)+'%';
+};
+
 function renderTree(){
-  const container=document.getElementById("treeContainer");
-  const svg=document.getElementById("treeSvg");
-  if(!sheetCourses.length){
+  buildPrereqTree(sheetCourses,{
+    containerId:"treeContainer",svgId:"treeSvg",canvasId:"treeCanvas",
+    completedCodes,
+    onToggle(code){
+      if(completedCodes.has(code))completedCodes.delete(code);
+      else completedCodes.add(code);
+      saveCompleted();renderTree();
+    }
+  });
+}
+
+function renderSupTree(){
+  buildPrereqTree(supCourses,{
+    containerId:"supTreeContainer",svgId:"supTreeSvg",canvasId:"supTreeCanvas",
+    completedCodes:supCompletedCodes,
+    onToggle(code){
+      if(supCompletedCodes.has(code))supCompletedCodes.delete(code);
+      else supCompletedCodes.add(code);
+      saveSupCompleted();renderSupTree();
+    }
+  });
+}
+
+function buildPrereqTree(courses,{containerId,svgId,canvasId,completedCodes,onToggle}){
+  const container=document.getElementById(containerId);
+  const svg=document.getElementById(svgId);
+  if(!container||!svg)return;
+  if(!courses.length){
     container.innerHTML='<p class="empty-state">لم يُضف الميجرشيت بعد.</p>';
     svg.innerHTML='';return;
   }
 
   const by={};
-  sheetCourses.forEach(c=>{by[c.code]=c});
+  courses.forEach(c=>{by[c.code]=c});
+
+  function unlocked(course){
+    if(!course.prereqs||!course.prereqs.length)return true;
+    const done=new Set([...completedCodes].map(canonCode));
+    const present=new Set(courses.map(c=>canonCode(c.code)));
+    return course.prereqs.every(p=>{
+      const cp=canonCode(p);
+      return !present.has(cp)||done.has(cp);
+    });
+  }
 
   /* ── LAYER via longest-path + fixpoint ── */
   const LY={};
@@ -798,10 +844,10 @@ function renderTree(){
     const v=c.prereqs.filter(p=>by[p]);
     return(LY[code]=v.length?Math.max(...v.map(p=>calcL(p,new Set(seen))))+1:0);
   }
-  sheetCourses.forEach(c=>calcL(c.code));
+  courses.forEach(c=>calcL(c.code));
   for(let i=0;i<60;i++){
     let ch=false;
-    sheetCourses.forEach(c=>{(c.prereqs||[]).forEach(p=>{
+    courses.forEach(c=>{(c.prereqs||[]).forEach(p=>{
       if(by[p]&&(LY[c.code]||0)<=(LY[p]||0)){LY[c.code]=(LY[p]||0)+1;ch=true;}
     })});
     if(!ch)break;
@@ -809,7 +855,7 @@ function renderTree(){
 
   /* ── GROUP by layer ── */
   const rows={};
-  sheetCourses.forEach(c=>{const r=LY[c.code]||0;(rows[r]||(rows[r]=[])).push(c)});
+  courses.forEach(c=>{const r=LY[c.code]||0;(rows[r]||(rows[r]=[])).push(c)});
   const layerKeys=Object.keys(rows).map(Number).sort((a,b)=>a-b);
 
   /* ── SORT — Barycenter + greedy adjacent-swap to minimize crossings ── */
@@ -855,7 +901,7 @@ function renderTree(){
         const med=c=>{
           const nb=pass%2===0
             ?(c.prereqs||[]).filter(p=>by[p]&&tempX[p]!=null)
-            :sheetCourses.filter(ch=>(ch.prereqs||[]).includes(c.code)&&tempX[ch.code]!=null).map(ch=>ch.code);
+            :courses.filter(ch=>(ch.prereqs||[]).includes(c.code)&&tempX[ch.code]!=null).map(ch=>ch.code);
           if(!nb.length)return tempX[c.code]??9999;
           const xs=nb.map(p=>tempX[p]).sort((x,y)=>x-y);
           return xs[Math.floor(xs.length/2)];
@@ -919,12 +965,12 @@ function renderTree(){
 
   /* ── RENDER NODES ── */
   let html='';
-  sheetCourses.forEach(c=>{
+  courses.forEach(c=>{
     const p=pos[c.code];if(!p)return;
     const done=completedCodes.has(c.code);
-    const unlocked=isUnlocked(c);
+    const isU=unlocked(c);
     const col=COLORS[c.type]||COLORS.dept;
-    const locked=!unlocked&&!done;
+    const locked=!isU&&!done;
     html+=`<div data-code="${c.code}" data-name="${c.nameAr}" data-hours="${c.hours}"
       data-prereqs="${(c.prereqs||[]).filter(q=>by[q]).join('، ')}"
       style="position:absolute;left:${Math.round(p.x)}px;top:${p.y}px;
@@ -963,7 +1009,7 @@ function renderTree(){
   // Build incoming/outgoing edge lists so connection points can fan out
   // across each node's edge instead of all stacking on the centre.
   const outMap={}, inMap={};
-  sheetCourses.forEach(child=>{
+  courses.forEach(child=>{
     (child.prereqs||[]).forEach(p=>{
       if(!by[p]||!pos[p]||!pos[child.code])return;
       if((LY[p]||0)>=(LY[child.code]||0))return; // skip back-edges
@@ -977,7 +1023,7 @@ function renderTree(){
   const SPAN=Math.min(NW-24,80);
   const slotX=(node,idx,n)=> n<=1 ? node.cx : node.cx-SPAN/2+SPAN*(idx/(n-1));
 
-  sheetCourses.forEach(child=>{
+  courses.forEach(child=>{
     const pC=pos[child.code];if(!pC)return;
     const ins=inMap[child.code];if(!ins||!ins.length)return;
     const col=EC[child.type]||EC.dept;
@@ -1002,10 +1048,7 @@ function renderTree(){
   container.querySelectorAll(".tree-node").forEach(nd=>{
     nd.addEventListener("click",()=>{
       if(nd.classList.contains("locked"))return;
-      const code=nd.dataset.code;
-      if(completedCodes.has(code))completedCodes.delete(code);
-      else completedCodes.add(code);
-      saveCompleted();renderTree();
+      onToggle(nd.dataset.code);
     });
     nd.addEventListener("mouseenter",e=>{
       if(!nd.classList.contains("locked"))nd.style.transform="translateY(-4px)";
@@ -1032,7 +1075,7 @@ function renderTree(){
       container.querySelectorAll(".tree-node").forEach(n=>n.style.boxShadow="");
     });
   });
-  document.getElementById("treeCanvas").style.cssText=
+  document.getElementById(canvasId).style.cssText=
     `position:relative;width:${CW}px;height:${CH}px`;
 }
 
