@@ -2509,7 +2509,7 @@ window.gcSelectMajor=async function(key){
   document.getElementById("gcEditor").style.display="block";
   document.getElementById("gcStatus").textContent="⏳ جاري التحميل...";
   try{
-    const d=await getDoc(doc(db,"gradCourses",key));
+    const d=await getDoc(doc(db,"majorSheets","grad_"+key));
     if(d.exists()){
       const data=d.data();
       gcCourses=data.courses||[];
@@ -2576,7 +2576,7 @@ window.gcSave=async function(){
   const status=document.getElementById("gcStatus");
   status.textContent="⏳ جاري الحفظ...";status.style.color="#f59e0b";
   try{
-    await setDoc(doc(db,"gradCourses",gcMajor),{
+    await setDoc(doc(db,"majorSheets","grad_"+gcMajor),{
       courses:gcCourses,
       totalUnits:parseInt(document.getElementById("gcTotalUnits").value)||130,
       univUnits:parseInt(document.getElementById("gcUnivUnits").value)||24,
