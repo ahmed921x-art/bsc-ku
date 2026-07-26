@@ -417,6 +417,24 @@ const RAW_SUPPORT_MOLECULAR=[
   {code:'0497-490',nameAr:'أساسيات التكنولوجيا الوراثية الحيوية',nameEn:'Fundamentals of Genetic Biotechnology',hours:3,type:'elective',prereqs:['0497-371']},
 ];
 
+// ── التقنية الحيوية المساند ────────────────────────────────────
+const RAW_SUPPORT_BIOTECH=[
+  // إلزامي
+  {code:'0497-295',nameAr:'مبادئ في التقنية الحيوية',nameEn:'Principles of Biotechnology',hours:3,type:'required',prereqs:['0420-110','0490-101']},
+  {code:'0497-300',nameAr:'مختبر التقنية الحيوية',nameEn:'Biotechnology Laboratory',hours:2,type:'required',prereqs:['0497-295']},
+  {code:'0495-381',nameAr:'العمليات و المنتجات الميكروبية',nameEn:'Microbial Processes and Products',hours:3,type:'required',prereqs:['0497-295','0490-105']},
+  {code:'0493-420',nameAr:'علم الوراثة التطوري في الحيوان',nameEn:'Animal Evolutionary Genetics',hours:3,type:'required',prereqs:['0490-281','0490-103']},
+  {code:'0494-437',nameAr:'التقنيات الحيوية الزراعية',nameEn:'Agricultural biotechnologies',hours:3,type:'required',prereqs:['0497-295']},
+  // اختياري
+  {code:'0497-390',nameAr:'المعلوماتية الحياتية',nameEn:'Bioinformatics',hours:4,type:'elective',prereqs:['0490-281','0480-102']},
+  {code:'0496-450',nameAr:'تطبيقات علم البروتيوميات في الكيمياء الحيوية',nameEn:'Applications of Proteomics in Biochemistry',hours:3,type:'elective',prereqs:['0490-271']},
+  {code:'0493-480',nameAr:'بيولوجيا الخلايا الجذعية',nameEn:'Stem Cell Biology',hours:3,type:'elective',prereqs:['0490-281','0490-103']},
+  {code:'0495-480',nameAr:'التقنية الحيوية للغذاء',nameEn:'Food Biotechnology',hours:3,type:'elective',prereqs:['0495-381']},
+  {code:'0499-483',nameAr:'التقنية الحيوية النباتية و البيئة',nameEn:'Plant Biotechnology and the Environment',hours:3,type:'elective',prereqs:['0494-473']},
+  {code:'0490-493',nameAr:'مواضيع في التقنية الحيوية',nameEn:'Topics in Biotechnology',hours:1,type:'elective',prereqs:[]},
+  {code:'0490-494',nameAr:'تطبيقات في التقنية الحيوية',nameEn:'Applications in Biotechnology',hours:3,type:'elective',prereqs:[]},
+];
+
 export const SUPPORT_CATALOG_SEED={
   forensic: {major:'forensic', courses:buildSupport(RAW_SUPPORT_FORENSIC)},
   animal:   {major:'animal',   courses:buildSupport(RAW_SUPPORT_ANIMAL)},
@@ -425,4 +443,5 @@ export const SUPPORT_CATALOG_SEED={
   micro:    {major:'micro',    courses:buildSupport(RAW_SUPPORT_MICRO)},
   biochem:  {major:'biochem',  courses:buildSupport(RAW_SUPPORT_BIOCHEM)},
   molecular:{major:'molecular',courses:buildSupport(RAW_SUPPORT_MOLECULAR)},
+  biotech:  {major:'biotech',  courses:buildSupport(RAW_SUPPORT_BIOTECH)},
 };
