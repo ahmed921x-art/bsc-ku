@@ -403,6 +403,7 @@ a{color:inherit;text-decoration:none}
       <button class="nav-item" data-panel="notes"><span class="ni">📚</span>النوتات</button>
       <button class="nav-item" data-panel="noteSubs"><span class="ni">📬</span>نوتات الزوار <span id="subsNavBadge" style="display:none;margin-inline-start:auto;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;padding:.1rem .45rem;border-radius:99px"></span></button>
       <button class="nav-item" data-panel="ratings"><span class="ni">⭐</span>تقييم المواد <span id="ratingsNavBadge" style="display:none;margin-inline-start:auto;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;padding:.1rem .45rem;border-radius:99px"></span></button>
+      <button class="nav-item" data-panel="videos"><span class="ni">🎬</span>شرح المواد <span id="videosNavBadge" style="display:none;margin-inline-start:auto;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;padding:.1rem .45rem;border-radius:99px"></span></button>
       <button class="nav-item" data-panel="news"><span class="ni">📰</span>الأخبار</button>
       <button class="nav-item" data-panel="announcements"><span class="ni">📢</span>الإعلانات</button>
       <button class="nav-item" data-panel="events"><span class="ni">🎤</span>الأنشطة</button>
@@ -510,6 +511,12 @@ a{color:inherit;text-decoration:none}
       <div class="panel" id="panel-ratings">
         <div class="panel-header"><h2>⭐ تقييم المواد</h2><p>تقييمات أرسلها الطلبة من صفحة الخدمات — اقبلها لتُنشر علناً أو ارفضها</p></div>
         <div class="items-list" id="ratingsList"></div>
+      </div>
+
+      <!-- COURSE VIDEOS -->
+      <div class="panel" id="panel-videos">
+        <div class="panel-header"><h2>🎬 شرح المواد</h2><p>شروحات مصوّرة أرسلها الطلبة من صفحة «شرح المواد» — راجع الفيديو قبل القبول</p></div>
+        <div class="items-list" id="videosList"></div>
       </div>
 
       <!-- NEWS -->
@@ -1414,6 +1421,58 @@ window.rejectRating_=async id=>{
   loadAll();
 };
 
+// شرح المواد (courseVideos): عرض + قبول/رفض
+let _videosCache={};
+const ytId_=u=>{const m=String(u||"").match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{11})/);return m?m[1]:null};
+function renderVideos(items){
+  _videosCache=Object.fromEntries(items.map(v=>[v.id,v]));
+  const pending=items.filter(v=>(v.status||"pending")==="pending");
+  const badge=document.getElementById("videosNavBadge");
+  if(badge){badge.textContent=pending.length;badge.style.display=pending.length?"inline-block":"none";}
+  const el=document.getElementById("videosList");if(!el)return;
+  if(!items.length){el.innerHTML='<p style="color:var(--muted);padding:1rem">ما فيه شروحات مرسلة حالياً.</p>';return;}
+  const STATUS={pending:['⏳ بانتظار المراجعة','#f59e0b'],approved:['✅ مقبول ومنشور','#10b981'],rejected:['❌ مرفوض','#ef4444']};
+  const ordered=[...items].sort((a,b)=>((a.status||"pending")==="pending"?0:1)-((b.status||"pending")==="pending"?0:1));
+  el.innerHTML=ordered.map(v=>{
+    const st=v.status||"pending";const[label,color]=STATUS[st]||STATUS.pending;
+    const id=ytId_(v.videoUrl);
+    const chaps=Array.isArray(v.chapters)?v.chapters:[];
+    const notes=(v.noteUrls||[]);
+    return `<div class="list-item" style="border-inline-start:3px solid ${color}">
+      <div class="list-item-body">
+        <h4>${escSub(v.courseCode)||"—"} — ${escSub(v.courseNameAr)} <span style="font-size:.72rem;font-weight:800;color:${color}">${label}</span></h4>
+        <p style="font-weight:700">${escSub(v.title)}</p>
+        <p style="font-size:.8rem;color:var(--muted)">${escSub(v.authorName)||"—"}${v.batch?` · دفعة ${escSub(v.batch)}`:""}${v.duration?` · ${escSub(v.duration)}`:""} · 👍 ${v.helpful||0}</p>
+        ${id?`<div style="display:flex;gap:.6rem;align-items:center;margin-top:.5rem">
+          <img src="https://img.youtube.com/vi/${id}/mqdefault.jpg" alt="" style="width:96px;height:60px;object-fit:cover;border-radius:8px">
+          <a href="${escSub(v.videoUrl)}" target="_blank" rel="noopener" style="font-size:.8rem;color:#a5b4fc;font-weight:700">▶ افتح الفيديو للمراجعة</a>
+        </div>`:`<p style="color:#fca5a5;font-size:.8rem">⚠️ رابط يوتيوب غير صالح: ${escSub(v.videoUrl)}</p>`}
+        ${chaps.length?`<p style="font-size:.78rem;color:var(--muted);margin-top:.4rem">📑 ${chaps.length} محور — ${escSub(chaps.slice(0,3).map(c=>c.time+" "+c.label).join(" · "))}${chaps.length>3?" …":""}</p>`:""}
+        ${notes.length?`<p style="font-size:.78rem;margin-top:.3rem">📄 ${notes.map((u,i)=>`<a href="${escSub(u)}" target="_blank" rel="noopener" style="color:#6ee7b7">نوتة ${i+1}</a>`).join(" · ")}</p>`:""}
+      </div>
+      <div class="list-item-actions" style="flex-wrap:wrap">
+        ${st==="pending"?`
+          <button class="btn btn-sm" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);color:#6ee7b7" onclick="approveVideo_('${v.id}')">✅ قبول ونشر</button>
+          <button class="btn btn-sm" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5" onclick="rejectVideo_('${v.id}')">❌ رفض</button>
+        `:""}
+        <button class="btn btn-danger btn-sm" onclick="delItem_('courseVideos','${v.id}')">حذف</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+window.approveVideo_=async id=>{
+  const v=_videosCache[id];if(!v)return;
+  if(!ytId_(v.videoUrl))return alert("رابط اليوتيوب غير صالح — لا يمكن نشره.");
+  if(!confirm(`نشر شرح «${v.title||""}» علناً؟ تأكد أنك فتحت الفيديو وراجعت محتواه.`))return;
+  await setDoc(doc(db,"courseVideos",id),{status:"approved",reviewedAt:serverTimestamp()},{merge:true});
+  loadAll();
+};
+window.rejectVideo_=async id=>{
+  if(!confirm("رفض هذا الشرح؟ (يظل محفوظاً هنا ويمكن حذفه)"))return;
+  await setDoc(doc(db,"courseVideos",id),{status:"rejected",reviewedAt:serverTimestamp()},{merge:true});
+  loadAll();
+};
+
 // ADD HANDLERS
 document.getElementById("addNote").onclick=async()=>{
   const d={title:noteTitle.value.trim(),course:noteCourse.value.trim(),major:noteMajor.value,type:noteType.value,term:noteTerm.value.trim()||"General",url:noteUrl.value.trim()};
@@ -2198,10 +2257,10 @@ document.addEventListener("click",e=>{
 // LOAD ALL
 async function loadAll(){
   try{
-    const[notes,events,advisors,committee,ann,resources,ai,chats,news,suggestions,scheds,subs,ratings]=await Promise.all([
+    const[notes,events,advisors,committee,ann,resources,ai,chats,news,suggestions,scheds,subs,ratings,vids]=await Promise.all([
       getItems("notes"),getItems("events"),getItems("advisors"),getItems("scheduleCommittee"),getItems("announcements"),
       getItems("majorResources"),getItems("aiKnowledge"),getItems("aiChats"),getItems("news"),getItems("suggestions"),
-      getItems("schedules"),getItems("noteSubmissions"),getItems("courseRatings")
+      getItems("schedules"),getItems("noteSubmissions"),getItems("courseRatings"),getItems("courseVideos")
     ]);
     // stats
     document.getElementById("ds-notes").textContent=notes.length;
@@ -2226,6 +2285,7 @@ async function loadAll(){
     renderItems("notesList",notes,["title","course","term"],"notes");
     renderSubmissions(subs);
     renderRatings(ratings);
+    renderVideos(vids);
     renderItems("newsList",news,["title","type",""],"news");
     renderItems("annList",ann,["title","type","content"],"announcements");
     renderItems("eventsList",events,["title","date","location"],"events");

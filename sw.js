@@ -1,10 +1,11 @@
 // BSC KU — Service Worker
-const CACHE = 'bscku-v4';
+const CACHE = 'bscku-v5';
 const STATIC = [
   '/',
   '/index.html',
   '/majors.html',
   '/notes.html',
+  '/explain.html',
   '/events.html',
   '/advisors.html',
   '/services.html',

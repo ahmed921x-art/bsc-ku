@@ -98,6 +98,18 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // Student course explainers (YouTube links), pending admin review.
+    // Anyone may bump `helpful` by exactly 1, but nothing else.
+    match /courseVideos/{id} {
+      allow create: if true;
+      allow read: if true;
+      allow update: if isAdmin() || (
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['helpful']) &&
+        request.resource.data.helpful == resource.data.helpful + 1
+      );
+      allow delete: if isAdmin();
+    }
+
     // Course ratings: create + read for everyone.
     // Site only shows approved ones. Status change/delete is admin-only.
     match /courseRatings/{id} {
