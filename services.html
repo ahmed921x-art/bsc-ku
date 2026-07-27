@@ -463,6 +463,72 @@ a{color:inherit;text-decoration:none}
     }
     /* Theme toggle button */
 @media(max-width:1280px){}
+/* ===== SCHEDULE PLANNER ===== */
+.pl-card{background:rgba(40,40,44,.55);border:1px solid var(--border);border-radius:20px;padding:1.25rem 1.4rem;margin-bottom:1.1rem}
+.pl-drafts{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.1rem}
+.pl-draft{position:relative;padding:.55rem 1.1rem;border-radius:12px;font-size:.85rem;font-weight:700;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);cursor:pointer;
+  font-family:'Tajawal',sans-serif;transition:all .2s;display:flex;align-items:center;gap:.5rem}
+.pl-draft:hover{color:#fff;border-color:rgba(99,102,241,.4)}
+.pl-draft.on{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-color:transparent}
+.pl-draft .n{font-size:.7rem;background:rgba(255,255,255,.16);padding:.05rem .45rem;border-radius:999px}
+.pl-form{display:flex;gap:.85rem;flex-wrap:wrap;margin-bottom:.95rem}
+.pl-f{display:flex;flex-direction:column;gap:.4rem;min-width:150px}
+.pl-f.pl-grow{flex:1;min-width:230px}
+.pl-f label{font-size:.78rem;font-weight:700;color:#a5b4fc}
+.pl-f label .opt{color:var(--muted);font-weight:500}
+.pl-f input,.pl-f select{padding:.6rem .8rem;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-size:.85rem;font-family:'Tajawal',sans-serif}
+.pl-f input:focus,.pl-f select:focus{outline:none;border-color:rgba(99,102,241,.55)}
+.pl-toggle,.pl-days{display:flex;gap:.4rem;flex-wrap:wrap}
+.pl-toggle button,.pl-days button{padding:.5rem .9rem;border-radius:10px;font-size:.8rem;font-weight:700;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);cursor:pointer;
+  font-family:'Tajawal',sans-serif;transition:all .18s}
+.pl-toggle button:hover,.pl-days button:hover{color:#fff}
+.pl-toggle button.on,.pl-days button.on{background:rgba(99,102,241,.24);border-color:rgba(99,102,241,.55);color:#fff}
+.pl-hint{font-size:.74rem;color:var(--muted);margin-top:.45rem;line-height:1.6}
+.pl-actions{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-top:.3rem}
+.pl-msg{font-size:.8rem;font-weight:700}
+.pl-sm{padding:.45rem 1rem;font-size:.78rem}
+.pl-gridcard{padding:1rem}
+.pl-gridhead{display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap;margin-bottom:.8rem}
+.pl-legend{display:flex;gap:.75rem;flex-wrap:wrap;font-size:.74rem;color:var(--muted)}
+.pl-legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-inline-end:.3rem;vertical-align:-1px}
+.pl-scroll{overflow-x:auto}
+.pl-grid{display:grid;grid-template-columns:58px repeat(5,minmax(118px,1fr));min-width:700px;
+  border:1px solid var(--border);border-radius:14px;overflow:hidden;background:rgba(255,255,255,.02)}
+.pl-hcell{padding:.55rem .3rem;text-align:center;font-size:.78rem;font-weight:800;color:#c8d2ea;
+  background:rgba(99,102,241,.10);border-bottom:1px solid var(--border)}
+.pl-hcell small{display:block;font-size:.62rem;font-weight:600;color:var(--muted);margin-top:.1rem}
+.pl-axis{position:relative;border-inline-end:1px solid var(--border);background:rgba(255,255,255,.015)}
+.pl-tick{position:absolute;inset-inline:0;transform:translateY(-50%);text-align:center;
+  font-size:.66rem;color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif}
+.pl-col{position:relative;border-inline-end:1px solid var(--border)}
+.pl-col:last-child{border-inline-end:0}
+.pl-line{position:absolute;inset-inline:0;height:1px;background:rgba(129,140,248,.10)}
+.pl-line.hr{background:rgba(129,140,248,.20)}
+.pl-ev{position:absolute;border-radius:8px;padding:.3rem .4rem;overflow:hidden;cursor:pointer;
+  font-size:.7rem;line-height:1.3;border:1px solid;transition:transform .15s}
+.pl-ev:hover{transform:scale(1.03);z-index:5}
+.pl-ev b{display:block;font-size:.72rem;font-weight:800}
+.pl-ev span{display:block;font-size:.63rem;opacity:.85}
+.pl-ev.clash{outline:2px solid #f87171;outline-offset:-2px}
+.pl-ev .lab{position:absolute;top:2px;inset-inline-end:3px;font-size:.6rem;opacity:.8}
+.pl-foot{display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:.8rem;font-size:.8rem;color:var(--muted)}
+.pl-foot b{color:#a5b4fc}
+.pl-warn{background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.32);border-radius:14px;
+  padding:.85rem 1.1rem;margin-bottom:1.1rem}
+.pl-warn h4{font-size:.9rem;font-weight:800;color:#fca5a5;margin-bottom:.4rem}
+.pl-warn p{font-size:.8rem;color:#e8b4b4;line-height:1.7}
+.pl-empty{text-align:center;padding:1.6rem 1rem;color:var(--muted);font-size:.84rem}
+@media(max-width:640px){.pl-grid{grid-template-columns:46px repeat(5,minmax(96px,1fr))}}
+[data-theme="light"] .pl-card{background:#fff !important}
+[data-theme="light"] .pl-hcell{color:#0f172a !important}
+[data-theme="light"] .pl-f input,[data-theme="light"] .pl-f select{background:#f8fafc !important;color:#0f172a !important}
+[data-theme="light"] .pl-toggle button,[data-theme="light"] .pl-days button,[data-theme="light"] .pl-draft{background:#f1f5f9 !important}
+[data-theme="light"] .pl-toggle button.on,[data-theme="light"] .pl-days button.on{background:rgba(99,102,241,.16) !important;color:#4f46e5 !important}
+[data-theme="light"] .pl-draft.on{background:linear-gradient(135deg,#6366f1,#8b5cf6) !important;color:#fff !important}
+
     </style>
 
   
@@ -560,6 +626,7 @@ a{color:inherit;text-decoration:none}
   <!-- Tabs -->
   <div class="service-tabs">
     <button class="stab active" onclick="switchTab('gpa')" data-ar="🎓 حاسبة المعدل" data-en="🎓 GPA Calculator">🎓 حاسبة المعدل</button>
+    <button class="stab" onclick="switchTab('planner')" data-ar="🗓️ منظم الجدول" data-en="🗓️ Schedule Planner">🗓️ منظم الجدول</button>
     <button class="stab" onclick="switchTab('news')" data-ar="📰 الأخبار" data-en="📰 News">📰 الأخبار</button>
     <button class="stab" onclick="switchTab('sched')" data-ar="📅 الجداول المقترحة" data-en="📅 Suggested Schedules">📅 الجداول المقترحة</button>
     <button class="stab" onclick="switchTab('guide')" data-ar="📖 دليل الطالب" data-en="📖 Student Guide">📖 دليل الطالب</button>
@@ -697,6 +764,89 @@ a{color:inherit;text-decoration:none}
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+
+  <!-- ===== SCHEDULE PLANNER ===== -->
+  <div class="service-panel" id="panel-planner">
+    <div class="section-label" data-ar="منظم الجدول" data-en="Schedule Planner">منظم الجدول</div>
+    <div class="section-h2" data-ar="رتّب جدول الفصل الجاي وشوف التعارضات" data-en="Plan next term and spot conflicts">رتّب جدول الفصل الجاي وشوف التعارضات</div>
+
+    <!-- drafts -->
+    <div class="pl-drafts" id="plDrafts"></div>
+
+    <!-- add form -->
+    <div class="pl-card">
+      <div class="pl-form">
+        <div class="pl-f"><label>رمز المقرر <span class="opt">(اختياري)</span></label>
+          <input id="plCode" placeholder="0497371" autocomplete="off"></div>
+        <div class="pl-f pl-grow"><label>اسم المقرر</label>
+          <input id="plName" placeholder="مقدمة في الوراثة الجزيئية" autocomplete="off"></div>
+      </div>
+
+      <div class="pl-form">
+        <div class="pl-f"><label>نوع المحاضرة</label>
+          <div class="pl-toggle" id="plKind">
+            <button class="on" data-v="lecture">محاضرة نظرية</button>
+            <button data-v="lab">محاضرة مختبر</button>
+          </div></div>
+        <div class="pl-f pl-grow"><label>طبيعة المقرر</label>
+          <div class="pl-toggle" id="plNature">
+            <button class="on" data-v="major">مقرر تخصص</button>
+            <button data-v="support">مقرر مساند</button>
+            <button data-v="dept">متطلب قسم</button>
+            <button data-v="univ">متطلب جامعي</button>
+          </div></div>
+      </div>
+
+      <div class="pl-f"><label>أيام المحاضرة</label>
+        <div class="pl-days" id="plDays">
+          <button data-d="0">الأحد</button><button data-d="1">الاثنين</button>
+          <button data-d="2">الثلاثاء</button><button data-d="3">الأربعاء</button>
+          <button data-d="4">الخميس</button>
+        </div>
+        <div class="pl-hint" id="plSlotHint"></div>
+      </div>
+
+      <div class="pl-form">
+        <div class="pl-f"><label>وقت البداية</label>
+          <input type="time" id="plStart" value="08:00" min="08:00" max="20:00" step="300"></div>
+        <div class="pl-f"><label>المدة</label>
+          <select id="plDur">
+            <option value="50">٥٠ دقيقة</option>
+            <option value="75">ساعة وربع</option>
+            <option value="60">ساعة</option>
+            <option value="90">ساعة ونصف</option>
+            <option value="120">ساعتان</option>
+            <option value="180">٣ ساعات (مختبر)</option>
+            <option value="360">٦ ساعات (مختبر)</option>
+            <option value="custom">مدة أخرى…</option>
+          </select></div>
+        <div class="pl-f" id="plCustomWrap" hidden><label>المدة بالدقائق</label>
+          <input type="number" id="plCustom" min="10" max="720" step="5" value="100"></div>
+      </div>
+
+      <div class="pl-actions">
+        <button class="btn-calc" id="plAdd">+ أضف للجدول</button>
+        <button class="btn-reset" id="plCancel" hidden>إلغاء التعديل</button>
+        <span id="plMsg" class="pl-msg"></span>
+      </div>
+    </div>
+
+    <!-- conflicts -->
+    <div id="plConflicts"></div>
+
+    <!-- grid -->
+    <div class="pl-card pl-gridcard">
+      <div class="pl-gridhead">
+        <div class="pl-legend" id="plLegend"></div>
+        <button class="btn-reset pl-sm" id="plClear">🗑️ تفريغ المسودة</button>
+      </div>
+      <div class="pl-scroll">
+        <div class="pl-grid" id="plGrid"></div>
+      </div>
+      <div class="pl-foot" id="plFoot"></div>
     </div>
   </div>
 
@@ -1074,7 +1224,7 @@ function fmtDate(ts){if(!ts)return{d:"—",m:""};const dt=ts.toDate?ts.toDate():
 <script>
 /* ===== TABS ===== */
 function switchTab(id){
-  document.querySelectorAll(".stab").forEach((t,i)=>{t.classList.toggle("active",["gpa","news","sched","guide","grad","ratings"][i]===id)});
+  document.querySelectorAll(".stab").forEach((t,i)=>{t.classList.toggle("active",["gpa","planner","news","sched","guide","grad","ratings"][i]===id)});
   document.querySelectorAll(".service-panel").forEach(p=>p.classList.remove("active"));
   document.getElementById("panel-"+id).classList.add("active");
   trigReveal();
@@ -1787,6 +1937,247 @@ function trigReveal(){
 /* ===== INIT ===== */
 // GPA v2 initializes via loadSemUI above
 loadPref();trigReveal();
+
+/* ===== SCHEDULE PLANNER ===== */
+(function(){
+  const DAYS=[
+    {ar:"الأحد",  en:"Sun", step:50},
+    {ar:"الاثنين",en:"Mon", step:75},
+    {ar:"الثلاثاء",en:"Tue",step:50},
+    {ar:"الأربعاء",en:"Wed",step:75},
+    {ar:"الخميس", en:"Thu", step:50},
+  ];
+  const T0=480, T1=1200, SPAN=T1-T0;           // 08:00 → 20:00
+  const NATURE={
+    major:{ar:"تخصص",   bg:"rgba(245,158,11,.22)", bd:"#f59e0b", tx:"#fcd34d"},
+    support:{ar:"مساند", bg:"rgba(239,68,68,.20)",  bd:"#ef4444", tx:"#fca5a5"},
+    dept:{ar:"متطلب قسم",bg:"rgba(59,130,246,.20)", bd:"#3b82f6", tx:"#93c5fd"},
+    univ:{ar:"متطلب جامعي",bg:"rgba(16,185,129,.20)",bd:"#10b981", tx:"#6ee7b7"},
+  };
+  const KEY="bscku_planner_v1";
+  const blank=()=>({items:[]});
+  let st={active:0, drafts:[blank(),blank(),blank(),blank()]};
+  let editId=null;
+
+  try{ const s=JSON.parse(localStorage.getItem(KEY)||"null");
+       if(s&&Array.isArray(s.drafts)&&s.drafts.length===4) st=s; }catch(e){}
+  const save=()=>localStorage.setItem(KEY,JSON.stringify(st));
+  const cur=()=>st.drafts[st.active];
+  const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const hhmm=m=>String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+  const pretty=m=>{const h=Math.floor(m/60),x=m%60;const ap=h<12?"ص":"م";const h12=h%12===0?12:h%12;
+    return h12+(x?":"+String(x).padStart(2,"0"):"")+" "+ap;};
+
+  const $=id=>document.getElementById(id);
+  const grid=$("plGrid");
+  if(!grid) return;
+
+  /* ---- pickers ---- */
+  const pick=(wrap,multi)=>{
+    wrap.addEventListener("click",e=>{
+      const b=e.target.closest("button"); if(!b)return;
+      if(multi) b.classList.toggle("on");
+      else{ [...wrap.children].forEach(x=>x.classList.toggle("on",x===b)); }
+      if(wrap.id==="plDays") slotHint();
+    });
+  };
+  pick($("plKind"),false); pick($("plNature"),false); pick($("plDays"),true);
+  const getOne=w=>{const b=w.querySelector(".on"); return b?b.dataset.v:null;};
+  const getDays=()=>[...$("plDays").querySelectorAll(".on")].map(b=>+b.dataset.d);
+
+  function slotHint(){
+    const d=getDays(); const h=$("plSlotHint");
+    if(!d.length){h.textContent="";return;}
+    const g50=d.some(x=>DAYS[x].step===50), g75=d.some(x=>DAYS[x].step===75);
+    const parts=[];
+    if(g50) parts.push("الأحد/الثلاثاء/الخميس مقسّمة ٥٠ دقيقة");
+    if(g75) parts.push("الاثنين/الأربعاء مقسّمة ساعة وربع");
+    h.textContent=parts.join(" — ")+(g50&&g75?" · اخترت أيام من المجموعتين، تأكد من الوقت":"");
+  }
+
+  $("plDur").addEventListener("change",e=>{
+    $("plCustomWrap").hidden = e.target.value!=="custom";
+  });
+
+  /* ---- drafts ---- */
+  function renderDrafts(){
+    $("plDrafts").innerHTML=st.drafts.map((d,i)=>
+      `<button class="pl-draft ${i===st.active?"on":""}" data-i="${i}">مسودة ${i+1}`+
+      (d.items.length?`<span class="n">${d.items.length}</span>`:"")+`</button>`).join("");
+  }
+  $("plDrafts").addEventListener("click",e=>{
+    const b=e.target.closest("[data-i]"); if(!b)return;
+    st.active=+b.dataset.i; save(); resetForm(); renderAll();
+  });
+
+  /* ---- conflicts ---- */
+  function blocks(){
+    const out=[];
+    cur().items.forEach(it=>it.days.forEach(d=>
+      out.push({id:it.id,day:d,s:it.start,e:it.start+it.dur,it})));
+    return out;
+  }
+  function clashes(){
+    const bs=blocks(), bad=new Set(), pairs=[];
+    for(let i=0;i<bs.length;i++)for(let j=i+1;j<bs.length;j++){
+      const a=bs[i],b=bs[j];
+      if(a.day===b.day && a.s<b.e && b.s<a.e){
+        bad.add(a.id+"|"+a.day); bad.add(b.id+"|"+b.day);
+        pairs.push({day:a.day,a:a.it,b:b.it,
+          from:Math.max(a.s,b.s), to:Math.min(a.e,b.e)});
+      }
+    }
+    return {bad,pairs};
+  }
+
+  /* ---- grid ---- */
+  function renderGrid(){
+    const {bad,pairs}=clashes();
+    let html='<div class="pl-hcell"></div>';
+    DAYS.forEach(d=>{html+=`<div class="pl-hcell">${d.ar}<small>${d.step===50?"٥٠ د":"١:١٥"}</small></div>`;});
+
+    // time axis
+    let ax='<div class="pl-axis" style="height:640px">';
+    for(let m=T0;m<=T1;m+=60)
+      ax+=`<div class="pl-tick" style="top:${(m-T0)/SPAN*100}%">${pretty(m)}</div>`;
+    ax+='</div>';
+    html+=ax;
+
+    DAYS.forEach((d,di)=>{
+      let c=`<div class="pl-col" style="height:640px">`;
+      for(let m=T0;m<=T1;m+=d.step)
+        c+=`<div class="pl-line" style="top:${(m-T0)/SPAN*100}%"></div>`;
+      for(let m=T0;m<=T1;m+=60)
+        c+=`<div class="pl-line hr" style="top:${(m-T0)/SPAN*100}%"></div>`;
+
+      // side-by-side layout for overlapping events
+      const evs=blocks().filter(b=>b.day===di).sort((a,b)=>a.s-b.s||a.e-b.e);
+      const lanes=[];
+      evs.forEach(ev=>{
+        let k=0; while(lanes[k]!==undefined && lanes[k]>ev.s) k++;
+        lanes[k]=ev.e; ev._lane=k;
+      });
+      const groups=[];
+      evs.forEach(ev=>{
+        let g=groups.find(g=>g.some(o=>o.s<ev.e&&ev.s<o.e));
+        if(g)g.push(ev); else groups.push([ev]);
+      });
+      const width={};
+      groups.forEach(g=>{const n=Math.max(...g.map(o=>o._lane))+1; g.forEach(o=>width[o.id+"_"+o.s]=n);});
+
+      evs.forEach(ev=>{
+        const n=width[ev.id+"_"+ev.s]||1, lane=ev._lane;
+        const nat=NATURE[ev.it.nature]||NATURE.major;
+        const top=(ev.s-T0)/SPAN*100, hgt=(ev.e-ev.s)/SPAN*100;
+        const w=100/n, left=lane*w;
+        const isLab=ev.it.kind==="lab";
+        c+=`<div class="pl-ev ${bad.has(ev.id+"|"+ev.day)?"clash":""}" data-id="${ev.id}"
+             style="top:${top}%;height:${hgt}%;inset-inline-start:${left}%;width:calc(${w}% - 3px);
+             background:${nat.bg};border-color:${nat.bd};color:${nat.tx};
+             ${isLab?"border-style:dashed;border-width:2px;":""}">
+             ${isLab?'<span class="lab">🧪</span>':""}
+             <b>${esc(ev.it.name||ev.it.code||"مقرر")}</b>
+             <span>${pretty(ev.s)} – ${pretty(ev.e)}</span></div>`;
+      });
+      c+="</div>"; html+=c;
+    });
+    grid.innerHTML=html;
+
+    // conflicts banner
+    const cw=$("plConflicts");
+    if(pairs.length){
+      const seen=new Set(); const lines=[];
+      pairs.forEach(p=>{
+        const k=[p.a.id,p.b.id,p.day].join("|"); if(seen.has(k))return; seen.add(k);
+        lines.push(`${DAYS[p.day].ar}: «${esc(p.a.name||p.a.code)}» مع «${esc(p.b.name||p.b.code)}» — ${pretty(p.from)} إلى ${pretty(p.to)}`);
+      });
+      cw.innerHTML=`<div class="pl-warn"><h4>⚠️ فيه ${lines.length} تعارض</h4>`+
+        lines.map(l=>`<p>• ${l}</p>`).join("")+`</div>`;
+    } else cw.innerHTML="";
+
+    // legend + totals
+    $("plLegend").innerHTML=Object.entries(NATURE).map(([k,v])=>
+      `<span><i style="background:${v.bd}"></i>${v.ar}</span>`).join("")+
+      `<span><i style="background:transparent;border:1.5px dashed #94a3b8"></i>مختبر</span>`;
+
+    const items=cur().items;
+    const mins=items.reduce((s,i)=>s+i.dur*i.days.length,0);
+    $("plFoot").innerHTML=items.length
+      ? `<span>المقررات: <b>${items.length}</b></span>
+         <span>الحصص الأسبوعية: <b>${items.reduce((s,i)=>s+i.days.length,0)}</b></span>
+         <span>ساعات التواجد: <b>${(mins/60).toFixed(1)}</b> ساعة</span>
+         ${pairs.length?`<span style="color:#fca5a5">تعارضات: <b style="color:#fca5a5">${pairs.length}</b></span>`:`<span style="color:#6ee7b7">ما فيه تعارض ✓</span>`}`
+      : `<span>ما أضفت مقررات لهذي المسودة بعد.</span>`;
+  }
+
+  function renderAll(){ renderDrafts(); renderGrid(); }
+
+  /* ---- add / edit ---- */
+  function msg(t,ok){const m=$("plMsg");m.textContent=t;m.style.color=ok?"#6ee7b7":"#f87171";
+    if(t)setTimeout(()=>{if(m.textContent===t)m.textContent="";},3000);}
+
+  function resetForm(){
+    editId=null;
+    $("plCode").value=""; $("plName").value="";
+    $("plDays").querySelectorAll(".on").forEach(b=>b.classList.remove("on"));
+    $("plStart").value="08:00"; $("plDur").value="50";
+    $("plCustomWrap").hidden=true;
+    $("plAdd").textContent="+ أضف للجدول";
+    $("plCancel").hidden=true; slotHint();
+  }
+  $("plCancel").addEventListener("click",resetForm);
+
+  $("plAdd").addEventListener("click",()=>{
+    const name=$("plName").value.trim(), code=$("plCode").value.trim();
+    const days=getDays();
+    if(!name&&!code) return msg("اكتب اسم المقرر أو رمزه.");
+    if(!days.length) return msg("اختر يوم واحد على الأقل.");
+    const [hh,mm]=($("plStart").value||"08:00").split(":").map(Number);
+    const start=hh*60+mm;
+    let dur=$("plDur").value==="custom" ? +$("plCustom").value : +$("plDur").value;
+    if(!dur||dur<10) return msg("المدة غير صحيحة.");
+    if(start<T0) return msg("الجدول يبدأ من ٨ صباحاً.");
+    if(start+dur>T1) return msg("المحاضرة تتجاوز ٨ مساءً — قصّر المدة أو قدّم الوقت.");
+
+    const rec={id:editId||("c"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)),
+      code,name,kind:getOne($("plKind"))||"lecture",nature:getOne($("plNature"))||"major",
+      days,start,dur};
+    const arr=cur().items;
+    if(editId){const i=arr.findIndex(x=>x.id===editId); if(i>-1)arr[i]=rec;}
+    else arr.push(rec);
+    save(); resetForm(); renderAll();
+    msg(editId?"تم التعديل ✓":"تمت الإضافة ✓",true);
+  });
+
+  grid.addEventListener("click",e=>{
+    const el=e.target.closest(".pl-ev"); if(!el)return;
+    const it=cur().items.find(x=>x.id===el.dataset.id); if(!it)return;
+    if(confirm(`«${it.name||it.code}»\n\nموافق = تعديل المقرر\nإلغاء = حذفه من الجدول`)){
+      editId=it.id;
+      $("plCode").value=it.code||""; $("plName").value=it.name||"";
+      [...$("plKind").children].forEach(b=>b.classList.toggle("on",b.dataset.v===it.kind));
+      [...$("plNature").children].forEach(b=>b.classList.toggle("on",b.dataset.v===it.nature));
+      [...$("plDays").children].forEach(b=>b.classList.toggle("on",it.days.includes(+b.dataset.d)));
+      $("plStart").value=hhmm(it.start);
+      const opt=[...$("plDur").options].find(o=>+o.value===it.dur);
+      if(opt){$("plDur").value=String(it.dur);$("plCustomWrap").hidden=true;}
+      else{$("plDur").value="custom";$("plCustomWrap").hidden=false;$("plCustom").value=it.dur;}
+      $("plAdd").textContent="💾 حفظ التعديل"; $("plCancel").hidden=false;
+      slotHint(); document.getElementById("plName").scrollIntoView({behavior:"smooth",block:"center"});
+    }else{
+      cur().items=cur().items.filter(x=>x.id!==it.id); save(); renderAll(); msg("تم الحذف",true);
+    }
+  });
+
+  $("plClear").addEventListener("click",()=>{
+    if(!cur().items.length) return;
+    if(!confirm(`تفريغ «مسودة ${st.active+1}» من كل المقررات؟`))return;
+    cur().items=[]; save(); resetForm(); renderAll();
+  });
+
+  renderAll(); slotHint();
+})();
+
 
 /* Navbar */
 const nav=document.getElementById("navbar");
