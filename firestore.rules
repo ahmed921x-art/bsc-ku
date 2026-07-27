@@ -110,6 +110,14 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Comments under a course explainer. Published immediately (post-moderated),
+    // so anyone may create and read, but only admins can edit or remove.
+    match /videoComments/{id} {
+      allow create: if true;
+      allow read: if true;
+      allow update, delete: if isAdmin();
+    }
+
     // Course ratings: create + read for everyone.
     // Site only shows approved ones. Status change/delete is admin-only.
     match /courseRatings/{id} {

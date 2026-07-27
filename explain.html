@@ -535,6 +535,10 @@ a{color:inherit;text-decoration:none}
     <input class="sn-input" id="avCourse" list="avCourseList" placeholder="اكتب رمز المادة أو اسمها" autocomplete="off">
     <datalist id="avCourseList"></datalist>
 
+    <label class="sn-label">رقم المحاضرة (اختياري)</label>
+    <input class="sn-input" id="avLec" type="number" min="1" max="99" placeholder="مثال: 3 — اتركه فاضي لو شرح عام للمادة">
+    <p class="sn-hint">لو تشرح المادة محاضرة محاضرة، حط الرقم عشان تترتب بالتسلسل.</p>
+
     <label class="sn-label">عنوان الشرح *</label>
     <input class="sn-input" id="avTitle" placeholder="مثال: شرح شامل مع حل نماذج اختبارات" maxlength="90">
 
@@ -611,6 +615,11 @@ a{color:inherit;text-decoration:none}
 .vid-row img{width:74px;height:46px;object-fit:cover;border-radius:7px;flex-shrink:0;background:#141829}
 .vid-row .vr-t{font-size:.85rem;font-weight:600;line-height:1.45;color:var(--text)}
 .vid-row .vr-m{font-size:.72rem;color:var(--muted);margin-top:.15rem}
+.vid-row.on{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.09)}
+.lec-no{flex-shrink:0;width:26px;height:26px;border-radius:8px;background:rgba(99,102,241,.18);color:#a5b4fc;font-family:'Plus Jakarta Sans',sans-serif;font-size:.78rem;font-weight:900;display:flex;align-items:center;justify-content:center}
+.vid-row.on .lec-no{background:#6366f1;color:#fff}
+.vr-now{flex-shrink:0;font-size:.68rem;font-weight:800;color:#a5b4fc;padding:.15rem .5rem;border-radius:999px;background:rgba(99,102,241,.15)}
+.lec-badge{display:inline-block;font-size:.7rem;font-weight:800;color:#a5b4fc;background:rgba(99,102,241,.15);padding:.12rem .5rem;border-radius:999px;vertical-align:middle}
 .empty-note{text-align:center;padding:2.5rem 1rem;color:var(--muted)}
 .empty-note .en-ico{font-size:2rem;display:block;margin-bottom:.6rem}
 .sn-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem}
@@ -668,7 +677,7 @@ const MAJORS=[
 
 let courses=[];          // {code,nameAr,nameEn,hours,majors:Set}
 let videos=[];           // approved courseVideos
-let state={major:null,q:"",course:null};
+let state={major:null,q:"",course:null,vid:null};
 
 /* ── youtube helpers ── */
 function ytId(url){
@@ -719,7 +728,13 @@ async function loadVideos(){
   }catch(e){videos=[]}
 }
 const vidsFor=code=>videos.filter(v=>String(v.courseCode).replace(/\s|-/g,"")===code)
-  .sort((a,b)=>(b.helpful||0)-(a.helpful||0));
+  .sort((a,b)=>{
+    const la=+a.lectureNo||0, lb=+b.lectureNo||0;
+    if(la&&lb&&la!==lb)return la-lb;   // both numbered -> by lecture
+    if(la&&!lb)return -1;              // numbered before unnumbered
+    if(!la&&lb)return 1;
+    return (b.helpful||0)-(a.helpful||0);
+  });
 
 /* ── list view ── */
 function renderChips(){
@@ -746,7 +761,7 @@ function renderGrid(){
     return `<button class="c-card ${n?"":"empty"}" data-code="${c.code}" style="animation-delay:${Math.min(i*.03,.4)}s">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem">
         <span class="c-code">${esc(c.code)}</span>
-        <span class="c-badge ${n?"":"zero"}">${n?`${n} شرح`:"كن الأول"}</span>
+        <span class="c-badge ${n?"":"zero"}">${n?`${n} محاضرة`:"كن الأول"}</span>
       </div>
       <div class="c-name">${esc(c.nameAr)}</div>
       <div class="c-meta">${c.hours?`<span>⏱ ${c.hours} ساعات</span>`:""}</div>
@@ -771,7 +786,7 @@ function openCourse(code,vidIdx){
     <div class="cv-head">
       <span class="c-code" style="font-size:.8rem">${esc(c.code)}</span>
       <h2>${esc(c.nameAr)}</h2>
-      <span style="font-size:.8rem;color:var(--muted)">${c.hours?`${c.hours} ساعات · `:""}${list.length} شرح</span>
+      <span style="font-size:.8rem;color:var(--muted)">${c.hours?`${c.hours} ساعات · `:""}${list.length} محاضرة</span>
     </div>`;
 
   if(!cur){
@@ -791,7 +806,7 @@ function openCourse(code,vidIdx){
   html+=`<div class="player">
       ${id?`<iframe id="ytFrame" src="${ytEmbed(id)}" title="${esc(cur.title)}" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>`:`<div style="padding:2rem;text-align:center;color:var(--muted)">رابط الفيديو غير صالح</div>`}
       <div class="player-info">
-        <h3>${esc(cur.title)}</h3>
+        <h3>${(+cur.lectureNo)?`<span class="lec-badge">محاضرة ${+cur.lectureNo}</span> `:""}${esc(cur.title)}</h3>
         <div class="byline">
           <span class="av-av">${esc((cur.authorName||"؟").trim().charAt(0))}</span>
           <span>${esc(cur.authorName||"طالب")}${cur.batch?` · دفعة ${esc(cur.batch)}`:""}</span>
@@ -814,22 +829,98 @@ function openCourse(code,vidIdx){
       </div></div>`;
   }
   if(list.length>1){
-    html+=`<div class="panel-title" style="max-width:900px;margin:1.2rem auto .6rem">شروحات أخرى للمادة</div>`;
+    const numbered=list.filter(v=>+v.lectureNo).length;
+    html+=`<div class="panel-title" style="max-width:900px;margin:1.2rem auto .6rem">${numbered?`قائمة المحاضرات (${list.length})`:"شروحات أخرى للمادة"}</div>`;
     list.forEach((v,i)=>{
-      if(v.id===cur.id)return;
       const vid=ytId(v.videoUrl);
-      html+=`<button class="vid-row" data-idx="${i}">
+      const on=v.id===cur.id;
+      const no=+v.lectureNo||0;
+      html+=`<button class="vid-row${on?" on":""}" data-idx="${i}"${on?' aria-current="true"':""}>
+        ${no?`<span class="lec-no">${no}</span>`:""}
         <img src="${vid?ytThumb(vid):""}" alt="" loading="lazy">
         <div style="min-width:0;flex:1">
           <div class="vr-t">${esc(v.title)}</div>
           <div class="vr-m">${esc(v.authorName||"طالب")}${v.duration?` · ${esc(v.duration)}`:""} · مفيد ${v.helpful||0}</div>
-        </div></button>`;
+        </div>
+        ${on?`<span class="vr-now">يُعرض الآن</span>`:""}</button>`;
     });
   }
+  html+=`<div class="panel-box" id="cmBox" style="margin-top:1.2rem">
+      <div class="panel-title">تعليقات الطلبة <span id="cmCount" style="color:var(--muted);font-weight:700"></span></div>
+      <div id="cmList"><p style="font-size:.82rem;color:var(--muted)">جاري التحميل...</p></div>
+      <div style="border-top:1px solid rgba(255,255,255,.06);margin-top:.9rem;padding-top:.9rem">
+        <input class="sn-input" id="cmName" placeholder="اسمك (اختياري)" maxlength="30">
+        <textarea class="sn-input" id="cmText" rows="2" placeholder="اكتب سؤالك أو ملاحظتك عن هذا الشرح..." maxlength="400"></textarea>
+        <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
+          <button class="share-cta-btn" id="cmSend" style="padding:.5rem 1.1rem;font-size:.82rem">أرسل</button>
+          <span id="cmMsg" style="font-size:.8rem;font-weight:700"></span>
+        </div>
+      </div>
+    </div>`;
   html+=`<div style="text-align:center;margin-top:1.4rem">
     <button class="share-cta-btn" onclick="window.__openAdd('${esc(c.code)}')">🎬 أضف شرحك لهذي المادة</button></div></div>`;
   body.innerHTML=html;
+  state.vid=cur.id;
+  loadComments(cur.id);
 }
+/* ── comments ── */
+function timeAgo(ts){
+  if(!ts||!ts.seconds)return "";
+  const s=Math.floor(Date.now()/1000-ts.seconds);
+  if(s<60)return "الآن";
+  if(s<3600)return `قبل ${Math.floor(s/60)} دقيقة`;
+  if(s<86400)return `قبل ${Math.floor(s/3600)} ساعة`;
+  return `قبل ${Math.floor(s/86400)} يوم`;
+}
+async function loadComments(videoId){
+  const list=document.getElementById("cmList");
+  if(!list)return;
+  let items=[];
+  try{
+    const snap=await getDocs(collection(db,"videoComments"));
+    items=snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(c=>c.videoId===videoId&&c.status!=="hidden")
+      .sort((a,b)=>((b.createdAt&&b.createdAt.seconds)||0)-((a.createdAt&&a.createdAt.seconds)||0));
+  }catch(e){
+    list.innerHTML='<p style="font-size:.82rem;color:var(--muted)">ما قدرنا نحمّل التعليقات.</p>';return;
+  }
+  const cnt=document.getElementById("cmCount");
+  if(cnt)cnt.textContent=items.length?`(${items.length})`:"";
+  list.innerHTML=items.length?items.map(c=>`
+    <div style="display:flex;gap:.6rem;padding:.6rem 0;border-bottom:1px solid rgba(255,255,255,.05)">
+      <div class="av-av" style="flex-shrink:0">${esc((c.name||"ط").trim().charAt(0))}</div>
+      <div style="min-width:0;flex:1">
+        <div style="font-size:.78rem;color:var(--muted)">${esc(c.name||"طالب")} · ${timeAgo(c.createdAt)}</div>
+        <div style="font-size:.86rem;line-height:1.75;color:#c8d2ea;white-space:pre-wrap;word-break:break-word">${esc(c.text)}</div>
+      </div>
+    </div>`).join("")
+    :'<p style="font-size:.82rem;color:var(--muted)">ما فيه تعليقات بعد — كن أول من يعلّق.</p>';
+}
+async function sendComment(videoId,courseCode){
+  const t=document.getElementById("cmText"),n=document.getElementById("cmName"),m=document.getElementById("cmMsg"),b=document.getElementById("cmSend");
+  const say=(x,ok)=>{m.textContent=x;m.style.color=ok?"#6ee7b7":"#f87171"};
+  const text=(t.value||"").trim();
+  if(text.length<2)return say("اكتب تعليقك أول.");
+  if(text.length>400)return say("التعليق طويل (400 حرف كحد أقصى).");
+  const last=+(localStorage.getItem("bscku_cm_last")||0);
+  if(Date.now()-last<20000)return say("انتظر شوي قبل تعليق ثاني.");
+  b.disabled=true;say("جاري الإرسال...",true);
+  try{
+    await addDoc(collection(db,"videoComments"),{
+      videoId,courseCode,
+      name:(n.value||"").trim().slice(0,30)||"طالب",
+      text:text.slice(0,400),
+      status:"visible",
+      createdAt:serverTimestamp()
+    });
+    localStorage.setItem("bscku_cm_last",String(Date.now()));
+    t.value="";say("✅ تم النشر",true);
+    await loadComments(videoId);
+    setTimeout(()=>say(""),2000);
+  }catch(e){say("صار خطأ، حاول مرة ثانية.");}
+  b.disabled=false;
+}
+
 function closeCourse(){
   state.course=null;
   if(location.hash)history.replaceState(null,"",location.pathname);
@@ -860,6 +951,7 @@ document.getElementById("courseBody").addEventListener("click",async e=>{
   }
   const row=e.target.closest(".vid-row");
   if(row){openCourse(state.course,+row.dataset.idx);return;}
+  if(e.target.closest("#cmSend")){ sendComment(state.vid,state.course); return; }
   const hb=e.target.closest(".helpful");
   if(hb&&!hb.disabled){
     const vid=hb.dataset.vid;
@@ -917,6 +1009,7 @@ document.getElementById("avSubmit").addEventListener("click",async()=>{
   try{
     await addDoc(collection(db,"courseVideos"),{
       courseCode:code,
+      lectureNo:Math.max(0,Math.min(99,parseInt(document.getElementById("avLec").value,10)||0)),
       courseNameAr:(courses.find(c=>c.code===code)||{}).nameAr||"",
       title:title.slice(0,90),
       videoUrl:`https://youtu.be/${id}`,
@@ -932,7 +1025,7 @@ document.getElementById("avSubmit").addEventListener("click",async()=>{
     localStorage.setItem("bscku_av_last",String(Date.now()));
     msg("✅ وصلنا شرحك! بعد مراجعة النادي بينشر هنا.",true);
     setTimeout(()=>{ov.hidden=true;document.body.style.overflow="";btn.disabled=false;
-      ["avTitle","avUrl","avDur","avChapters","avNote1","avNote2"].forEach(i=>document.getElementById(i).value="");
+      ["avTitle","avUrl","avDur","avChapters","avNote1","avNote2","avLec"].forEach(i=>document.getElementById(i).value="");
       document.getElementById("avPreview").hidden=true;msg("");},2600);
   }catch(e){msg("صار خطأ، حاول مرة ثانية.");btn.disabled=false}
 });
