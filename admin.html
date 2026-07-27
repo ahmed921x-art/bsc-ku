@@ -1462,34 +1462,142 @@ function renderVideos(items){
   const el=document.getElementById("videosList");if(!el)return;
   if(!items.length){el.innerHTML='<p style="color:var(--muted);padding:1rem">ما فيه شروحات مرسلة حالياً.</p>';return;}
   const STATUS={pending:['⏳ بانتظار المراجعة','#f59e0b'],approved:['✅ مقبول ومنشور','#10b981'],rejected:['❌ مرفوض','#ef4444']};
-  const ordered=[...items].sort((a,b)=>((a.status||"pending")==="pending"?0:1)-((b.status||"pending")==="pending"?0:1));
-  el.innerHTML=ordered.map(v=>{
-    const st=v.status||"pending";const[label,color]=STATUS[st]||STATUS.pending;
-    const id=ytId_(v.videoUrl);
-    const chaps=Array.isArray(v.chapters)?v.chapters:[];
-    const notes=(v.noteUrls||[]);
-    return `<div class="list-item" style="border-inline-start:3px solid ${color}">
-      <div class="list-item-body">
-        <h4>${(+v.lectureNo)?`<span style="background:rgba(99,102,241,.2);color:#a5b4fc;padding:.05rem .45rem;border-radius:6px;font-size:.72rem">محاضرة ${+v.lectureNo}</span> `:""}${escSub(v.courseCode)||"—"} — ${escSub(v.courseNameAr)} <span style="font-size:.72rem;font-weight:800;color:${color}">${label}</span></h4>
-        <p style="font-weight:700">${escSub(v.title)}</p>
-        <p style="font-size:.8rem;color:var(--muted)">${escSub(v.authorName)||"—"}${v.batch?` · دفعة ${escSub(v.batch)}`:""}${v.duration?` · ${escSub(v.duration)}`:""} · 👍 ${v.helpful||0}</p>
-        ${id?`<div style="display:flex;gap:.6rem;align-items:center;margin-top:.5rem">
-          <img src="https://img.youtube.com/vi/${id}/mqdefault.jpg" alt="" style="width:96px;height:60px;object-fit:cover;border-radius:8px">
-          <a href="${escSub(v.videoUrl)}" target="_blank" rel="noopener" style="font-size:.8rem;color:#a5b4fc;font-weight:700">▶ افتح الفيديو للمراجعة</a>
-        </div>`:`<p style="color:#fca5a5;font-size:.8rem">⚠️ رابط يوتيوب غير صالح: ${escSub(v.videoUrl)}</p>`}
-        ${chaps.length?`<p style="font-size:.78rem;color:var(--muted);margin-top:.4rem">📑 ${chaps.length} محور — ${escSub(chaps.slice(0,3).map(c=>c.time+" "+c.label).join(" · "))}${chaps.length>3?" …":""}</p>`:""}
-        ${notes.length?`<p style="font-size:.78rem;margin-top:.3rem">📄 ${notes.map((u,i)=>`<a href="${escSub(u)}" target="_blank" rel="noopener" style="color:#6ee7b7">نوتة ${i+1}</a>`).join(" · ")}</p>`:""}
-      </div>
-      <div class="list-item-actions" style="flex-wrap:wrap">
-        ${st==="pending"?`
-          <button class="btn btn-sm" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);color:#6ee7b7" onclick="approveVideo_('${v.id}')">✅ قبول ونشر</button>
-          <button class="btn btn-sm" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5" onclick="rejectVideo_('${v.id}')">❌ رفض</button>
-        `:""}
-        <button class="btn btn-danger btn-sm" onclick="delItem_('courseVideos','${v.id}')">حذف</button>
-      </div>
-    </div>`;
+
+  // group by course, pending first, then lecture order
+  const groups={};
+  items.forEach(v=>{const k=v.courseCode||"—";(groups[k]||(groups[k]=[])).push(v)});
+  const lecSort=(a,b)=>{
+    const la=+a.lectureNo||0, lb=+b.lectureNo||0;
+    if(la&&lb&&la!==lb)return la-lb;
+    if(la&&!lb)return -1;
+    if(!la&&lb)return 1;
+    return ((a.createdAt&&a.createdAt.seconds)||0)-((b.createdAt&&b.createdAt.seconds)||0);
+  };
+  const keys=Object.keys(groups).sort((a,b)=>{
+    const pa=groups[a].some(v=>(v.status||"pending")==="pending")?0:1;
+    const pb=groups[b].some(v=>(v.status||"pending")==="pending")?0:1;
+    return pa-pb || a.localeCompare(b);
+  });
+
+  el.innerHTML=keys.map(code=>{
+    const list=[...groups[code]].sort(lecSort);
+    const nameAr=(list[0]||{}).courseNameAr||"";
+    const rows=list.map((v,idx)=>{
+      const st=v.status||"pending";const[label,color]=STATUS[st]||STATUS.pending;
+      const id=ytId_(v.videoUrl);
+      const chaps=Array.isArray(v.chapters)?v.chapters:[];
+      const notes=(v.noteUrls||[]);
+      return `<div class="list-item" style="border-inline-start:3px solid ${color}">
+        <div class="list-item-body">
+          <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.35rem">
+            <label style="font-size:.7rem;color:var(--muted)">محاضرة</label>
+            <input type="number" min="0" max="99" value="${+v.lectureNo||""}" placeholder="—" title="رقم المحاضرة — 0 أو فاضي يعني شرح عام"
+              onchange="vidSetLec_('${v.id}',this.value)"
+              style="width:56px;padding:.3rem;text-align:center;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Tajawal',system-ui">
+            <button class="btn btn-sm" title="أعلى" onclick="vidMove_('${escSub(code)}','${v.id}',-1)" ${idx===0?"disabled":""} style="padding:.2rem .5rem">▲</button>
+            <button class="btn btn-sm" title="أسفل" onclick="vidMove_('${escSub(code)}','${v.id}',1)" ${idx===list.length-1?"disabled":""} style="padding:.2rem .5rem">▼</button>
+            <span style="font-size:.72rem;font-weight:800;color:${color}">${label}</span>
+          </div>
+          <p style="font-weight:700">${escSub(v.title)}</p>
+          <p style="font-size:.8rem;color:var(--muted)">${escSub(v.authorName)||"—"}${v.batch?` · دفعة ${escSub(v.batch)}`:""}${v.duration?` · ${escSub(v.duration)}`:""} · 👍 ${v.helpful||0}</p>
+          ${id?`<div style="display:flex;gap:.6rem;align-items:center;margin-top:.5rem">
+            <img src="https://img.youtube.com/vi/${id}/mqdefault.jpg" alt="" style="width:96px;height:60px;object-fit:cover;border-radius:8px">
+            <a href="${escSub(v.videoUrl)}" target="_blank" rel="noopener" style="font-size:.8rem;color:#a5b4fc;font-weight:700">▶ افتح الفيديو</a>
+          </div>`:`<p style="color:#fca5a5;font-size:.8rem">⚠️ رابط يوتيوب غير صالح: ${escSub(v.videoUrl)}</p>`}
+          ${chaps.length?`<p style="font-size:.78rem;color:var(--muted);margin-top:.4rem">📑 ${chaps.length} محور — ${escSub(chaps.slice(0,3).map(c=>c.time+" "+c.label).join(" · "))}${chaps.length>3?" …":""}</p>`:""}
+          ${notes.length?`<p style="font-size:.78rem;margin-top:.3rem">📄 ${notes.map((u,i)=>`<a href="${escSub(u)}" target="_blank" rel="noopener" style="color:#6ee7b7">نوتة ${i+1}</a>`).join(" · ")}</p>`:""}
+          <div id="ved-${v.id}" style="display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)"></div>
+        </div>
+        <div class="list-item-actions" style="flex-wrap:wrap">
+          ${st==="pending"?`
+            <button class="btn btn-sm" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);color:#6ee7b7" onclick="approveVideo_('${v.id}')">✅ قبول ونشر</button>
+            <button class="btn btn-sm" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5" onclick="rejectVideo_('${v.id}')">❌ رفض</button>
+          `:""}
+          <button class="btn btn-sm" style="background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.35);color:#a5b4fc" onclick="vidEdit_('${v.id}')">✏️ تعديل</button>
+          <button class="btn btn-danger btn-sm" onclick="delItem_('courseVideos','${v.id}')">حذف</button>
+        </div>
+      </div>`;
+    }).join("");
+    return `<div style="margin-bottom:1.5rem">
+      <h3 style="font-size:.9rem;font-weight:800;color:#a5b4fc;margin-bottom:.6rem;padding-inline-start:.2rem">
+        ${escSub(code)} — ${escSub(nameAr)} <span style="color:var(--muted);font-weight:700">(${list.length})</span>
+      </h3>${rows}</div>`;
   }).join("");
 }
+
+// تعديل رقم المحاضرة مباشرة
+window.vidSetLec_=async (id,val)=>{
+  const n=Math.max(0,Math.min(99,parseInt(val,10)||0));
+  await setDoc(doc(db,"courseVideos",id),{lectureNo:n},{merge:true});
+  loadAll();
+};
+// نقل المحاضرة أعلى/أسفل داخل نفس المادة (يبدّل الأرقام)
+window.vidMove_=async (code,id,dir)=>{
+  const list=Object.values(_videosCache).filter(v=>(v.courseCode||"—")===code)
+    .sort((a,b)=>{
+      const la=+a.lectureNo||0, lb=+b.lectureNo||0;
+      if(la&&lb&&la!==lb)return la-lb;
+      if(la&&!lb)return -1;
+      if(!la&&lb)return 1;
+      return ((a.createdAt&&a.createdAt.seconds)||0)-((b.createdAt&&b.createdAt.seconds)||0);
+    });
+  const i=list.findIndex(v=>v.id===id), j=i+dir;
+  if(i<0||j<0||j>=list.length)return;
+  // renumber the whole course 1..n then swap the two positions
+  const order=list.map(v=>v.id);
+  order.splice(j,0,order.splice(i,1)[0]);
+  await Promise.all(order.map((vid,k)=>setDoc(doc(db,"courseVideos",vid),{lectureNo:k+1},{merge:true})));
+  loadAll();
+};
+// نموذج تعديل كامل داخل البطاقة
+window.vidEdit_=id=>{
+  const v=_videosCache[id];if(!v)return;
+  const box=document.getElementById("ved-"+id);if(!box)return;
+  if(box.style.display==="block"){box.style.display="none";box.innerHTML="";return;}
+  const chapText=(Array.isArray(v.chapters)?v.chapters:[]).map(c=>`${c.time} ${c.label}`).join("\n");
+  const n=(v.noteUrls||[]);
+  box.style.display="block";
+  box.innerHTML=`<div class="form-grid">
+      <div class="form-group"><label>عنوان الشرح</label><input id="ve-title-${id}" value="${escSub(v.title)}"></div>
+      <div class="form-group"><label>رابط اليوتيوب</label><input id="ve-url-${id}" value="${escSub(v.videoUrl)}" dir="ltr"></div>
+      <div class="form-group"><label>المدة</label><input id="ve-dur-${id}" value="${escSub(v.duration||"")}" dir="ltr" placeholder="38:14"></div>
+      <div class="form-group"><label>اسم الشارح</label><input id="ve-name-${id}" value="${escSub(v.authorName||"")}"></div>
+      <div class="form-group"><label>الدفعة</label><input id="ve-batch-${id}" value="${escSub(v.batch||"")}"></div>
+      <div class="form-group form-full"><label>فهرس المحاور (سطر لكل محور)</label><textarea id="ve-chap-${id}" rows="3">${escSub(chapText)}</textarea></div>
+      <div class="form-group"><label>نوتة 1</label><input id="ve-n1-${id}" value="${escSub(n[0]||"")}" dir="ltr"></div>
+      <div class="form-group"><label>نوتة 2</label><input id="ve-n2-${id}" value="${escSub(n[1]||"")}" dir="ltr"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-green btn-sm" onclick="vidSave_('${id}')">💾 حفظ</button>
+      <button class="btn btn-ghost btn-sm" onclick="vidEdit_('${id}')">إلغاء</button>
+      <span id="ve-msg-${id}" style="font-size:.8rem;display:flex;align-items:center"></span>
+    </div>`;
+};
+window.vidSave_=async id=>{
+  const g=k=>document.getElementById(`ve-${k}-${id}`).value.trim();
+  const msg=document.getElementById("ve-msg-"+id);
+  const say=(t,ok)=>{msg.textContent=t;msg.style.color=ok?"#6ee7b7":"#f87171"};
+  const title=g("title"), url=g("url"), name=g("name");
+  if(title.length<6)return say("العنوان قصير.");
+  if(!ytId_(url))return say("رابط اليوتيوب غير صالح.");
+  if(name.length<2)return say("اكتب اسم الشارح.");
+  const notes=[g("n1"),g("n2")].filter(u=>/^https:\/\/(drive|docs)\.google\.com\//.test(u));
+  say("⏳ جاري الحفظ...",true);
+  try{
+    await setDoc(doc(db,"courseVideos",id),{
+      title:title.slice(0,90),
+      videoUrl:`https://youtu.be/${ytId_(url)}`,
+      duration:g("dur").slice(0,8),
+      authorName:name.slice(0,40),
+      batch:g("batch").slice(0,12),
+      chapters:avaParseChapters(g("chap")).slice(0,40),
+      noteUrls:notes,
+      updatedAt:serverTimestamp()
+    },{merge:true});
+    say("✅ تم الحفظ",true);
+    setTimeout(loadAll,600);
+  }catch(e){say("صار خطأ: "+(e.code||e.message));}
+};
 window.approveVideo_=async id=>{
   const v=_videosCache[id];if(!v)return;
   if(!ytId_(v.videoUrl))return alert("رابط اليوتيوب غير صالح — لا يمكن نشره.");
