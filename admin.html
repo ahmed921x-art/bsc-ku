@@ -516,6 +516,28 @@ a{color:inherit;text-decoration:none}
       <!-- COURSE VIDEOS -->
       <div class="panel" id="panel-videos">
         <div class="panel-header"><h2>🎬 شرح المواد</h2><p>شروحات مصوّرة أرسلها الطلبة من صفحة «شرح المواد» — راجع الفيديو قبل القبول</p></div>
+        <div class="card"><h3>➕ إضافة شرح من النادي</h3>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">اللي تضيفه من هنا يُنشر مباشرة بدون مراجعة. الفيديو لازم يكون على يوتيوب.</p>
+          <div class="form-grid">
+            <div class="form-group"><label>المادة</label>
+              <input id="avaCourse" list="avaCourseList" placeholder="اكتب رمز المادة أو اسمها" autocomplete="off">
+              <datalist id="avaCourseList"></datalist>
+            </div>
+            <div class="form-group"><label>عنوان الشرح</label><input id="avaTitle" placeholder="شرح شامل مع حل نماذج"></div>
+            <div class="form-group"><label>رابط اليوتيوب</label><input id="avaUrl" placeholder="https://youtu.be/..." dir="ltr"></div>
+            <div class="form-group"><label>مدة الفيديو</label><input id="avaDur" placeholder="38:14" dir="ltr"></div>
+            <div class="form-group"><label>اسم الشارح</label><input id="avaName" placeholder="اسم الطالب أو النادي"></div>
+            <div class="form-group"><label>الدفعة</label><input id="avaBatch" placeholder="2023"></div>
+            <div class="form-group form-full"><label>فهرس المحاور (سطر لكل محور — مثال: 04:20 تركيب الأغشية)</label>
+              <textarea id="avaChapters" rows="3" placeholder="00:00 مقدمة&#10;04:20 تركيب الأغشية"></textarea></div>
+            <div class="form-group"><label>نوتة مرفقة 1 (رابط Drive)</label><input id="avaNote1" placeholder="اختياري" dir="ltr"></div>
+            <div class="form-group"><label>نوتة مرفقة 2 (رابط Drive)</label><input id="avaNote2" placeholder="اختياري" dir="ltr"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="avaAdd">+ إضافة ونشر</button>
+            <span id="avaMsg" style="font-size:.82rem;display:flex;align-items:center"></span>
+          </div>
+        </div>
         <div class="items-list" id="videosList"></div>
       </div>
 
@@ -1471,6 +1493,76 @@ window.rejectVideo_=async id=>{
   if(!confirm("رفض هذا الشرح؟ (يظل محفوظاً هنا ويمكن حذفه)"))return;
   await setDoc(doc(db,"courseVideos",id),{status:"rejected",reviewedAt:serverTimestamp()},{merge:true});
   loadAll();
+};
+
+// إضافة شرح من لوحة الأدمن مباشرة (يُنشر بدون مراجعة)
+let _avaCatalog=[];
+async function avaLoadCatalog(){
+  if(_avaCatalog.length)return;
+  const byCode=new Map();
+  const add=list=>(list||[]).forEach(c=>{
+    if(!c.code)return;
+    const k=String(c.code).replace(/[\s-]/g,"");
+    if(!byCode.has(k)&&c.nameAr)byCode.set(k,{code:k,nameAr:c.nameAr});
+  });
+  for(const m of Object.keys(MN)){
+    for(const col of ["majorSheets","supportSheets"]){
+      try{const s=await getDoc(doc(db,col,m));if(s.exists())add(s.data().courses);}catch(e){}
+    }
+  }
+  _avaCatalog=[...byCode.values()].sort((a,b)=>a.code.localeCompare(b.code));
+  const dl=document.getElementById("avaCourseList");
+  if(dl)dl.innerHTML=_avaCatalog.map(c=>`<option value="${c.code}">${escSub(c.code)} — ${escSub(c.nameAr)}</option>`).join("");
+}
+function avaParseChapters(t){
+  return String(t||"").split("\n").map(l=>{
+    const m=l.trim().match(/^(\d{1,2}:\d{2}(?::\d{2})?)\s+(.{1,80})$/);
+    if(!m)return null;
+    const p=m[1].split(":").map(Number);
+    const sec=p.length===3?p[0]*3600+p[1]*60+p[2]:p[0]*60+p[1];
+    return {time:m[1],sec,label:m[2].trim()};
+  }).filter(Boolean);
+}
+document.getElementById("avaAdd").onclick=async()=>{
+  const msg=document.getElementById("avaMsg");
+  const say=(t,ok)=>{msg.textContent=t;msg.style.color=ok?"#6ee7b7":"#f87171"};
+  const code=(document.getElementById("avaCourse").value||"").split("—")[0].replace(/[\s-]/g,"");
+  const title=document.getElementById("avaTitle").value.trim();
+  const url=document.getElementById("avaUrl").value.trim();
+  const name=document.getElementById("avaName").value.trim();
+  const id=ytId_(url);
+  if(!_avaCatalog.length){say("⏳ جاري تحميل قائمة المواد...",true);await avaLoadCatalog();}
+  if(!_avaCatalog.length)return say("ما قدرنا نحمّل قائمة المواد — حدّث الصفحة وحاول مرة ثانية.");
+  const course=_avaCatalog.find(c=>c.code===code);
+  if(!course)return say("اختر مادة من القائمة (اكتب الرمز واختر من الاقتراحات).");
+  if(title.length<6)return say("اكتب عنوان واضح للشرح.");
+  if(!id)return say("رابط اليوتيوب غير صالح.");
+  if(name.length<2)return say("اكتب اسم الشارح.");
+  const notes=[document.getElementById("avaNote1").value.trim(),document.getElementById("avaNote2").value.trim()]
+    .filter(u=>/^https:\/\/(drive|docs)\.google\.com\//.test(u));
+  say("⏳ جاري الإضافة...",true);
+  try{
+    await addDoc(collection(db,"courseVideos"),{
+      courseCode:code,courseNameAr:course.nameAr,
+      title:title.slice(0,90),
+      videoUrl:`https://youtu.be/${id}`,
+      duration:document.getElementById("avaDur").value.trim().slice(0,8),
+      chapters:avaParseChapters(document.getElementById("avaChapters").value).slice(0,40),
+      noteUrls:notes,
+      authorName:name.slice(0,40),
+      batch:document.getElementById("avaBatch").value.trim().slice(0,12),
+      helpful:0,
+      status:"approved",
+      addedByAdmin:true,
+      reviewedAt:serverTimestamp(),
+      createdAt:serverTimestamp()
+    });
+    say("✅ تم النشر!",true);
+    ["avaCourse","avaTitle","avaUrl","avaDur","avaChapters","avaNote1","avaNote2","avaName","avaBatch"]
+      .forEach(i=>document.getElementById(i).value="");
+    loadAll();
+    setTimeout(()=>say(""),2500);
+  }catch(e){say("صار خطأ: "+(e.code||e.message));}
 };
 
 // ADD HANDLERS
@@ -2546,6 +2638,7 @@ function renderSupportCourses(){
 document.addEventListener('click',e=>{
   if(e.target.closest('[data-panel="supportsheet"]'))setTimeout(()=>loadSupportCourses(currentSupportMajor),100);
   if(e.target.closest('[data-panel="gradcalc"]'))setTimeout(gcInit,100);
+  if(e.target.closest('[data-panel="videos"]'))avaLoadCatalog();
 });
 
 // ── GRADUATION CALC ADMIN ──
