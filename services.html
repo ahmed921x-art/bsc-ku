@@ -823,7 +823,7 @@ a{color:inherit;text-decoration:none}
 
       <div class="pl-form">
         <div class="pl-f"><label>وقت البداية</label>
-          <input type="time" id="plStart" value="08:00" min="08:00" max="20:00" step="300"></div>
+          <select id="plStart"></select></div>
         <div class="pl-f"><label>المدة</label>
           <select id="plDur">
             <option value="50">٥٠ دقيقة</option>
@@ -1982,6 +1982,12 @@ loadPref();trigReveal();
     return h12+(x?":"+String(x).padStart(2,"0"):"")+" "+ap;};
 
   const $=id=>document.getElementById(id);
+  (function fillStarts(){
+    const s=$("plStart"); if(!s)return;
+    let o="";
+    for(let m=T0;m<T1;m+=15) o+=`<option value="${hhmm(m)}">${pretty(m)}</option>`;
+    s.innerHTML=o; s.value="08:00";
+  })();
   const grid=$("plGrid");
   if(!grid) return;
 
@@ -2163,7 +2169,7 @@ loadPref();trigReveal();
     const start=hh*60+mm;
     let dur=$("plDur").value==="custom" ? +$("plCustom").value : +$("plDur").value;
     if(!dur||dur<10) return msg("المدة غير صحيحة.");
-    if(start<T0) return msg("الجدول يبدأ من ٨ صباحاً.");
+    if(start<T0||start>=T1) return msg("اختر وقت بداية بين ٨ صباحاً و٨ مساءً.");
     if(start+dur>T1) return msg("المحاضرة تتجاوز ٨ مساءً — قصّر المدة أو قدّم الوقت.");
 
     const rec={id:editId||("c"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)),
