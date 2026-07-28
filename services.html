@@ -487,7 +487,8 @@ a{color:inherit;text-decoration:none}
   background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);cursor:pointer;
   font-family:'Tajawal',sans-serif;transition:all .18s}
 .pl-toggle button:hover,.pl-days button:hover{color:#fff}
-.pl-toggle button.on,.pl-days button.on{background:rgba(99,102,241,.24);border-color:rgba(99,102,241,.55);color:#fff}
+.pl-toggle button.on,.pl-days button.on{background:linear-gradient(135deg,#6366f1,#8b5cf6);border-color:transparent;color:#fff;box-shadow:0 4px 14px rgba(99,102,241,.45)}
+.pl-days button.on::before{content:"✓ ";font-weight:900}
 .pl-hint{font-size:.74rem;color:var(--muted);margin-top:.45rem;line-height:1.6}
 .pl-actions{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-top:.3rem}
 .pl-msg{font-size:.82rem;font-weight:700}
@@ -803,7 +804,7 @@ a{color:inherit;text-decoration:none}
           </div></div>
       </div>
 
-      <div class="pl-f"><label>أيام المحاضرة</label>
+      <div class="pl-f"><label>أيام المحاضرة <span class="opt">(اضغط على اليوم — يصير بنفسجي)</span></label>
         <div class="pl-days" id="plDays">
           <button data-d="0">الأحد</button><button data-d="1">الاثنين</button>
           <button data-d="2">الثلاثاء</button><button data-d="3">الأربعاء</button>
@@ -2118,6 +2119,7 @@ loadPref();trigReveal();
   /* ---- add / edit ---- */
   function msg(t,ok){const m=$("plMsg");m.textContent=t;m.style.color=ok?"#6ee7b7":"#f87171";
     m.classList.toggle("bad",!ok&&!!t);
+    if(t&&!ok){try{m.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){}}
     if(t&&ok)setTimeout(()=>{if(m.textContent===t){m.textContent="";m.classList.remove("bad");}},3000);}
 
   function resetForm(){
