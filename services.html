@@ -464,6 +464,8 @@ a{color:inherit;text-decoration:none}
     /* Theme toggle button */
 @media(max-width:1280px){}
 /* ===== SCHEDULE PLANNER ===== */
+#panel-planner [hidden]{display:none !important}
+
 .pl-card{background:rgba(40,40,44,.55);border:1px solid var(--border);border-radius:20px;padding:1.25rem 1.4rem;margin-bottom:1.1rem}
 .pl-drafts{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.1rem}
 .pl-draft{position:relative;padding:.55rem 1.1rem;border-radius:12px;font-size:.85rem;font-weight:700;
@@ -488,7 +490,8 @@ a{color:inherit;text-decoration:none}
 .pl-toggle button.on,.pl-days button.on{background:rgba(99,102,241,.24);border-color:rgba(99,102,241,.55);color:#fff}
 .pl-hint{font-size:.74rem;color:var(--muted);margin-top:.45rem;line-height:1.6}
 .pl-actions{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-top:.3rem}
-.pl-msg{font-size:.8rem;font-weight:700}
+.pl-msg{font-size:.82rem;font-weight:700}
+.pl-msg.bad{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:10px;padding:.4rem .8rem}
 .pl-sm{padding:.45rem 1rem;font-size:.78rem}
 .pl-gridcard{padding:1rem}
 .pl-gridhead{display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap;margin-bottom:.8rem}
@@ -2114,7 +2117,8 @@ loadPref();trigReveal();
 
   /* ---- add / edit ---- */
   function msg(t,ok){const m=$("plMsg");m.textContent=t;m.style.color=ok?"#6ee7b7":"#f87171";
-    if(t)setTimeout(()=>{if(m.textContent===t)m.textContent="";},3000);}
+    m.classList.toggle("bad",!ok&&!!t);
+    if(t&&ok)setTimeout(()=>{if(m.textContent===t){m.textContent="";m.classList.remove("bad");}},3000);}
 
   function resetForm(){
     editId=null;
