@@ -490,6 +490,9 @@ a{color:inherit;text-decoration:none}
 .pl-toggle button.on,.pl-days button.on{background:linear-gradient(135deg,#6366f1,#8b5cf6);border-color:transparent;color:#fff;box-shadow:0 4px 14px rgba(99,102,241,.45)}
 .pl-days button.on::before{content:"✓ ";font-weight:900}
 .pl-hint{font-size:.74rem;color:var(--muted);margin-top:.45rem;line-height:1.6}
+.pl-picked{margin-top:.55rem;font-size:.8rem;font-weight:700;padding:.4rem .8rem;border-radius:10px;display:inline-block}
+.pl-picked.ok{background:rgba(16,185,129,.14);border:1px solid rgba(16,185,129,.4);color:#6ee7b7}
+.pl-picked.no{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);color:#fcd34d}
 .pl-actions{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-top:.3rem}
 .pl-msg{font-size:.82rem;font-weight:700}
 .pl-added{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.9rem}
@@ -814,6 +817,7 @@ a{color:inherit;text-decoration:none}
           <button data-d="2">الثلاثاء</button><button data-d="3">الأربعاء</button>
           <button data-d="4">الخميس</button>
         </div>
+        <div class="pl-picked no" id="plPicked">⚠️ ما اخترت يوم — اضغط على يوم فوق</div>
         <div class="pl-hint" id="plSlotHint"></div>
       </div>
 
@@ -1995,7 +1999,11 @@ loadPref();trigReveal();
   const getDays=()=>[...$("plDays").querySelectorAll(".on")].map(b=>+b.dataset.d);
 
   function slotHint(){
-    const d=getDays(); const h=$("plSlotHint");
+    const d=getDays(); const h=$("plSlotHint"); const p=$("plPicked");
+    if(p){
+      if(d.length){ p.innerHTML='✓ الأيام المختارة: <b>'+d.map(x=>DAYS[x].ar).join("، ")+'</b>'; p.className="pl-picked ok"; }
+      else { p.innerHTML='⚠️ ما اخترت يوم — اضغط على يوم فوق'; p.className="pl-picked no"; }
+    }
     if(!d.length){h.textContent="";return;}
     const g50=d.some(x=>DAYS[x].step===50), g75=d.some(x=>DAYS[x].step===75);
     const parts=[];
