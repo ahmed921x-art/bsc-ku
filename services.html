@@ -563,6 +563,35 @@ a{color:inherit;text-decoration:none}
 .pl-copy-t:hover{border-color:rgba(99,102,241,.55);color:#fff;transform:translateY(-2px)}
 .pl-copy-t .n{font-size:.68rem;font-weight:600;color:var(--muted)}
 
+/* --- export / share --- */
+.pl-headbtns{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.pl-exp-row{display:flex;gap:.85rem;flex-wrap:wrap}
+.pl-exp-row .pl-f{min-width:150px}
+.pl-share-row{display:flex;gap:.5rem;align-items:stretch;flex-wrap:wrap}
+.pl-share-row textarea{flex:1;min-width:220px;padding:.6rem .8rem;background:rgba(255,255,255,.05);
+  border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:.78rem;
+  font-family:'Plus Jakarta Sans',monospace;resize:vertical;direction:ltr;text-align:start;
+  word-break:break-all}
+.pl-share-row textarea:focus{outline:none;border-color:rgba(99,102,241,.55)}
+.pl-share-row .pl-copy-t{justify-content:center;flex-shrink:0}
+
+/* --- prerequisite warnings --- */
+.pl-prereq{background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.34);border-radius:14px;
+  padding:.85rem 1.1rem;margin-bottom:1.1rem}
+.pl-prereq h4{font-size:.9rem;font-weight:800;color:#fcd34d;margin-bottom:.4rem}
+.pl-prereq p{font-size:.8rem;color:#e8d5b4;line-height:1.7}
+.pl-prereq .why{font-size:.74rem;color:var(--muted);margin-top:.5rem;line-height:1.6}
+.pl-ev.prereq::after{content:"⚠";position:absolute;bottom:2px;inset-inline-end:3px;font-size:.66rem;opacity:.9}
+
+/* --- graduation: currently-registered courses --- */
+.grad-now{display:inline-block;font-size:.62rem;font-weight:800;padding:.12rem .45rem;border-radius:999px;
+  background:rgba(99,102,241,.2);color:#a5b4fc;border:1px solid rgba(99,102,241,.4);flex-shrink:0}
+
+[data-theme="light"] .pl-share-row textarea{background:#f8fafc !important;color:#0f172a !important}
+[data-theme="light"] .pl-prereq{background:rgba(245,158,11,.08) !important}
+[data-theme="light"] .pl-prereq h4{color:#b45309 !important}
+[data-theme="light"] .pl-prereq p{color:#78350f !important}
+
 @media(max-width:640px){.pl-grid{grid-template-columns:46px repeat(5,minmax(96px,1fr))}
   .pl-copybtn{margin-inline-start:0;width:100%}}
 [data-theme="light"] .pl-card{background:#fff !important}
@@ -911,11 +940,52 @@ a{color:inherit;text-decoration:none}
     <!-- conflicts -->
     <div id="plConflicts"></div>
 
+    <!-- prerequisite warnings -->
+    <div id="plPrereq"></div>
+
     <!-- grid -->
     <div class="pl-card pl-gridcard">
       <div class="pl-gridhead">
         <div class="pl-legend" id="plLegend"></div>
-        <button class="btn-reset pl-sm" id="plClear">🗑️ تفريغ المسودة</button>
+        <div class="pl-headbtns">
+          <button class="pl-copybtn" id="plShareBtn">🔗 مشاركة</button>
+          <button class="pl-copybtn" id="plExportBtn">⬇️ تصدير</button>
+          <button class="btn-reset pl-sm" id="plClear">🗑️ تفريغ المسودة</button>
+        </div>
+      </div>
+
+      <!-- export panel -->
+      <div class="pl-copy" id="plExportWrap" hidden style="margin:.2rem 0 1rem">
+        <h4>⬇️ تصدير الجدول</h4>
+        <div class="sub">احفظ الجدول صورة تنشرها، أو ملف تقويم يدخل مباشرة في تقويم جوالك مع تذكير قبل كل محاضرة.</div>
+        <div class="pl-exp-row">
+          <div class="pl-f"><label>بداية الفصل</label><input type="date" id="plTermStart"></div>
+          <div class="pl-f"><label>عدد الأسابيع</label>
+            <input type="number" id="plWeeks" min="1" max="20" step="1" value="15"></div>
+        </div>
+        <div class="pl-copy-targets" style="margin-top:.6rem">
+          <button class="pl-copy-t" id="plExpPng">🖼️ صورة PNG<span class="n">للنشر والمشاركة</span></button>
+          <button class="pl-copy-t" id="plExpIcs">📅 ملف تقويم ICS<span class="n">جوجل / آبل كالندر</span></button>
+        </div>
+      </div>
+
+      <!-- share panel -->
+      <div class="pl-copy" id="plShareWrap" hidden style="margin:.2rem 0 1rem">
+        <h4>🔗 مشاركة الجدول</h4>
+        <div class="sub">انسخ الرمز وأرسله لصاحبك — يلصقه تحت ويطلع له جدولك كامل.</div>
+
+        <div class="pl-copy-lbl">رمز جدولك</div>
+        <div class="pl-share-row">
+          <textarea id="plShareOut" readonly rows="2" spellcheck="false"></textarea>
+          <button class="pl-copy-t" id="plShareCopy">📋 نسخ</button>
+        </div>
+
+        <div class="pl-copy-lbl" style="margin-top:1rem">استيراد رمز وصلك</div>
+        <div class="pl-share-row">
+          <textarea id="plShareIn" rows="2" placeholder="الصق الرمز هنا…" spellcheck="false"></textarea>
+          <button class="pl-copy-t" id="plShareLoad">📥 استيراد</button>
+        </div>
+        <div class="pl-hint" id="plShareMsg"></div>
       </div>
       <div class="pl-scroll">
         <div class="pl-grid" id="plGrid"></div>
@@ -995,6 +1065,10 @@ a{color:inherit;text-decoration:none}
             <div class="res-card">
               <span class="res-label" data-ar="ساعات متبقية" data-en="Hours Left">ساعات متبقية</span>
               <span class="res-val" id="gradHrsLeft">0</span>
+            </div>
+            <div class="res-card" id="gradNowCard" style="display:none">
+              <span class="res-label" data-ar="قيد التسجيل الآن" data-en="Registering Now">قيد التسجيل الآن</span>
+              <span class="res-val" id="gradNowHrs">0</span>
             </div>
           </div>
         </div>
@@ -1574,13 +1648,20 @@ function setPref(btn){
   document.querySelectorAll(".pref-btn").forEach(b=>b.classList.toggle("selected",b===btn));
   showPrefSaved(major);
 }
+// لوحة «تخصصي المفضّل» انشالت من الصفحة، بس هالدوال باقية ويُستدعون عند الإقلاع.
+// كل عنصر هنا صار اختياري — بدون هالحماية أي طالب عنده تخصص محفوظ يطيح عنده
+// السكربت كامل (ومعاه منظم الجدول) قبل ما يشتغل.
 function showPrefSaved(major){
+  const name=document.getElementById("prefSavedName");
+  if(name) name.textContent=majorNames[major]||major;
   const saved=document.getElementById("prefSaved");
+  if(saved) saved.style.display="flex";
   const sc=document.getElementById("prefShortcuts");
-  document.getElementById("prefSavedName").textContent=majorNames[major]||major;
-  saved.style.display="flex";sc.style.display="block";
-  document.getElementById("scNotes").href=`notes.html`;
-  document.getElementById("scMajor").href=`major.html?major=${major}`;
+  if(sc) sc.style.display="block";
+  const n=document.getElementById("scNotes");
+  if(n) n.href=`notes.html`;
+  const m=document.getElementById("scMajor");
+  if(m) m.href=`major.html?major=${major}`;
 }
 function loadPref(){
   const saved=localStorage.getItem("bscku_major");
@@ -1885,6 +1966,8 @@ const GRAD_DATA={
 
 window.selectGradMajor=async function(key){
   gradMajor=key;
+  // نثبّت التخصص عشان منظم الجدول يعرف أي ميجرشيت يقرأ للمتطلبات السابقة
+  localStorage.setItem("bscku_major",key);
   document.querySelectorAll("#gradMajorBtns .pref-btn").forEach(b=>b.classList.toggle("selected",b.textContent.includes(GRAD_MAJORS[key].ar)));
   gradBatch=null;gradAllBatches={};
   document.getElementById("gradBatchBar").style.display="none";
@@ -1923,6 +2006,7 @@ window.selectGradMajor=async function(key){
     gradCompleted=new Set(JSON.parse(localStorage.getItem("bscku_grad_"+key)||"[]"));
   }
   renderGrad();
+  window.dispatchEvent(new CustomEvent("bscku:grad-changed"));
 };
 
 function renderGradBatchBar(batches){
@@ -1960,6 +2044,18 @@ function renderGrad(){
   document.getElementById("gradHrsDone").textContent=doneHrs;
   document.getElementById("gradHrsLeft").textContent=totalHrs-doneHrs;
 
+  // المقررات المسجَّلة حالياً في منظم الجدول — تُعرض كـ«قيد التسجيل» ولا تُحتسب منجزة
+  const planned=(typeof window.bsckuPlannerCodes==="function")?window.bsckuPlannerCodes().codes:new Set();
+  const _n=s=>String(s==null?"":s).replace(/[\s\-_.]/g,"").toLowerCase();
+  const nowCourses=gradCourses.filter(c=>!gradCompleted.has(c.code)&&planned.has(_n(c.code)));
+  const nowHrs=nowCourses.reduce((s,c)=>s+(c.hours||3),0);
+  const nowCard=document.getElementById("gradNowCard");
+  if(nowCard){
+    nowCard.style.display=nowHrs?"":"none";
+    document.getElementById("gradNowHrs").textContent=nowHrs;
+  }
+  const nowSet=new Set(nowCourses.map(c=>c.code));
+
   const circ=326.73;
   document.getElementById("gradRing").style.strokeDashoffset=circ-(circ*pct/100);
 
@@ -1973,11 +2069,13 @@ function renderGrad(){
   const list=document.getElementById("gradCourseList");
   list.innerHTML=filtered.map(c=>{
     const isDone=gradCompleted.has(c.code);
+    const isNow=nowSet.has(c.code);
     const col=GRAD_TYPE_COLORS[c.type]||GRAD_TYPE_COLORS.dept;
-    return`<div onclick="toggleGradCourse('${c.code}')" style="display:flex;align-items:center;gap:.75rem;padding:.65rem 1rem;background:${isDone?'rgba(16,185,129,.08)':col.bg};border:1px solid ${isDone?'rgba(16,185,129,.25)':col.border};border-radius:10px;cursor:pointer;transition:all .2s;opacity:${isDone?'.65':'1'};user-select:none">
+    return`<div onclick="toggleGradCourse('${c.code}')" style="display:flex;align-items:center;gap:.75rem;padding:.65rem 1rem;background:${isDone?'rgba(16,185,129,.08)':isNow?'rgba(99,102,241,.12)':col.bg};border:1px solid ${isDone?'rgba(16,185,129,.25)':isNow?'rgba(99,102,241,.45)':col.border};border-radius:10px;cursor:pointer;transition:all .2s;opacity:${isDone?'.65':'1'};user-select:none">
       <div style="width:22px;height:22px;border-radius:6px;border:2px solid ${isDone?'#10b981':col.border};background:${isDone?'#10b981':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:.7rem;color:#fff">${isDone?'✓':''}</div>
       <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:.78rem;font-weight:900;color:${isDone?'#6ee7b7':col.text};min-width:75px;flex-shrink:0">${c.code}</span>
       <span style="font-size:.85rem;font-weight:600;flex:1;color:${isDone?'var(--muted)':'var(--text)'};${isDone?'text-decoration:line-through':''}">${c.nameAr}</span>
+      ${isNow?'<span class="grad-now">📅 قيد التسجيل</span>':''}
       <span style="font-size:.7rem;color:var(--muted);flex-shrink:0">${c.hours||3} س</span>
       <span style="font-size:.65rem;font-weight:700;padding:.15rem .45rem;border-radius:999px;background:${col.bg};color:${col.text};flex-shrink:0">${col.label}</span>
     </div>`}).join("");
@@ -1991,6 +2089,8 @@ window.toggleGradCourse=function(code){
   const storageKey=gradBatch?("bscku_done_"+gradMajor+"_"+gradBatch):("bscku_grad_"+gradMajor);
   localStorage.setItem(storageKey,JSON.stringify([...gradCompleted]));
   renderGrad();
+  // خلّي منظم الجدول يعيد فحص المتطلبات السابقة
+  window.dispatchEvent(new CustomEvent("bscku:grad-changed"));
 };
 
 // Init graduation buttons (after all functions are defined)
@@ -2343,6 +2443,399 @@ loadPref();trigReveal();
     cur().items=[]; save(); resetForm(); closeCopy(); renderAll();
   });
 
+  /* ═══════════ تصدير الجدول: صورة PNG + ملف تقويم ICS ═══════════ */
+  function closeExport(){ $("plExportWrap").hidden=true; $("plExportBtn").classList.remove("on"); }
+  function closeShare(){ $("plShareWrap").hidden=true; $("plShareBtn").classList.remove("on"); }
+
+  // افتراضياً: أقرب يوم أحد جاي (بداية الأسبوع الدراسي في الكويت)
+  (function defaultTermStart(){
+    const d=new Date(); d.setHours(0,0,0,0);
+    d.setDate(d.getDate()+((7-d.getDay())%7||7));
+    $("plTermStart").value=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  })();
+
+  $("plExportBtn").addEventListener("click",()=>{
+    if(!cur().items.length) return msg("المسودة فاضية — ما فيه شي تصدّره.");
+    closeShare(); closeCopy();
+    if($("plExportWrap").hidden){ $("plExportWrap").hidden=false; $("plExportBtn").classList.add("on"); }
+    else closeExport();
+  });
+
+  function download(blob,filename){
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob); a.download=filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},0);
+  }
+
+  /* --- صورة PNG: نرسم الشبكة على canvas بدون أي مكتبة خارجية --- */
+  $("plExpPng").addEventListener("click",async()=>{
+    const items=cur().items;
+    if(!items.length) return msg("المسودة فاضية.");
+    // بدون هذا، لو الخط ما وصل بعد تنرسم الصورة بخط النظام الاحتياطي
+    try{ await document.fonts.ready; }catch(e){}
+    const PAD=26, AXIS=64, HEAD=96, DAYH=46, GRIDH=780, FOOT=58;
+    const W=1060, H=HEAD+DAYH+GRIDH+FOOT+PAD;
+    const colW=(W-PAD*2-AXIS)/DAYS.length;
+    const dpr=2;
+    const cv=document.createElement("canvas");
+    cv.width=W*dpr; cv.height=H*dpr;
+    const x=cv.getContext("2d");
+    x.scale(dpr,dpr);
+    x.textBaseline="middle";
+
+    // خلفية
+    x.fillStyle="#04050a"; x.fillRect(0,0,W,H);
+
+    // العنوان
+    x.direction="rtl"; x.textAlign="right";
+    x.fillStyle="#fff"; x.font=`800 30px Tajawal, 'Segoe UI', sans-serif`;
+    x.fillText(`جدول الفصل — مسودة ${st.active+1}`,W-PAD,HEAD/2-12);
+    const U=unitsInfo(items);
+    x.fillStyle="#8b96b8"; x.font=`600 16px Tajawal, 'Segoe UI', sans-serif`;
+    x.fillText(`${U.courses} مقرر · ${U.total} وحدة · ${items.reduce((s,i)=>s+i.days.length,0)} حصة أسبوعياً`,W-PAD,HEAD/2+18);
+    x.textAlign="left"; x.direction="ltr";
+    x.fillStyle="#5d6b98"; x.font=`600 14px 'Segoe UI', sans-serif`;
+    x.fillText("biosci-ku.com",PAD,HEAD/2+18);
+
+    // الأعمدة من اليمين لليسار (الأحد يمين) — نفس ترتيب الشاشة
+    const colX=i=>W-PAD-AXIS-(i+1)*colW;
+    const gridTop=HEAD+DAYH, gridBot=gridTop+GRIDH;
+    const yOf=m=>gridTop+(m-T0)/SPAN*GRIDH;
+
+    // رؤوس الأيام
+    x.direction="rtl"; x.textAlign="center";
+    DAYS.forEach((d,i)=>{
+      x.fillStyle="rgba(99,102,241,.16)";
+      x.fillRect(colX(i),HEAD,colW,DAYH);
+      x.fillStyle="#dbe2f3"; x.font=`800 17px Tajawal, 'Segoe UI', sans-serif`;
+      x.fillText(d.ar,colX(i)+colW/2,HEAD+DAYH/2);
+    });
+
+    // خطوط الساعات + محور الوقت
+    for(let m=T0;m<=T1;m+=60){
+      const y=yOf(m);
+      x.strokeStyle="rgba(129,140,248,.18)"; x.lineWidth=1;
+      x.beginPath(); x.moveTo(PAD,y); x.lineTo(W-PAD-AXIS,y); x.stroke();
+      x.fillStyle="#5d6b98"; x.font=`600 12px 'Segoe UI', sans-serif`;
+      x.textAlign="center"; x.direction="rtl";
+      x.fillText(pretty(m),W-PAD-AXIS/2,y);
+    }
+    // فواصل الأعمدة
+    x.strokeStyle="rgba(255,255,255,.09)";
+    DAYS.forEach((d,i)=>{
+      x.beginPath(); x.moveTo(colX(i),gridTop); x.lineTo(colX(i),gridBot); x.stroke();
+    });
+    x.strokeRect(PAD,gridTop,W-PAD*2-AXIS,GRIDH);
+
+    // المحاضرات — مع توزيع المتداخلات جنب بعض
+    const {bad}=clashes();
+    DAYS.forEach((d,di)=>{
+      const evs=blocks().filter(b=>b.day===di).sort((a,b)=>a.s-b.s||a.e-b.e);
+      const lanes=[];
+      evs.forEach(ev=>{ let k=0; while(lanes[k]!==undefined&&lanes[k]>ev.s) k++; lanes[k]=ev.e; ev._lane=k; });
+      const groups=[];
+      evs.forEach(ev=>{ const g=groups.find(g=>g.some(o=>o.s<ev.e&&ev.s<o.e)); if(g)g.push(ev); else groups.push([ev]); });
+      const width={};
+      groups.forEach(g=>{const n=Math.max(...g.map(o=>o._lane))+1; g.forEach(o=>width[o.id+"_"+o.s]=n);});
+
+      evs.forEach(ev=>{
+        const n=width[ev.id+"_"+ev.s]||1, lane=ev._lane;
+        const nat=NATURE[ev.it.nature]||NATURE.major;
+        const w=colW/n, bx=colX(di)+lane*w+2;
+        const by=yOf(ev.s)+1, bh=Math.max(18,yOf(ev.e)-yOf(ev.s)-2);
+        x.fillStyle=nat.bg; x.strokeStyle=nat.bd; x.lineWidth=bad.has(ev.id+"|"+ev.day)?2.5:1.4;
+        if(bad.has(ev.id+"|"+ev.day)) x.strokeStyle="#f87171";
+        x.beginPath();
+        (x.roundRect?x.roundRect(bx,by,w-4,bh,7):x.rect(bx,by,w-4,bh));
+        x.fill(); x.stroke();
+
+        // النص — نقصّه إذا طوّل على عرض البلوك
+        x.save();
+        x.beginPath(); x.rect(bx,by,w-4,bh); x.clip();
+        x.direction="rtl"; x.textAlign="center";
+        x.fillStyle=nat.tx; x.font=`800 13px Tajawal, 'Segoe UI', sans-serif`;
+        let label=(ev.it.name||ev.it.code||"مقرر");
+        while(label.length>4&&x.measureText(label).width>w-14) label=label.slice(0,-1);
+        if(label!==(ev.it.name||ev.it.code||"مقرر")) label=label.slice(0,-1)+"…";
+        x.fillText((ev.it.kind==="lab"?"🧪 ":"")+label,bx+(w-4)/2,by+13);
+        if(bh>32){
+          x.font=`600 11px 'Segoe UI', sans-serif`; x.fillStyle=nat.tx;
+          x.globalAlpha=.85;
+          x.fillText(pretty(ev.s)+" – "+pretty(ev.e),bx+(w-4)/2,by+29);
+          x.globalAlpha=1;
+        }
+        x.restore();
+      });
+    });
+
+    // التذييل — دليل الألوان
+    x.direction="rtl"; x.textAlign="right";
+    let fx=W-PAD;
+    const fy=gridBot+FOOT/2+4;
+    Object.values(NATURE).forEach(v=>{
+      x.fillStyle=v.bd; x.beginPath();
+      (x.roundRect?x.roundRect(fx-13,fy-6,12,12,3):x.rect(fx-13,fy-6,12,12));
+      x.fill();
+      x.fillStyle="#8b96b8"; x.font=`600 13px Tajawal, 'Segoe UI', sans-serif`;
+      x.fillText(v.ar,fx-20,fy);
+      fx-=(x.measureText(v.ar).width+42);
+    });
+
+    cv.toBlob(b=>{
+      if(!b) return msg("تعذّر إنشاء الصورة.");
+      download(b,`جدول-مسودة-${st.active+1}.png`);
+      msg("تم حفظ الصورة ✓",true);
+    },"image/png");
+  });
+
+  /* --- ملف تقويم ICS --- */
+  const icsEsc=s=>String(s==null?"":s).replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n");
+  // حد السطر في ICS ٧٥ بايت (مو ٧٥ حرف). الحرف العربي بايتين والإيموجي أربعة،
+  // فنعدّ بايتات ونقطع عند حدود النقاط البرمجية — القطع بالحروف يكسّر الإيموجي
+  // لأنه زوج بديل في جافاسكربت.
+  const fold=line=>{
+    const enc=new TextEncoder();
+    let out="",cur="",bytes=0;
+    for(const ch of line){
+      const n=enc.encode(ch).length;
+      if(bytes+n>73){ out+=cur+"\r\n "; cur=""; bytes=0; }
+      cur+=ch; bytes+=n;
+    }
+    return out+cur;
+  };
+  const stamp=d=>d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")
+    +"T"+String(d.getHours()).padStart(2,"0")+String(d.getMinutes()).padStart(2,"0")+"00";
+
+  $("plExpIcs").addEventListener("click",()=>{
+    const items=cur().items;
+    if(!items.length) return msg("المسودة فاضية.");
+    const sv=$("plTermStart").value;
+    if(!sv) return msg("اختر تاريخ بداية الفصل.");
+    const weeks=Math.min(20,Math.max(1,parseInt($("plWeeks").value,10)||15));
+    const [Y,M,D]=sv.split("-").map(Number);
+    const start=new Date(Y,M-1,D); start.setHours(0,0,0,0);
+    if(isNaN(start.getTime())) return msg("تاريخ غير صحيح.");
+
+    const now=new Date();
+    const L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//BSC KU//Schedule Planner//AR",
+             "CALSCALE:GREGORIAN","METHOD:PUBLISH",`X-WR-CALNAME:${icsEsc("جدول الفصل — مسودة "+(st.active+1))}`];
+    let n=0;
+    items.forEach(it=>{
+      it.days.forEach(d=>{
+        // أول موعد لهذا اليوم في أو بعد بداية الفصل (الأحد=0 في JS ونفس ترتيب DAYS)
+        const first=new Date(start);
+        first.setDate(first.getDate()+((d-start.getDay()+7)%7));
+        const s0=new Date(first); s0.setHours(Math.floor(it.start/60),it.start%60,0,0);
+        const e0=new Date(s0.getTime()+it.dur*60000);
+        const title=(it.kind==="lab"?"🧪 ":"")+(it.name||it.code||"مقرر");
+        const nat=(NATURE[it.nature]||NATURE.major).ar;
+        L.push("BEGIN:VEVENT",
+          `UID:${it.id}-${d}-${Date.now().toString(36)}@biosci-ku.com`,
+          `DTSTAMP:${stamp(now)}`,
+          // وقت عائم بدون منطقة زمنية — يُقرأ بتوقيت جهاز الطالب
+          `DTSTART:${stamp(s0)}`,
+          `DTEND:${stamp(e0)}`,
+          `RRULE:FREQ=WEEKLY;COUNT=${weeks}`,
+          fold(`SUMMARY:${icsEsc(title)}`),
+          fold(`DESCRIPTION:${icsEsc([it.code?"رمز المقرر: "+it.code:"",nat,(+it.units||3)+" وحدات"].filter(Boolean).join(" · ")+"\nمن منظم الجدول — biosci-ku.com")}`),
+          "BEGIN:VALARM","TRIGGER:-PT15M","ACTION:DISPLAY",
+          fold(`DESCRIPTION:${icsEsc(title)}`),"END:VALARM",
+          "END:VEVENT");
+        n++;
+      });
+    });
+    L.push("END:VCALENDAR");
+    download(new Blob([L.join("\r\n")+"\r\n"],{type:"text/calendar;charset=utf-8"}),
+             `جدول-مسودة-${st.active+1}.ics`);
+    msg(`تم حفظ ${n} موعد أسبوعي × ${weeks} أسبوع ✓`,true);
+  });
+
+  /* ═══════════ مشاركة الجدول برمز ═══════════ */
+  const NATS=["major","support","dept","univ"];
+  const b64u=s=>btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+  const unb64u=s=>{ let t=s.replace(/-/g,"+").replace(/_/g,"/"); while(t.length%4) t+="="; return atob(t); };
+  const bytesToStr=u8=>{ let s=""; for(let i=0;i<u8.length;i+=4096) s+=String.fromCharCode.apply(null,u8.subarray(i,i+4096)); return s; };
+
+  function encodeDraft(items){
+    const arr=items.map(i=>[i.code||"",i.name||"",i.kind==="lab"?1:0,
+      Math.max(0,NATS.indexOf(i.nature)),
+      i.days.reduce((m,d)=>m|(1<<d),0), i.start, i.dur, +i.units||3]);
+    return "BSC1-"+b64u(bytesToStr(new TextEncoder().encode(JSON.stringify(arr))));
+  }
+  function decodeDraft(code){
+    const raw=String(code||"").trim().replace(/\s+/g,"");
+    const m=raw.match(/BSC1-([A-Za-z0-9_-]+)/);
+    if(!m) throw new Error("الرمز غير صالح — لازم يبدأ بـ BSC1-");
+    const bin=unb64u(m[1]);
+    const u8=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) u8[i]=bin.charCodeAt(i);
+    const arr=JSON.parse(new TextDecoder().decode(u8));
+    if(!Array.isArray(arr)) throw new Error("محتوى الرمز غير صالح");
+    return arr.map(r=>{
+      if(!Array.isArray(r)||r.length<7) throw new Error("محتوى الرمز غير صالح");
+      const days=[];
+      for(let d=0;d<DAYS.length;d++) if((+r[4])&(1<<d)) days.push(d);
+      const start=+r[5], dur=+r[6];
+      if(!days.length||!(start>=T0&&start<T1)||!(dur>=10&&start+dur<=T1))
+        throw new Error("فيه مقرر ببيانات وقت غير منطقية");
+      return {id:uid(),code:String(r[0]||"").slice(0,20),name:String(r[1]||"").slice(0,80),
+        kind:+r[2]===1?"lab":"lecture", nature:NATS[+r[3]]||"major",
+        days, start, dur, units:Math.min(4,Math.max(1,+r[7]||3))};
+    });
+  }
+
+  $("plShareBtn").addEventListener("click",()=>{
+    closeExport(); closeCopy();
+    if($("plShareWrap").hidden){
+      $("plShareOut").value=cur().items.length?encodeDraft(cur().items):"— المسودة فاضية —";
+      $("plShareMsg").textContent="";
+      $("plShareWrap").hidden=false; $("plShareBtn").classList.add("on");
+    } else closeShare();
+  });
+  $("plShareCopy").addEventListener("click",async()=>{
+    const v=$("plShareOut").value;
+    if(!v.startsWith("BSC1-")) return;
+    try{ await navigator.clipboard.writeText(v); }
+    catch(e){ $("plShareOut").select(); try{document.execCommand("copy")}catch(e2){} }
+    $("plShareMsg").textContent="تم نسخ الرمز ✓ أرسله لصاحبك";
+  });
+  $("plShareLoad").addEventListener("click",()=>{
+    const v=$("plShareIn").value.trim();
+    if(!v) return void($("plShareMsg").textContent="الصق الرمز أول.");
+    let items;
+    try{ items=decodeDraft(v); }
+    catch(e){ $("plShareMsg").textContent="⚠️ "+e.message; return; }
+    if(!items.length) return void($("plShareMsg").textContent="الرمز ما فيه مقررات.");
+    if(cur().items.length&&!confirm(`«مسودة ${st.active+1}» فيها ${cur().items.length} مقرر بينحذفون ويتبدلون بـ ${items.length} مقرر من الرمز.\n\nتكمل؟`)) return;
+    cur().items=items; save(); resetForm(); closeShare(); renderAll();
+    msg(`تم استيراد ${items.length} مقرر ✓`,true);
+    $("plShareIn").value="";
+  });
+
+  // رمز في رابط الصفحة: services.html#s=BSC1-…
+  (function fromHash(){
+    const m=(location.hash||"").match(/[#&]s=(BSC1-[A-Za-z0-9_-]+)/);
+    if(!m) return;
+    try{
+      const items=decodeDraft(m[1]);
+      if(items.length&&confirm(`وصلك جدول فيه ${items.length} مقرر.\n\nموافق = نحطه في «مسودة ${st.active+1}» (بيمسح اللي فيها)`)){
+        cur().items=items; save(); renderAll();
+        msg(`تم استيراد ${items.length} مقرر من الرابط ✓`,true);
+      }
+    }catch(e){}
+    history.replaceState(null,"",location.pathname+location.search);
+  })();
+
+  /* ═══════════ تحذير المتطلبات السابقة ═══════════ */
+  // نطبّع الرموز: "0490-101" و"0490 101" و"0490101" كلها نفس المقرر
+  const normCode=s=>String(s==null?"":s).replace(/[\s\-_.]/g,"").toLowerCase();
+  let sheet=null;          // رمز مطبّع → {nameAr, prereqs:[مطبّع]}
+  let sheetMajor=null;
+
+  function completedCodes(){
+    const major=localStorage.getItem("bscku_major");
+    const set=new Set();
+    if(!major) return set;
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(!k) continue;
+      if(k==="bscku_grad_"+major||k.startsWith("bscku_done_"+major)){
+        try{ (JSON.parse(localStorage.getItem(k))||[]).forEach(c=>set.add(normCode(c))); }catch(e){}
+      }
+    }
+    return set;
+  }
+
+  async function loadSheet(){
+    const major=localStorage.getItem("bscku_major");
+    if(!major){ sheet=null; sheetMajor=null; return; }
+    if(sheetMajor===major) return;
+    sheetMajor=major; sheet=null;
+    try{
+      const {initializeApp,getApps}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+      const {getFirestore,doc,getDoc}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+      const app=getApps().length?getApps()[0]:initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"});
+      const snap=await getDoc(doc(getFirestore(app),"majorSheets",major));
+      if(!snap.exists()) return;
+      const data=snap.data();
+      let courses=data.courses||[];
+      if((!courses||!courses.length)&&data.batches){
+        // بدون دفعة محددة نأخذ الأحدث
+        const keys=Object.keys(data.batches).sort((a,b)=>b.localeCompare(a,undefined,{numeric:true}));
+        courses=(data.batches[keys[0]]&&data.batches[keys[0]].courses)||[];
+      }
+      const m={};
+      courses.forEach(c=>{
+        if(!c||!c.code) return;
+        m[normCode(c.code)]={nameAr:c.nameAr||c.nameEn||c.code,
+          prereqs:(c.prereqs||[]).map(normCode).filter(Boolean)};
+      });
+      sheet=Object.keys(m).length?m:null;
+    }catch(e){ console.warn("prereq sheet:",e); }
+  }
+
+  function renderPrereq(){
+    const box=$("plPrereq"); if(!box) return;
+    const items=cur().items;
+    if(!items.length){ box.innerHTML=""; return; }
+    const major=localStorage.getItem("bscku_major");
+    if(!major){
+      box.innerHTML=`<div class="pl-prereq"><h4>💡 تبي نتحقق من المتطلبات السابقة؟</h4>
+        <p>حدّد تخصصك من تبويب «إنجاز التخرج» وعلّم المواد اللي خلصتها — بعدها نحذّرك هنا إذا سجّلت مقرر متطلبه ما خلصته.</p></div>`;
+      return;
+    }
+    if(!sheet){ box.innerHTML=""; return; }
+
+    const done=completedCodes();
+    const inDraft=new Set(items.map(i=>normCode(i.code)).filter(Boolean));
+    const problems=[];
+    const flagged=new Set();
+    items.forEach(it=>{
+      const key=normCode(it.code);
+      if(!key) return;
+      const info=sheet[key];
+      if(!info||!info.prereqs.length) return;
+      const missing=info.prereqs.filter(p=>!done.has(p));
+      if(!missing.length) return;
+      flagged.add(it.id);
+      problems.push({
+        name:it.name||it.code,
+        missing:missing.map(p=>({
+          code:p,
+          nameAr:(sheet[p]&&sheet[p].nameAr)||null,
+          sameTerm:inDraft.has(p)
+        }))
+      });
+    });
+
+    if(!problems.length){ box.innerHTML=""; }
+    else{
+      box.innerHTML=`<div class="pl-prereq">
+        <h4>⚠️ ${problems.length} مقرر متطلباته السابقة ناقصة</h4>
+        ${problems.map(p=>`<p>• «${esc(p.name)}» يحتاج: ${
+          p.missing.map(m=>`<b>${esc(m.nameAr||m.code)}</b>${m.sameTerm?" (تسجّله نفس الفصل — عادةً ما ينفع)":""}`).join("، ")
+        }</p>`).join("")}
+        <div class="why">هذا التحقق مبني على ما علّمته «منجز» في تبويب إنجاز التخرج وعلى الميجرشيت المنشور. راجع مرشدك قبل التسجيل النهائي.</div>
+      </div>`;
+    }
+    // نعلّم البلوكات في الجدول
+    document.querySelectorAll("#plGrid .pl-ev").forEach(el=>
+      el.classList.toggle("prereq",flagged.has(el.dataset.id)));
+  }
+
+  // نعيد الفحص بعد كل رسم، وبعد ما يوصل الميجرشيت
+  const _renderAll=renderAll;
+  renderAll=function(fresh){ _renderAll(fresh); renderPrereq(); };
+  loadSheet().then(renderPrereq);
+  // لو غيّر تخصصه أو علّم مواد من تبويب التخرج
+  window.addEventListener("bscku:grad-changed",()=>{ loadSheet().then(renderPrereq); });
+
+  window.bsckuPlannerCodes=()=>({
+    codes:new Set(cur().items.map(i=>normCode(i.code)).filter(Boolean)),
+    units:unitsInfo(cur().items).total
+  });
+
   renderAll(); slotHint();
 })();
 
@@ -2360,4 +2853,5 @@ if('serviceWorker' in navigator){
 }
 </script>
 <script type="module" src="visit-counter.js"></script>
+<script type="module" src="notify.js"></script>
 </body></html>

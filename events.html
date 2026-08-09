@@ -462,6 +462,7 @@ const db=getFirestore(app);
       <p>${lead.description||""}</p>
       <div class="ev-foot">
         ${lead.location?`<span class="ev-loc">📍 ${lead.location}</span>`:""}
+        <button class="dl-btn ev-cal" data-ev="${lead.id}" hidden>${isAr?"📅 أضف للتقويم":"📅 Add to calendar"}</button>
         ${lead.url?`<a class="dl-btn" href="${lead.url}" target="_blank">${isAr?"التفاصيل ←":"Details ←"}</a>`:""}
       </div>
     </div>`;
@@ -475,11 +476,32 @@ const db=getFirestore(app);
       </div>
       <div class="event-footer">
         <span class="event-loc">📍 ${e.location||""}</span>
+        <button class="dl-btn ev-cal" data-ev="${e.id}" hidden>📅 أضف للتقويم</button>
         ${e.url?`<a class="dl-btn" href="${e.url}" target="_blank">التفاصيل ←</a>`:""}
       </div>
     </div>`).join(""):"";
   const obs=new IntersectionObserver(ents=>{ents.forEach(x=>{if(x.isIntersecting){x.target.classList.add("visible");obs.unobserve(x.target)}})},{threshold:.1});
   document.querySelectorAll(".reveal").forEach(el=>obs.observe(el));
+
+  /* أزرار «أضف للتقويم» — تظهر فقط للأنشطة اللي تاريخها مفهوم.
+     الأدمن يكتب التاريخ نص حر، فلو ما انفهم نخفي الزر بدل ما ننزّل
+     ملف تقويم بتاريخ مخترع. */
+  const byId={}; events.forEach(e=>byId[e.id]=e);
+  function revealCalButtons(){
+    if(typeof window.bsckuParseEventDate!=="function")return;
+    document.querySelectorAll(".ev-cal[data-ev]").forEach(b=>{
+      const ev=byId[b.dataset.ev];
+      if(ev&&window.bsckuParseEventDate(ev.date)) b.hidden=false;
+    });
+  }
+  window.addEventListener("bscku:notify-ready",revealCalButtons);
+  revealCalButtons();   // لو notify.js وصل قبلنا
+
+  document.addEventListener("click",ev=>{
+    const b=ev.target.closest(".ev-cal[data-ev]"); if(!b)return;
+    const e=byId[b.dataset.ev];
+    if(e&&window.bsckuAddToCalendar) window.bsckuAddToCalendar(e);
+  });
 })();
 </script>
 
@@ -492,4 +514,5 @@ if('serviceWorker' in navigator){
 }
 </script>
 <script type="module" src="visit-counter.js"></script>
+<script type="module" src="notify.js"></script>
 </body></html>
