@@ -74,6 +74,40 @@ a{color:inherit;text-decoration:none}
 .stat-card{background:rgba(15,23,42,.75);border:1px solid var(--border);border-radius:14px;padding:1.25rem;text-align:center}
 .stat-card strong{display:block;font-size:2rem;font-weight:900;background:linear-gradient(135deg,#6366f1,#a5b4fc);-webkit-background-clip:text;background-clip:text;color:transparent;font-family:'Plus Jakarta Sans',system-ui}
 .stat-card span{font-size:.8rem;color:var(--muted)}
+/* GPA DATA + ALL SUBMISSIONS */
+.gpa-tools{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:.5rem}
+.gpa-tools input,.gpa-tools select{padding:.55rem .8rem;background:rgba(15,23,42,.8);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-size:.85rem;font-family:'Tajawal',sans-serif}
+.gpa-tools input{flex:1;min-width:220px}
+.gpa-tools input:focus,.gpa-tools select:focus{outline:none;border-color:rgba(99,102,241,.55)}
+.gpa-rec{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.gpa-rec-head{padding:.9rem 1.15rem;display:flex;align-items:center;gap:.85rem;flex-wrap:wrap;cursor:pointer}
+.gpa-rec-head:hover{background:rgba(99,102,241,.06)}
+.gpa-rec-head .caret{color:var(--muted);font-size:.8rem;transition:transform .2s}
+.gpa-rec.open .caret{transform:rotate(90deg)}
+.gpa-rec-id{font-family:'Plus Jakarta Sans',system-ui;font-size:.78rem;color:var(--muted);
+  direction:ltr;unicode-bidi:isolate}
+.gpa-rec-gpa{font-size:1.1rem;font-weight:900;font-family:'Plus Jakarta Sans',system-ui;
+  margin-inline-start:auto;direction:ltr;unicode-bidi:isolate}
+.gpa-rec-meta{font-size:.76rem;color:var(--muted)}
+.gpa-rec-body{display:none;padding:0 1.15rem 1.15rem;border-top:1px solid var(--border)}
+.gpa-rec.open .gpa-rec-body{display:block}
+.gpa-sem{margin-top:1rem}
+.gpa-sem h5{font-size:.85rem;font-weight:800;color:#a5b4fc;margin-bottom:.5rem}
+.gpa-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.gpa-table th{text-align:start;font-weight:700;color:var(--muted);font-size:.74rem;
+  padding:.35rem .5rem;border-bottom:1px solid var(--border)}
+.gpa-table td{padding:.35rem .5rem;border-bottom:1px solid rgba(255,255,255,.05);color:var(--text)}
+.gpa-table td.num{font-family:'Plus Jakarta Sans',system-ui;direction:ltr;unicode-bidi:isolate}
+.sub-item{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;
+  padding:.9rem 1.15rem;display:flex;align-items:flex-start;gap:.9rem}
+.sub-item .ico{font-size:1.1rem;flex-shrink:0;line-height:1.4}
+.sub-item .bd{flex:1;min-width:0}
+.sub-item .bd h4{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:.2rem;
+  overflow-wrap:anywhere}
+.sub-item .bd p{font-size:.8rem;color:var(--muted);overflow-wrap:anywhere}
+.sub-item .when{font-size:.72rem;color:var(--muted);flex-shrink:0;white-space:nowrap}
+.sub-empty{color:var(--muted);padding:1rem;font-size:.85rem}
 /* MAJOR SHEET BUILDER */
 .course-node{background:rgba(15,23,42,.8);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem;transition:border-color .2s}
 .course-node:hover{border-color:rgba(99,102,241,.3)}
@@ -422,6 +456,9 @@ a{color:inherit;text-decoration:none}
       <button class="nav-item" data-panel="aiknowledge"><span class="ni">🤖</span>معرفة المساعد</button>
       <button class="nav-item" data-panel="aichats"><span class="ni">💬</span>أسئلة الطلبة</button>
       <button class="nav-item" data-panel="suggestions"><span class="ni">💡</span>اقتراحات المواد</button>
+      <div class="sidebar-label">بيانات الطلبة</div>
+      <button class="nav-item" data-panel="gpadata"><span class="ni">🧮</span>معدلات الطلبة <span id="gpaNavBadge" style="display:none;margin-inline-start:auto;background:#6366f1;color:#fff;font-size:.7rem;font-weight:800;padding:.1rem .45rem;border-radius:99px"></span></button>
+      <button class="nav-item" data-panel="allsubs"><span class="ni">🗂️</span>كل مساهمات الطلبة <span id="allSubsNavBadge" style="display:none;margin-inline-start:auto;background:#6366f1;color:#fff;font-size:.7rem;font-weight:800;padding:.1rem .45rem;border-radius:99px"></span></button>
       <div class="sidebar-label">الإعدادات</div>
       <button class="nav-item" data-panel="admins"><span class="ni">🔐</span>الأدمنز</button>
     </aside>
@@ -1191,6 +1228,54 @@ a{color:inherit;text-decoration:none}
       <div class="panel" id="panel-aichats">
         <div class="panel-header"><h2>💬 أسئلة الطلبة</h2><p>الأسئلة التي وجّهها الطلبة للمساعد الذكي</p></div>
         <div class="items-list" id="aiChatsList"></div>
+      </div>
+
+      <!-- GPA DATA -->
+      <div class="panel" id="panel-gpadata">
+        <div class="panel-header"><h2>🧮 معدلات الطلبة</h2>
+          <p>بيانات حاسبة المعدل المحفوظة على السحابة. البيانات مجهولة الهوية — ما فيها اسم ولا رقم طالب، بس معرّف عشوائي للجهاز.</p></div>
+
+        <div class="stats-row" id="gpaStats"></div>
+
+        <div class="gpa-tools">
+          <input id="gpaSearch" placeholder="🔍 بحث برمز الجهاز أو اسم مقرر…" autocomplete="off">
+          <select id="gpaSort">
+            <option value="recent">الأحدث تحديثاً</option>
+            <option value="gpaDesc">المعدل: من الأعلى</option>
+            <option value="gpaAsc">المعدل: من الأدنى</option>
+            <option value="hours">أكثر ساعات</option>
+          </select>
+          <button class="btn btn-sm" id="gpaExport">⬇️ تصدير CSV</button>
+          <button class="btn btn-sm" id="gpaRefresh">🔄 تحديث</button>
+        </div>
+
+        <div class="items-list" id="gpaList"></div>
+      </div>
+
+      <!-- ALL STUDENT SUBMISSIONS -->
+      <div class="panel" id="panel-allsubs">
+        <div class="panel-header"><h2>🗂️ كل مساهمات الطلبة</h2>
+          <p>كل شي يرسله الطلبة من الموقع في مكان واحد ومرتّب بالتاريخ — أسئلة المساعد، تقييمات المواد، الشروحات، التعليقات، النوتات المرسلة، اقتراحات المواد، وبيانات المعدلات.</p></div>
+
+        <div class="stats-row" id="allSubsStats"></div>
+
+        <div class="gpa-tools">
+          <input id="allSubsSearch" placeholder="🔍 بحث في كل المحتوى…" autocomplete="off">
+          <select id="allSubsType">
+            <option value="">كل الأنواع</option>
+            <option value="aiChats">💬 أسئلة المساعد</option>
+            <option value="courseRatings">⭐ تقييمات المواد</option>
+            <option value="courseVideos">🎬 شروحات مصوّرة</option>
+            <option value="videoComments">🗨️ تعليقات الشروحات</option>
+            <option value="noteSubmissions">📬 نوتات مرسلة</option>
+            <option value="suggestions">💡 اقتراحات مواد</option>
+            <option value="gpaData">🧮 بيانات معدلات</option>
+          </select>
+          <button class="btn btn-sm" id="allSubsExport">⬇️ تصدير CSV</button>
+          <button class="btn btn-sm" id="allSubsRefresh">🔄 تحديث</button>
+        </div>
+
+        <div class="items-list" id="allSubsList"></div>
       </div>
 
       <!-- SUGGESTIONS -->
@@ -3430,6 +3515,298 @@ window.gcSave=async function(){
     const nb = document.getElementById('importNotesBtn');
     if(nb) nb.addEventListener('click', importSeedNotes);
   }
+
+/* ══════════════════════════════════════════════════════════════════════
+   بيانات الطلبة — معدلات الطلبة + كل مساهمات الطلبة
+   البيانات هنا مجهولة الهوية: ما فيها اسم ولا رقم طالب، بس معرّف عشوائي
+   ينحفظ في متصفح الطالب. القراءة الجماعية (list) محصورة على الأدمن في
+   firestore.rules.
+   ══════════════════════════════════════════════════════════════════════ */
+(function(){
+  const $=id=>document.getElementById(id);
+  if(!$("gpaList")) return;
+
+  const esc=s=>(s==null?"":String(s)).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const GRADES={A:4.0,"A-":3.67,"B+":3.33,B:3.0,"B-":2.67,"C+":2.33,C:2.0,"C-":1.67,"D+":1.33,D:1.0,F:0,"غير معادة":null};
+
+  const toDate=v=>{
+    if(!v) return null;
+    if(typeof v==="object"&&typeof v.toDate==="function"){try{return v.toDate()}catch(e){return null}}
+    if(typeof v==="object"&&typeof v.seconds==="number") return new Date(v.seconds*1000);
+    const d=new Date(v); return isNaN(d.getTime())?null:d;
+  };
+  const fmtDate=d=>d?d.toLocaleDateString("ar-KW",{year:"numeric",month:"short",day:"numeric"})+
+    " · "+d.toLocaleTimeString("ar-KW",{hour:"2-digit",minute:"2-digit"}):"بدون تاريخ";
+  const gpaColor=g=>g>=3.67?"#6ee7b7":g>=3?"#a5b4fc":g>=2.67?"#fcd34d":g>=2?"#fb923c":"#f87171";
+
+  function csv(rows,name){
+    const body=rows.map(r=>r.map(c=>{
+      const s=(c==null?"":String(c)).replace(/"/g,'""');
+      return /[",\n]/.test(s)?`"${s}"`:s;
+    }).join(",")).join("\r\n");
+    const blob=new Blob(["﻿"+body],{type:"text/csv;charset=utf-8"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download=`${name}-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},0);
+  }
+
+  /* ───────── حساب المعدل — نفس منطق حاسبة services.html ───────── */
+  function semStats(sem){
+    let pts=0,hrs=0,retakeHrs=0,retakeOldPts=0;
+    (sem.courses||[]).forEach(c=>{
+      const h=parseFloat(c.hrs)||0;
+      let p=GRADES[c.grade]||0;
+      const prev=c.prevGrade;
+      // مقرر معاد: تُحتسب الدرجة الأعلى، والمحاولة القديمة تُطرح من التراكمي
+      if(prev&&prev!=="غير معادة"&&GRADES[prev]!=null){
+        p=Math.max(GRADES[c.grade]||0,GRADES[prev]||0);
+        retakeHrs+=h; retakeOldPts+=(GRADES[prev]||0)*h;
+      }
+      pts+=p*h; hrs+=h;
+    });
+    const semGPA=hrs>0?pts/hrs:0;
+    const prevH=parseFloat(sem.prevHours)||0, prevG=parseFloat(sem.prevGPA)||0;
+    let totalH,cumGPA;
+    if(prevH>0){
+      totalH=prevH+hrs-retakeHrs;
+      cumGPA=totalH>0?((prevG*prevH-retakeOldPts+pts)/totalH):semGPA;
+    }else{ totalH=hrs; cumGPA=semGPA; }
+    return {pts,hrs,semGPA,totalH,cumGPA};
+  }
+  function recStats(rec){
+    const sems=Array.isArray(rec.semesters)?rec.semesters:[];
+    let courses=0; sems.forEach(s=>courses+=((s.courses||[]).length));
+    // المعدل التراكمي يؤخذ من آخر فصل فيه مواد
+    let last=null;
+    for(let i=sems.length-1;i>=0;i--){ if((sems[i].courses||[]).length){last=sems[i];break;} }
+    const st=last?semStats(last):null;
+    return {semCount:sems.length,courses,cumGPA:st?st.cumGPA:0,totalH:st?st.totalH:0,has:!!st};
+  }
+
+  /* ───────── معدلات الطلبة ───────── */
+  let gpaCache=null;
+
+  async function fetchGpa(){
+    const snap=await getDocs(collection(db,"gpaData"));
+    gpaCache=snap.docs.map(d=>{
+      const data=d.data()||{};
+      return {id:d.id,...data,_stats:recStats(data),_when:toDate(data.updatedAt)};
+    });
+  }
+
+  function gpaFiltered(){
+    const q=($("gpaSearch").value||"").trim().toLowerCase();
+    let list=(gpaCache||[]).slice();
+    if(q) list=list.filter(r=>{
+      if(r.id.toLowerCase().includes(q)) return true;
+      return (r.semesters||[]).some(s=>
+        String(s.name||"").toLowerCase().includes(q)||
+        (s.courses||[]).some(c=>String(c.name||"").toLowerCase().includes(q)));
+    });
+    const by=$("gpaSort").value;
+    list.sort((a,b)=>
+      by==="gpaDesc"?b._stats.cumGPA-a._stats.cumGPA:
+      by==="gpaAsc" ?a._stats.cumGPA-b._stats.cumGPA:
+      by==="hours"  ?b._stats.totalH-a._stats.totalH:
+      (b._when?b._when.getTime():0)-(a._when?a._when.getTime():0));
+    return list;
+  }
+
+  function renderGpa(){
+    const list=gpaFiltered(), all=gpaCache||[];
+    const withGpa=all.filter(r=>r._stats.has);
+    const avg=withGpa.length?withGpa.reduce((s,r)=>s+r._stats.cumGPA,0)/withGpa.length:0;
+    const totalCourses=all.reduce((s,r)=>s+r._stats.courses,0);
+
+    $("gpaStats").innerHTML=`
+      <div class="stat-card"><strong>${all.length}</strong><span>طالب استخدم الحاسبة</span></div>
+      <div class="stat-card"><strong>${avg?avg.toFixed(2):"—"}</strong><span>متوسط المعدلات</span></div>
+      <div class="stat-card"><strong>${totalCourses}</strong><span>مادة مسجّلة</span></div>
+      <div class="stat-card"><strong>${all.reduce((s,r)=>s+r._stats.semCount,0)}</strong><span>فصل دراسي</span></div>`;
+
+    const badge=$("gpaNavBadge");
+    if(badge){ badge.textContent=all.length; badge.style.display=all.length?"inline-block":"none"; }
+
+    if(!list.length){
+      $("gpaList").innerHTML=`<p class="sub-empty">${all.length?"ما فيه نتائج مطابقة للبحث.":"ما فيه بيانات معدلات محفوظة بعد."}</p>`;
+      return;
+    }
+
+    $("gpaList").innerHTML=list.map(r=>{
+      const s=r._stats;
+      const sems=(r.semesters||[]).map(sem=>{
+        const ss=semStats(sem);
+        const rows=(sem.courses||[]).map(c=>`
+          <tr><td>${esc(c.name||"—")}</td>
+              <td class="num">${esc(c.hrs||"—")}</td>
+              <td class="num">${esc(c.grade||"—")}</td>
+              <td class="num">${c.prevGrade&&c.prevGrade!=="غير معادة"?esc(c.prevGrade):"—"}</td></tr>`).join("");
+        return `<div class="gpa-sem">
+          <h5>${esc(sem.name||"فصل")} — معدل الفصل ${ss.semGPA.toFixed(2)} · ${ss.hrs} ساعة</h5>
+          ${rows?`<table class="gpa-table">
+            <thead><tr><th>المقرر</th><th>الساعات</th><th>الدرجة</th><th>درجة سابقة</th></tr></thead>
+            <tbody>${rows}</tbody></table>`
+          :`<p class="sub-empty" style="padding:.3rem 0">ما فيه مواد في هذا الفصل.</p>`}
+        </div>`;
+      }).join("");
+
+      return `<div class="gpa-rec" data-id="${esc(r.id)}">
+        <div class="gpa-rec-head">
+          <span class="caret">▶</span>
+          <div>
+            <div class="gpa-rec-id">${esc(r.id)}</div>
+            <div class="gpa-rec-meta">${s.semCount} فصل · ${s.courses} مادة · ${s.totalH} ساعة · آخر تحديث ${fmtDate(r._when)}</div>
+          </div>
+          <span class="gpa-rec-gpa" style="color:${s.has?gpaColor(s.cumGPA):"#94a3b8"}">${s.has?s.cumGPA.toFixed(2):"—"}</span>
+          <button class="btn btn-danger btn-sm" data-del="${esc(r.id)}">حذف</button>
+        </div>
+        <div class="gpa-rec-body">${sems||'<p class="sub-empty">ما فيه فصول.</p>'}</div>
+      </div>`;
+    }).join("");
+  }
+
+  $("gpaList").addEventListener("click",async e=>{
+    const del=e.target.closest("[data-del]");
+    if(del){
+      e.stopPropagation();
+      const id=del.dataset.del;
+      if(!confirm(`حذف بيانات المعدل للجهاز:\n${id}\n\nما ينحذف من جهاز الطالب، بس من السحابة. متأكد؟`)) return;
+      try{
+        await deleteDoc(doc(db,"gpaData",id));
+        gpaCache=gpaCache.filter(r=>r.id!==id);
+        renderGpa();
+      }catch(err){ alert("تعذّر الحذف: "+err.message); }
+      return;
+    }
+    const head=e.target.closest(".gpa-rec-head");
+    if(head) head.parentElement.classList.toggle("open");
+  });
+
+  $("gpaSearch").addEventListener("input",renderGpa);
+  $("gpaSort").addEventListener("change",renderGpa);
+  $("gpaRefresh").addEventListener("click",()=>loadGpa(true));
+  $("gpaExport").addEventListener("click",()=>{
+    const rows=[["معرّف الجهاز","الفصل","المقرر","الساعات","الدرجة","درجة سابقة","معدل الفصل","المعدل التراكمي","آخر تحديث"]];
+    gpaFiltered().forEach(r=>{
+      (r.semesters||[]).forEach(sem=>{
+        const ss=semStats(sem);
+        const cs=sem.courses||[];
+        if(!cs.length){ rows.push([r.id,sem.name||"",  "","","","",ss.semGPA.toFixed(2),ss.cumGPA.toFixed(2),r._when?r._when.toISOString():""]); return; }
+        cs.forEach(c=>rows.push([r.id,sem.name||"",c.name||"",c.hrs||"",c.grade||"",
+          (c.prevGrade&&c.prevGrade!=="غير معادة")?c.prevGrade:"",
+          ss.semGPA.toFixed(2),ss.cumGPA.toFixed(2),r._when?r._when.toISOString():""]));
+      });
+    });
+    csv(rows,"bscku-gpa");
+  });
+
+  async function loadGpa(force){
+    if(gpaCache&&!force){ renderGpa(); return; }
+    $("gpaList").innerHTML='<p class="sub-empty">⏳ جاري التحميل…</p>';
+    try{ await fetchGpa(); renderGpa(); }
+    catch(e){ $("gpaList").innerHTML=`<p class="sub-empty" style="color:#fca5a5">تعذّر التحميل: ${esc(e.message)}<br><small>تأكد أن قواعد firestore.rules المحدَّثة منشورة في Firebase Console.</small></p>`; }
+  }
+
+  /* ───────── كل مساهمات الطلبة ───────── */
+  const SOURCES=[
+    {col:"aiChats",        ico:"💬", label:"سؤال للمساعد",   panel:"aichats",
+      title:d=>d.question||"سؤال", body:d=>d.answer||""},
+    {col:"courseRatings",  ico:"⭐", label:"تقييم مادة",      panel:"ratings",
+      title:d=>`${d.courseCode||""} ${d.courseNameAr||""}`.trim()||"تقييم",
+      body:d=>`${"★".repeat(+d.rating||0)}${d.comment?" — "+d.comment:""}`},
+    {col:"courseVideos",   ico:"🎬", label:"شرح مصوّر",       panel:"videos",
+      title:d=>d.title||"شرح", body:d=>`${d.courseCode||""} ${d.courseNameAr||""} · ${d.videoUrl||""}`.trim()},
+    {col:"videoComments",  ico:"🗨️", label:"تعليق على شرح",  panel:"vcomments",
+      title:d=>d.name||"طالب", body:d=>d.text||""},
+    {col:"noteSubmissions",ico:"📬", label:"نوتة مرسلة",      panel:"noteSubs",
+      title:d=>d.title||"نوتة", body:d=>`${d.course||""}${d.name?" · أرسلها "+d.name:""}`},
+    {col:"suggestions",    ico:"💡", label:"اقتراح مادة",     panel:"suggestions",
+      title:d=>`${d.code||""} ${d.nameAr||""}`.trim()||"اقتراح",
+      body:d=>`${d.major||""}${d.notes?" · "+d.notes:""}`},
+  ];
+  let subsCache=null;
+
+  async function fetchSubs(){
+    const results=await Promise.all(SOURCES.map(async src=>{
+      try{
+        const snap=await getDocs(collection(db,src.col));
+        return snap.docs.map(d=>{
+          const data=d.data()||{};
+          return {id:d.id,col:src.col,ico:src.ico,label:src.label,panel:src.panel,
+            title:src.title(data),body:src.body(data),
+            when:toDate(data.createdAt)||toDate(data.date)||null};
+        });
+      }catch(e){ console.warn(src.col+" load failed",e); return []; }
+    }));
+    const gpa=(gpaCache||[]).map(r=>({
+      id:r.id,col:"gpaData",ico:"🧮",label:"بيانات معدل",panel:"gpadata",
+      title:r.id,
+      body:`${r._stats.semCount} فصل · ${r._stats.courses} مادة`+(r._stats.has?` · تراكمي ${r._stats.cumGPA.toFixed(2)}`:""),
+      when:r._when}));
+    subsCache=results.flat().concat(gpa)
+      .sort((a,b)=>(b.when?b.when.getTime():0)-(a.when?a.when.getTime():0));
+  }
+
+  function subsFiltered(){
+    const q=($("allSubsSearch").value||"").trim().toLowerCase();
+    const type=$("allSubsType").value;
+    return (subsCache||[]).filter(x=>
+      (!type||x.col===type)&&
+      (!q||(x.title+" "+x.body+" "+x.id).toLowerCase().includes(q)));
+  }
+
+  function renderSubs(){
+    const all=subsCache||[], list=subsFiltered();
+    const counts={};
+    all.forEach(x=>counts[x.col]=(counts[x.col]||0)+1);
+    const cards=SOURCES.concat([{col:"gpaData",ico:"🧮",label:"بيانات معدل"}])
+      .map(s=>`<div class="stat-card"><strong>${counts[s.col]||0}</strong><span>${s.ico} ${s.label}</span></div>`).join("");
+    $("allSubsStats").innerHTML=`<div class="stat-card"><strong>${all.length}</strong><span>🗂️ الإجمالي</span></div>`+cards;
+
+    const badge=$("allSubsNavBadge");
+    if(badge){ badge.textContent=all.length; badge.style.display=all.length?"inline-block":"none"; }
+
+    $("allSubsList").innerHTML=list.length
+      ? list.map(x=>`<div class="sub-item">
+          <span class="ico">${x.ico}</span>
+          <div class="bd">
+            <h4>${esc(x.title)}</h4>
+            <p>${esc(x.body)}</p>
+            <p style="margin-top:.25rem"><span class="badge badge-blue">${x.label}</span></p>
+          </div>
+          <span class="when">${fmtDate(x.when)}</span>
+          <button class="btn btn-sm" data-go="${x.panel}">إدارة</button>
+        </div>`).join("")
+      : `<p class="sub-empty">${all.length?"ما فيه نتائج مطابقة.":"ما فيه مساهمات بعد."}</p>`;
+  }
+
+  $("allSubsList").addEventListener("click",e=>{
+    const b=e.target.closest("[data-go]"); if(!b)return;
+    window.goPanel(b.dataset.go);
+  });
+  $("allSubsSearch").addEventListener("input",renderSubs);
+  $("allSubsType").addEventListener("change",renderSubs);
+  $("allSubsRefresh").addEventListener("click",()=>loadSubs(true));
+  $("allSubsExport").addEventListener("click",()=>{
+    const rows=[["النوع","المعرّف","العنوان","المحتوى","التاريخ"]];
+    subsFiltered().forEach(x=>rows.push([x.label,x.id,x.title,x.body,x.when?x.when.toISOString():""]));
+    csv(rows,"bscku-submissions");
+  });
+
+  async function loadSubs(force){
+    if(subsCache&&!force){ renderSubs(); return; }
+    $("allSubsList").innerHTML='<p class="sub-empty">⏳ جاري التحميل…</p>';
+    if(!gpaCache){ try{ await fetchGpa(); }catch(e){} }
+    try{ await fetchSubs(); renderSubs(); }
+    catch(e){ $("allSubsList").innerHTML=`<p class="sub-empty" style="color:#fca5a5">تعذّر التحميل: ${esc(e.message)}</p>`; }
+  }
+
+  /* تحميل عند فتح التبويب فقط — عشان ما نثقّل فتح لوحة التحكم */
+  document.querySelectorAll('.nav-item[data-panel="gpadata"]').forEach(b=>b.addEventListener("click",()=>loadGpa()));
+  document.querySelectorAll('.nav-item[data-panel="allsubs"]').forEach(b=>b.addEventListener("click",()=>loadSubs()));
+})();
 
 </script>
 <script src="theme.js"></script>

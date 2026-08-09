@@ -126,9 +126,19 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
-    // GPA calculator save data, keyed by device id.
+    // GPA calculator save data, keyed by a random device id kept in the
+    // student's own localStorage.
+    //
+    // `get` is open because the student's browser has to read back its own
+    // document and there is no login on the calculator — but the id is random
+    // and unguessable, so this only reaches the one who already has it.
+    // `list` is the dangerous half: it would let anyone dump every student's
+    // grades in one request. That is admin-only.
     match /gpaData/{deviceId} {
-      allow read, write: if true;
+      allow get: if true;
+      allow list: if isAdmin();
+      allow create, update: if true;
+      allow delete: if isAdmin();
     }
 
     // Visit counters, bumped by exactly +1 per visit.
