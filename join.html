@@ -102,6 +102,20 @@ textarea.input{resize:vertical;min-height:104px;line-height:1.8}
 .preview-meta span{font-size:.73rem;color:var(--muted)}
 .preview button{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:9px;padding:.35rem .7rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;flex-shrink:0}
 
+/* راديو وتشيك بوكس */
+.radio-group{display:flex;gap:.7rem;flex-wrap:wrap}
+.radio-pill{display:flex;align-items:center;gap:.5rem;padding:.6rem 1.2rem;border-radius:12px;background:rgba(255,255,255,.045);border:1px solid var(--border2);cursor:pointer;transition:all .2s;font-size:.86rem;color:#cbd5e1}
+.radio-pill input{accent-color:#10b981;width:16px;height:16px;cursor:pointer}
+.radio-pill:has(input:checked){background:rgba(16,185,129,.12);border-color:#10b981;color:#6ee7b7}
+.check-group{display:flex;flex-direction:column;gap:.55rem}
+.check-item{display:flex;align-items:flex-start;gap:.6rem;padding:.55rem .85rem;border-radius:11px;background:rgba(255,255,255,.035);border:1px solid var(--border);cursor:pointer;transition:all .2s;font-size:.84rem;color:#cbd5e1;line-height:1.6}
+.check-item input{accent-color:#10b981;width:16px;height:16px;margin-top:.15rem;cursor:pointer;flex-shrink:0}
+.check-item:has(input:checked){background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.35);color:#e2e8f0}
+[data-theme="light"] .radio-pill{background:#f8fafc!important;border-color:rgba(99,102,241,.2)!important;color:#334155!important}
+[data-theme="light"] .radio-pill:has(input:checked){background:rgba(16,185,129,.1)!important;border-color:#10b981!important;color:#047857!important}
+[data-theme="light"] .check-item{background:#f8fafc!important;border-color:rgba(99,102,241,.15)!important;color:#334155!important}
+[data-theme="light"] .check-item:has(input:checked){background:rgba(16,185,129,.08)!important;border-color:rgba(16,185,129,.3)!important;color:#161616!important}
+
 /* شريط التنبيه فوق الفورم */
 .notice-bar{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;padding:.95rem 1.2rem;border-radius:14px;background:rgba(16,185,129,.09);border:1px solid rgba(16,185,129,.26);margin-bottom:1.75rem}
 .notice-bar .nb-ico{font-size:1.25rem}
@@ -405,10 +419,15 @@ textarea.input{resize:vertical;min-height:104px;line-height:1.8}
             <div class="err-line">اختر سنتك الدراسية.</div>
           </div>
           <div class="field">
-            <label for="fGpa">المعدل التراكمي <span class="req">*</span></label>
+            <label for="fGpa">المعدل العام (GPA) <span class="req">*</span></label>
             <input class="input" id="fGpa" type="number" step="0.01" min="0" max="4" placeholder="مثال: 3.25" dir="ltr">
             <div class="hint">من ٠ إلى ٤. يستخدم لتوزيع الأعضاء على اللجان فقط.</div>
             <div class="err-line">حط معدل بين ٠ و ٤.</div>
+          </div>
+          <div class="field">
+            <label for="fMgpa">معدل التخصص (MGPA) <span class="req">*</span></label>
+            <input class="input" id="fMgpa" type="number" step="0.01" min="0" max="4" placeholder="مثال: 3.4" dir="ltr">
+            <div class="err-line">حط معدل تخصص بين ٠ و ٤.</div>
           </div>
         </div>
       </fieldset>
@@ -416,8 +435,12 @@ textarea.input{resize:vertical;min-height:104px;line-height:1.8}
       <fieldset class="fieldset">
         <div class="legend">اللجنة والدافع</div>
         <div class="grid2">
-          <div class="field">
+          <div class="field full">
             <label for="fCommittee">اللجنة اللي تبي تنضم لها <span class="req">*</span></label>
+            <div class="hint" style="margin-bottom:.5rem">
+              <b>اللجنة الثقافية:</b> بحث عن مواضيع علمية مرتبطة بتخصصات العلوم البيولوجية، إنشاء عرض باوربوينت للمواضيع لعرضها في المعارض، المشاركة في فعاليات ترفيهية مع الطلبة في فعاليات النادي، طرح أفكار للمواضيع والفعاليات والحفلات، إبراز أهمية تخصصات الوظيفية المستقبلية بالتطبيق العملي، والمساعدة في إدارة اللجنة الثقافية.<br><br>
+              <b>اللجنة الإعلامية:</b> تصوير وتوثيق مشاركة النادي في المعارض العلمية والترفيهية، تصميم منشورات متنوعة للفعاليات لكافة منصات التواصل الاجتماعي، تصميم فيديوهات متنوعة لإبراز فعاليات النادي وفعاليات الطلبة مواكبة لترندات السوشيال ميديا، تصميم فيديوهات ترفيهية لمنصة تيك توك مثل مقابلات مع الطلاب، إنتاج تصاميم باستخدام الذكاء الاصطناعي، والمساعدة عند اللزوم وعرضها بالإضافة إلى التواجد في بوث النادي للترفيه ومساعدة اللجنة الإعلامية.
+            </div>
             <select class="input" id="fCommittee">
               <option value="">— اختر —</option>
               <option value="academic">اللجنة الثقافية</option>
@@ -425,28 +448,73 @@ textarea.input{resize:vertical;min-height:104px;line-height:1.8}
             </select>
             <div class="err-line">اختر اللجنة.</div>
           </div>
+
+          <div class="field full" id="academicTasksWrap" hidden>
+            <label>يرجى تحديد طبيعة العمل الذي ستقدمه للجنة الثقافية <span class="hint" style="display:inline">(اختياري)</span></label>
+            <div class="check-group" id="academicTasks">
+              <label class="check-item"><input type="checkbox" value="بحث وتحضير باوربوينت لمواضيع المعارض"><span>بحث وتحضير باوربوينت لمواضيع المعارض</span></label>
+              <label class="check-item"><input type="checkbox" value="اشغال يدوية (للفعاليات الترفيهية او العلمية او الديكور)"><span>اشغال يدوية (للفعاليات الترفيهية او العلمية او الديكور)</span></label>
+              <label class="check-item"><input type="checkbox" value="التواجد في بوث النادي للشرح العلمي"><span>التواجد في بوث النادي للشرح العلمي</span></label>
+              <label class="check-item"><input type="checkbox" value="التواجد في بوث النادي للفعاليات الترفيهية"><span>التواجد في بوث النادي للفعاليات الترفيهية</span></label>
+              <label class="check-item"><input type="checkbox" value="العمل خلف الكواليس"><span>العمل خلف الكواليس</span></label>
+            </div>
+          </div>
+
+          <div class="field full" id="mediaTasksWrap" hidden>
+            <label>يرجى تحديد طبيعة العمل الذي ستقدمه للجنة الإعلامية <span class="hint" style="display:inline">(اختياري)</span></label>
+            <div class="check-group" id="mediaTasks">
+              <label class="check-item"><input type="checkbox" value="تصميم منشورات"><span>تصميم منشورات</span></label>
+              <label class="check-item"><input type="checkbox" value="تصميم فيديوهات لفعاليات النادي"><span>تصميم فيديوهات لفعاليات النادي</span></label>
+              <label class="check-item"><input type="checkbox" value="انتاج صور او فيديوهات بالذكاء الاصطناعي"><span>انتاج صور او فيديوهات بالذكاء الاصطناعي</span></label>
+              <label class="check-item"><input type="checkbox" value="تصوير وتوثيق خلال المعارض"><span>تصوير وتوثيق خلال المعارض</span></label>
+              <label class="check-item"><input type="checkbox" value="ادارة احدى صفحات النادي على مواقع التواصل الاجتماعي"><span>ادارة احدى صفحات النادي على مواقع التواصل الاجتماعي</span></label>
+            </div>
+          </div>
+
           <div class="field">
             <label for="fSkills">مهاراتك <span class="hint" style="display:inline">(اختياري)</span></label>
             <input class="input" id="fSkills" type="text" placeholder="تصميم، تصوير، كتابة، تنظيم…" maxlength="90">
           </div>
+
           <div class="field full">
-            <label for="fReason">ليش تبي تنضم للنادي؟ <span class="req">*</span></label>
+            <label>هل كنت عضو سابق في النادي؟ <span class="req">*</span></label>
+            <div class="radio-group" id="prevMemberGroup">
+              <label class="radio-pill"><input type="radio" name="prevMember" value="yes"><span>نعم</span></label>
+              <label class="radio-pill"><input type="radio" name="prevMember" value="no"><span>لا</span></label>
+            </div>
+            <div class="err-line">اختر نعم أو لا.</div>
+          </div>
+          <div class="field" id="prevYearWrap" hidden>
+            <label for="fPrevYear">ما هو العام اللي كنت فيه عضو؟ <span class="hint" style="display:inline">(اختياري)</span></label>
+            <input class="input" id="fPrevYear" type="text" placeholder="مثال: 2023" maxlength="20">
+          </div>
+
+          <div class="field full">
+            <label for="fReason">ما هو دافعك للانضمام لنادي العلوم البيولوجية؟ <span class="req">*</span></label>
             <textarea class="input" id="fReason" placeholder="اكتب بكلماتك — ما نبي كلام رسمي، نبي نعرفك." maxlength="600"></textarea>
             <div class="hint"><span id="reasonCount">0</span>/600 حرف</div>
             <div class="err-line">اكتب سطرين على الأقل (٢٠ حرف فأكثر).</div>
+          </div>
+          <div class="field full">
+            <label for="fHopeToLearn">ما الذي تأمل أن تتعلمه من خلال انضمامك لنادي العلوم البيولوجية؟ <span class="hint" style="display:inline">(اختياري)</span></label>
+            <textarea class="input" id="fHopeToLearn" placeholder="اكتب بكلماتك…" maxlength="500"></textarea>
+          </div>
+          <div class="field full">
+            <label for="fSuggestions">أفكار واقتراحات تساهم في تطوير نادي العلوم البيولوجية <span class="hint" style="display:inline">(اختياري)</span></label>
+            <textarea class="input" id="fSuggestions" placeholder="اكتب بكلماتك…" maxlength="500"></textarea>
           </div>
         </div>
       </fieldset>
 
       <fieldset class="fieldset">
-        <div class="legend">الجدول الدراسي</div>
+        <div class="legend">الجدول الدراسي وتأكيد المعدل</div>
         <div class="field full">
           <label for="fSchedule">صورة من جدولك الدراسي لهذا الفصل <span class="req">*</span></label>
           <div class="hint" style="margin-bottom:.6rem">تساعدنا نعرف أوقات فراغك عشان نحط اجتماعات اللجنة في وقت يناسبك. صورة من سستم الجامعة تكفي.</div>
           <label class="drop" id="dropZone">
             <span class="drop-ico">📅</span>
             <b>اضغط لاختيار صورة الجدول</b>
-            <span>PNG أو JPG · حتى ٥ ميجابايت</span>
+            <span>PNG أو JPG · حتى ٨ ميجابايت</span>
             <input type="file" id="fSchedule" accept="image/*">
           </label>
           <div class="preview" id="schedPreview">
@@ -458,6 +526,25 @@ textarea.input{resize:vertical;min-height:104px;line-height:1.8}
             <button type="button" id="schedRemove">إزالة</button>
           </div>
           <div class="err-line">أرفق صورة جدولك الدراسي.</div>
+        </div>
+        <div class="field full" style="margin-top:1.2rem">
+          <label for="fGpaProof">صورة للمعدل العام ومعدل التخصص للتأكيد <span class="req">*</span></label>
+          <div class="hint" style="margin-bottom:.6rem">لقطة شاشة من سستم الجامعة توضّح المعدلين — عشان نتأكد إن الأرقام اللي كتبتها فوق صحيحة.</div>
+          <label class="drop" id="dropZoneGpa">
+            <span class="drop-ico">🧮</span>
+            <b>اضغط لاختيار صورة تأكيد المعدل</b>
+            <span>PNG أو JPG · حتى ٨ ميجابايت</span>
+            <input type="file" id="fGpaProof" accept="image/*">
+          </label>
+          <div class="preview" id="gpaProofPreview">
+            <img id="gpaProofThumb" alt="معاينة تأكيد المعدل">
+            <div class="preview-meta">
+              <b id="gpaProofName"></b>
+              <span id="gpaProofSize"></span>
+            </div>
+            <button type="button" id="gpaProofRemove">إزالة</button>
+          </div>
+          <div class="err-line">أرفق صورة تأكيد المعدل.</div>
         </div>
       </fieldset>
 
@@ -505,8 +592,9 @@ const MAJOR_AR={molecular:"البيولوجيا الجزيئية",micro:"علم 
 const COMMITTEE_AR={academic:"اللجنة الثقافية",media:"اللجنة الإعلامية"};
 const YEAR_AR={1:"السنة الأولى",2:"السنة الثانية",3:"السنة الثالثة",4:"السنة الرابعة",5:"السنة الخامسة فأكثر"};
 
-let me=null;           // مستخدم Firebase (مجهول أو مربوط بجوجل)
-let pendingPhoto=null; // صورة الجدول بعد الضغط، بصيغة data URL جاهزة للتخزين
+let me=null; // مستخدم Firebase (مجهول أو مربوط بجوجل)
+// pendingPhoto (الجدول) وpendingGpaProof (تأكيد المعدل) معرّفين بالأسفل
+// جنب wireUploader() — كلاهما data URL بعد الضغط، جاهزين للتخزين.
 
 /* ═════════ الإقلاع ═════════ */
 // account.js هو اللي يسجّل الزائر دخول مجهول. ننتظره بدل ما نستدعي
@@ -596,35 +684,60 @@ $("fSupport").addEventListener("change",function(){
 });
 $("fReason").addEventListener("input",function(){ $("reasonCount").textContent=this.value.length; });
 
-/* ── اختيار صورة الجدول وضغطها ── */
-const dropZone=$("dropZone");
-["dragenter","dragover"].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.add("over");}));
-["dragleave","drop"].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.remove("over");}));
-dropZone.addEventListener("drop",e=>{ const f=e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) handleFile(f); });
-$("fSchedule").addEventListener("change",function(){ const f=this.files&&this.files[0]; if(f) handleFile(f); });
-$("schedRemove").addEventListener("click",()=>{
-  pendingPhoto=null; $("fSchedule").value="";
-  $("schedPreview").classList.remove("on"); dropZone.style.display="";
+/* ── اللجنة: نص وصفي + قوائم مهام شرطية ── */
+$("fCommittee").addEventListener("change",function(){
+  $("academicTasksWrap").hidden=this.value!=="academic";
+  $("mediaTasksWrap").hidden=this.value!=="media";
 });
 
-async function handleFile(file){
-  if(!/^image\//.test(file.type)) return showMsg("err","الملف لازم يكون صورة (PNG أو JPG).");
-  if(file.size>8*1024*1024) return showMsg("err","حجم الصورة أكبر من ٨ ميجابايت. صغّرها وحاول مرة ثانية.");
-  hideMsg();
-  let dataUrl;
-  try{ dataUrl=await shrinkToDataUrl(file); }
-  catch(e){ return showMsg("err","تعذّرت قراءة هالصورة. جرّب صورة ثانية."); }
-  if(dataUrl.length>MAX_PHOTO_BASE64){
-    return showMsg("err","صورة الجدول لسا كبيرة حتى بعد الضغط. جرّب لقطة أوضح لجدولك بس، بدون خلفية أو تفاصيل زايدة.");
+/* ── هل كنت عضو سابق؟ ── */
+document.querySelectorAll('input[name="prevMember"]').forEach(r=>{
+  r.addEventListener("change",()=>{ $("prevYearWrap").hidden=r.value!=="yes"||!r.checked; });
+});
+
+/* ── اختيار الصور وضغطها — دالة عامة تخدم صورة الجدول وصورة تأكيد المعدل ── */
+let pendingPhoto=null, pendingGpaProof=null;
+
+function wireUploader({inputId,dropId,previewId,thumbId,nameId,sizeId,removeId,setPending,getPending,tooBigMsg}){
+  const drop=$(dropId);
+  ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over");}));
+  ["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over");}));
+  drop.addEventListener("drop",e=>{ const f=e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) handle(f); });
+  $(inputId).addEventListener("change",function(){ const f=this.files&&this.files[0]; if(f) handle(f); });
+  $(removeId).addEventListener("click",()=>{
+    setPending(null); $(inputId).value="";
+    $(previewId).classList.remove("on"); drop.style.display="";
+  });
+  async function handle(file){
+    if(!/^image\//.test(file.type)) return showMsg("err","الملف لازم يكون صورة (PNG أو JPG).");
+    if(file.size>8*1024*1024) return showMsg("err","حجم الصورة أكبر من ٨ ميجابايت. صغّرها وحاول مرة ثانية.");
+    hideMsg();
+    let dataUrl;
+    try{ dataUrl=await shrinkToDataUrl(file); }
+    catch(e){ return showMsg("err","تعذّرت قراءة هالصورة. جرّب صورة ثانية."); }
+    if(dataUrl.length>MAX_PHOTO_BASE64) return showMsg("err",tooBigMsg);
+    setPending(dataUrl);
+    $(thumbId).src=dataUrl;
+    $(nameId).textContent=file.name;
+    $(sizeId).textContent=Math.round(dataUrl.length*.73/1024)+" كيلوبايت (بعد الضغط)";
+    $(previewId).classList.add("on");
+    drop.style.display="none";
+    clearErr($(inputId).closest(".field"));
   }
-  pendingPhoto=dataUrl;
-  $("schedThumb").src=dataUrl;
-  $("schedName").textContent=file.name;
-  $("schedSize").textContent=Math.round(dataUrl.length*.73/1024)+" كيلوبايت (بعد الضغط)";
-  $("schedPreview").classList.add("on");
-  dropZone.style.display="none";
-  clearErr($("fSchedule").closest(".field"));
 }
+
+wireUploader({
+  inputId:"fSchedule",dropId:"dropZone",previewId:"schedPreview",thumbId:"schedThumb",
+  nameId:"schedName",sizeId:"schedSize",removeId:"schedRemove",
+  setPending:v=>pendingPhoto=v, getPending:()=>pendingPhoto,
+  tooBigMsg:"صورة الجدول لسا كبيرة حتى بعد الضغط. جرّب لقطة أوضح لجدولك بس، بدون خلفية أو تفاصيل زايدة."
+});
+wireUploader({
+  inputId:"fGpaProof",dropId:"dropZoneGpa",previewId:"gpaProofPreview",thumbId:"gpaProofThumb",
+  nameId:"gpaProofName",sizeId:"gpaProofSize",removeId:"gpaProofRemove",
+  setPending:v=>pendingGpaProof=v, getPending:()=>pendingGpaProof,
+  tooBigMsg:"صورة تأكيد المعدل لسا كبيرة حتى بعد الضغط. جرّب لقطة أوضح بس، بدون خلفية أو تفاصيل زايدة."
+});
 
 // نحوّل الصورة لـ data URL مضغوطة تحت سقف مستند Firestore. نبدأ بعرض ١٦٠٠px
 // وجودة ٠.٨، ولو لسا كبيرة نقلّل الجودة ثم الأبعاد تدريجياً حتى تصير تحت السقف.
@@ -675,9 +788,18 @@ function validate(){
   check($("fYear"), !!v("fYear"));
   const gpa=parseFloat(v("fGpa"));
   check($("fGpa"), !isNaN(gpa) && gpa>=0 && gpa<=4);
+  const mgpa=parseFloat(v("fMgpa"));
+  check($("fMgpa"), !isNaN(mgpa) && mgpa>=0 && mgpa<=4);
   check($("fCommittee"), !!v("fCommittee"));
+
+  const prevMemberChecked=!!document.querySelector('input[name="prevMember"]:checked');
+  const prevGroupField=$("prevMemberGroup").closest(".field");
+  setErr(prevGroupField,!prevMemberChecked);
+  if(!prevMemberChecked && !firstBad) firstBad=prevGroupField;
+
   check($("fReason"), v("fReason").length>=20);
   check($("fSchedule"), !!pendingPhoto);
+  check($("fGpaProof"), !!pendingGpaProof);
 
   if(firstBad){ firstBad.scrollIntoView({behavior:"smooth",block:"center"}); return false; }
   return true;
@@ -706,13 +828,23 @@ $("joinForm").addEventListener("submit",async e=>{
   };
 
   try{
-    // ١) صورة الجدول أولاً، في مستند منفصل — لو فشلت ما نبي طلباً بلا صورة.
+    // ١) الصورتين أولاً، كل وحدة بمستند منفصل — لو فشلن ما نبي طلباً بلا صور.
     //    القواعد تمنع الكتابة هنا بعد ما يصير عندنا مستند طلب بنفس الـ uid،
-    //    فهالترتيب (الصورة ثم الطلب) مو اختياري.
+    //    فهالترتيب (الصور ثم الطلب) مو اختياري.
     await withTimeout(
       setDoc(doc(db,"membershipPhotos",me.uid),{uid:me.uid,dataUrl:pendingPhoto,updatedAt:serverTimestamp()}),
       20000,"app/photo-timeout"
     );
+    await withTimeout(
+      setDoc(doc(db,"membershipGpaProof",me.uid),{uid:me.uid,dataUrl:pendingGpaProof,updatedAt:serverTimestamp()}),
+      20000,"app/photo-timeout"
+    );
+
+    const committeeVal=$("fCommittee").value;
+    const committeeTasks=[...document.querySelectorAll(
+      (committeeVal==="academic"?"#academicTasks":"#mediaTasks")+" input:checked"
+    )].map(el=>el.value);
+    const prevMemberVal=(document.querySelector('input[name="prevMember"]:checked')||{}).value||"";
 
     // ٢) الطلب نفسه — معرّف المستند هو الـ uid، فما يقدر يسجّل مرتين
     const supportSel=$("fSupport").value;
@@ -729,10 +861,17 @@ $("joinForm").addEventListener("submit",async e=>{
         supportMajorOther:supportSel==="__other"?$("fSupportOther").value.trim():"",
         year:$("fYear").value,
         gpa:parseFloat($("fGpa").value),
-        committee:$("fCommittee").value,
+        mgpa:parseFloat($("fMgpa").value),
+        committee:committeeVal,
+        committeeTasks,
         skills:$("fSkills").value.trim(),
+        previousMember:prevMemberVal==="yes",
+        previousMemberYear:prevMemberVal==="yes"?$("fPrevYear").value.trim():"",
         reason:$("fReason").value.trim(),
+        hopeToLearn:$("fHopeToLearn").value.trim(),
+        suggestions:$("fSuggestions").value.trim(),
         hasPhoto:true,
+        hasGpaProof:true,
         verifiedEmail:!!(me.providerData&&me.providerData.length),
         status:"pending",
         createdAt:serverTimestamp()
@@ -748,7 +887,7 @@ $("joinForm").addEventListener("submit",async e=>{
       major:$("fMajor").value,
       supportMajor:supportSel==="__other"?$("fSupportOther").value.trim():supportSel,
       year:$("fYear").value,
-      committee:$("fCommittee").value
+      committee:committeeVal
     });
     window.scrollTo({top:200,behavior:"smooth"});
   }catch(err){
@@ -761,7 +900,7 @@ $("joinForm").addEventListener("submit",async e=>{
     else if(code==="app/photo-timeout"||code==="app/submit-timeout")
       showMsg("err","تعذّر الاتصال بالخادم. تأكد من الإنترنت وحاول مرة ثانية.");
     else if(code==="invalid-argument"||/longer than|exceeds the maximum|too large/i.test(msg))
-      showMsg("err","صورة الجدول لسا كبيرة رغم الضغط. جرّب صورة أوضح وأقرب لجدولك بس.");
+      showMsg("err","إحدى الصورتين لسا كبيرة رغم الضغط. جرّب صورة أوضح وأقرب.");
     else
       showMsg("err","صار خطأ أثناء الإرسال. حاول مرة ثانية، ولو تكرر بلّغنا.");
   }

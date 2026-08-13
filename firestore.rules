@@ -164,6 +164,19 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Second confirmation photo (GPA + major GPA screenshot). Same shape and
+    // same reasoning as membershipPhotos above — kept as its own collection
+    // rather than a second field on the same document so each photo gets its
+    // own ~1MiB budget instead of splitting one budget two ways.
+    match /membershipGpaProof/{uid} {
+      allow write: if request.auth != null
+                   && request.auth.uid == uid
+                   && !exists(/databases/$(database)/documents/memberships/$(uid));
+      allow get: if isAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow list: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     // Registration window + committee list, edited from the admin panel.
     // Read is open because join.html has to know whether to show the form.
     match /membershipConfig/{id} {

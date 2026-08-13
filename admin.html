@@ -1605,6 +1605,11 @@ function renderMemList(){
     const[label,color]=MEM_STATUS[st]||MEM_STATUS.pending;
     const when=memDate(m.createdAt);
     const gpa=typeof m.gpa==="number"?m.gpa.toFixed(2):(m.gpa||"—");
+    const mgpa=typeof m.mgpa==="number"?m.mgpa.toFixed(2):(m.mgpa||"—");
+    const tasks=(m.committeeTasks||[]).map(escSub).join("، ");
+    const prevMemberLine=m.previousMember
+      ? `عضو سابق${m.previousMemberYear?" ("+escSub(m.previousMemberYear)+")":""}`
+      : "ما كان عضو سابق";
     // مكرّر بالرقم الجامعي — يصير لو الطالب قدّم من متصفح ثاني بهوية مجهولة جديدة
     const dup=m.studentId && all.some(o=>o.id!==m.id && o.studentId===m.studentId);
     return `<div class="list-item" style="border-inline-start:3px solid ${color};align-items:flex-start">
@@ -1615,14 +1620,18 @@ function renderMemList(){
           ${m.verifiedEmail?'<span style="font-size:.7rem;color:#6ee7b7" title="سجّل دخوله بجوجل">✓ إيميل موثّق</span>':""}
           ${dup?'<span style="font-size:.7rem;color:#fca5a5" title="نفس الرقم الجامعي مقدّم في طلب ثاني">⚠ رقم جامعي مكرر</span>':""}
         </h4>
-        <p>🆔 ${escSub(m.studentId)||"—"} · ${escSub(MN[m.major]||m.major||"—")} · مساند: ${escSub(memSupport(m))} · ${escSub(MEM_YEAR[m.year]||m.year||"—")} · معدل ${escSub(gpa)}</p>
-        <p style="margin-top:.2rem">🎯 ${escSub(MEM_COMMITTEE[m.committee]||m.committee||"—")}${m.skills?" · 🛠 "+escSub(m.skills):""}</p>
+        <p>🆔 ${escSub(m.studentId)||"—"} · ${escSub(MN[m.major]||m.major||"—")} · مساند: ${escSub(memSupport(m))} · ${escSub(MEM_YEAR[m.year]||m.year||"—")} · GPA ${escSub(gpa)} · MGPA ${escSub(mgpa)}</p>
+        <p style="margin-top:.2rem">🎯 ${escSub(MEM_COMMITTEE[m.committee]||m.committee||"—")}${tasks?" — "+tasks:""}${m.skills?" · 🛠 "+escSub(m.skills):""}</p>
         <p style="margin-top:.2rem;direction:ltr;text-align:start">📞 ${escSub(m.phone)||"—"} · ✉️ ${escSub(m.email)||"—"}${m.instagram?" · 📷 @"+escSub(m.instagram):""}</p>
-        ${m.reason?`<p style="margin-top:.35rem;color:var(--muted);line-height:1.75">💬 ${escSub(m.reason)}</p>`:""}
+        <p style="margin-top:.2rem;font-size:.78rem;color:var(--muted)">👤 ${prevMemberLine}</p>
+        ${m.reason?`<p style="margin-top:.35rem;color:var(--muted);line-height:1.75">💬 <b style="color:#cbd5e1">الدافع:</b> ${escSub(m.reason)}</p>`:""}
+        ${m.hopeToLearn?`<p style="margin-top:.25rem;color:var(--muted);line-height:1.75">🎯 <b style="color:#cbd5e1">يتمنى يتعلم:</b> ${escSub(m.hopeToLearn)}</p>`:""}
+        ${m.suggestions?`<p style="margin-top:.25rem;color:var(--muted);line-height:1.75">💡 <b style="color:#cbd5e1">اقتراحات:</b> ${escSub(m.suggestions)}</p>`:""}
         <p style="margin-top:.25rem;font-size:.74rem;color:var(--muted)">${when?when.toLocaleDateString("ar-KW",{year:"numeric",month:"short",day:"numeric"})+" · "+when.toLocaleTimeString("ar-KW",{hour:"2-digit",minute:"2-digit"}):"بدون تاريخ"}</p>
       </div>
       <div class="list-item-actions" style="flex-wrap:wrap">
         <button class="btn btn-sm" style="background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);color:#a5b4fc" onclick="memViewPhoto_('${m.id}',this)">📅 عرض الجدول</button>
+        <button class="btn btn-sm" style="background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#c4b5fd" onclick="memViewGpaProof_('${m.id}',this)">🧮 عرض تأكيد المعدل</button>
         ${st!=="approved"?`<button class="btn btn-sm" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);color:#6ee7b7" onclick="memApprove_('${m.id}')">✅ قبول</button>`:""}
         ${st!=="rejected"?`<button class="btn btn-sm" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5" onclick="memReject_('${m.id}')">❌ رفض</button>`:""}
         <button class="btn btn-danger btn-sm" onclick="memDelete_('${m.id}')">حذف</button>
@@ -1648,20 +1657,25 @@ window.memDelete_=async id=>{
   if(!confirm("حذف الطلب نهائياً؟\n\nملاحظة: الحذف يسمح لنفس الطالب يقدّم طلب جديد."))return;
   await deleteDoc(doc(db,"memberships",id));
   await deleteDoc(doc(db,"membershipPhotos",id)).catch(()=>{});
+  await deleteDoc(doc(db,"membershipGpaProof",id)).catch(()=>{});
   loadAll();
 };
 
-// صورة الجدول تعيش في مستند منفصل (membershipPhotos) عشان قائمة الطلبات ما
-// تجرّ صور كل المتقدمين وهي بس بتفتح واحدة. نجيبها هنا عند الطلب فقط.
-window.memViewPhoto_=async(id,btn)=>{
-  const original=btn.textContent; btn.disabled=true; btn.textContent="⏳";
-  try{
-    const snap=await getDoc(doc(db,"membershipPhotos",id));
-    if(!snap.exists()||!snap.data().dataUrl){ alert("ما فيه صورة جدول محفوظة لهالطلب."); return; }
-    memOpenLightbox(snap.data().dataUrl);
-  }catch(e){ alert("تعذّر تحميل الصورة: "+(e.message||e)); }
-  finally{ btn.disabled=false; btn.textContent=original; }
-};
+// كل صورة تعيش في مستند منفصل (membershipPhotos / membershipGpaProof) عشان
+// قائمة الطلبات ما تجرّ صور كل المتقدمين وهي بس بتفتح وحدة. نجيبها عند الطلب.
+function memViewPhotoFrom(col,missingMsg){
+  return async(id,btn)=>{
+    const original=btn.textContent; btn.disabled=true; btn.textContent="⏳";
+    try{
+      const snap=await getDoc(doc(db,col,id));
+      if(!snap.exists()||!snap.data().dataUrl){ alert(missingMsg); return; }
+      memOpenLightbox(snap.data().dataUrl);
+    }catch(e){ alert("تعذّر تحميل الصورة: "+(e.message||e)); }
+    finally{ btn.disabled=false; btn.textContent=original; }
+  };
+}
+window.memViewPhoto_=memViewPhotoFrom("membershipPhotos","ما فيه صورة جدول محفوظة لهالطلب.");
+window.memViewGpaProof_=memViewPhotoFrom("membershipGpaProof","ما فيه صورة تأكيد معدل محفوظة لهالطلب.");
 function memOpenLightbox(dataUrl){
   let lb=document.getElementById("memLightbox");
   if(!lb){
@@ -1677,12 +1691,14 @@ function memOpenLightbox(dataUrl){
 }
 
 function memCsv(){
-  const rows=[["الاسم","الرقم الجامعي","الإيميل","إيميل موثّق","التلفون","إنستقرام","التخصص الرئيسي","التخصص المساند","السنة","المعدل","اللجنة","المهارات","سبب الانضمام","صورة الجدول","الحالة","تاريخ التقديم"]];
+  const rows=[["الاسم","الرقم الجامعي","الإيميل","إيميل موثّق","التلفون","إنستقرام","التخصص الرئيسي","التخصص المساند","السنة","GPA","MGPA","اللجنة","مهام اللجنة","المهارات","عضو سابق","عام العضوية السابقة","الدافع","يتمنى يتعلم","اقتراحات","صورة الجدول","صورة تأكيد المعدل","الحالة","تاريخ التقديم"]];
   memFiltered().forEach(m=>{
     const w=memDate(m.createdAt);
     rows.push([m.fullName,m.studentId,m.email,m.verifiedEmail?"نعم":"لا",m.phone,m.instagram,
-      MN[m.major]||m.major,memSupport(m),MEM_YEAR[m.year]||m.year,m.gpa,
-      MEM_COMMITTEE[m.committee]||m.committee,m.skills,m.reason,m.hasPhoto?"محفوظة — افتحها من لوحة التحكم":"—",
+      MN[m.major]||m.major,memSupport(m),MEM_YEAR[m.year]||m.year,m.gpa,m.mgpa,
+      MEM_COMMITTEE[m.committee]||m.committee,(m.committeeTasks||[]).join("، "),m.skills,
+      m.previousMember?"نعم":"لا",m.previousMemberYear,m.reason,m.hopeToLearn,m.suggestions,
+      m.hasPhoto?"محفوظة — افتحها من لوحة التحكم":"—",m.hasGpaProof?"محفوظة — افتحها من لوحة التحكم":"—",
       (MEM_STATUS[m.status||"pending"]||MEM_STATUS.pending)[0],w?w.toISOString():""]);
   });
   const body=rows.map(r=>r.map(c=>{
