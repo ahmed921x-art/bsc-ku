@@ -1,0 +1,47 @@
+rules_version = '2';
+
+// BSC KU Storage Security Rules
+// Paste into Firebase Console → Storage → Rules → Publish.
+//
+// ⚠️ Publishing these replaces whatever rules are live now. The `resources/`
+// block below reproduces what the admin panel already relies on
+// (admin.html → uploadFileToStorage), so uploading event/major files keeps
+// working. Do not drop it.
+//
+// ⚠️ Storage itself is not provisioned on this project yet — a live check
+// against both possible bucket names (bsc-ku.firebasestorage.app and
+// bsc-ku.appspot.com) returned 404 Not Found on both. That's why the
+// membership form stores its schedule photo as base64 inside Firestore
+// instead of here (see firestore.rules → membershipPhotos). These rules only
+// take effect once Storage is enabled from Console → Storage → Get started —
+// until then, admin.html's own file upload (uploadFileToStorage, used for
+// major/event resources) is silently broken the same way the membership photo
+// upload was before this rule existed.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Same allowlist used in admin.html and firestore.rules.
+    function isAdmin() {
+      return request.auth != null &&
+        request.auth.token.email in [
+          'ahmed921x@gmail.com',
+          'abdullaalshewaya66@gmail.com',
+          'kmaldebs@gmail.com',
+          'biosciclub@gmail.com'
+        ];
+    }
+
+    // Admin-uploaded files shown publicly on the site (major resources,
+    // event images). Unchanged behaviour.
+    match /resources/{file=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Everything else: denied by default.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

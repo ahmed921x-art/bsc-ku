@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BSC KU">
+  <meta name="theme-color" content="#6366f1">
+  <link rel="apple-touch-icon" href="favicon.png">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <link rel="icon" type="image/png" href="favicon.png" sizes="512x512">
+  <meta property="og:image" content="https://biosci-ku.com/logo.png">
+  <meta property="og:site_name" content="BSC KU">
+  <meta property="og:locale" content="ar_KW">
+
+<title>انضم للنادي | BSC KU</title>
+<meta name="description" content="سجّل عضويتك في نادي العلوم البيولوجية بجامعة الكويت — املأ نموذج الانضمام واختر اللجنة اللي تناسبك.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="انضم لنادي العلوم البيولوجية | BSC KU">
+<meta property="og:description" content="سجّل عضويتك في نادي العلوم البيولوجية بجامعة الكويت — املأ نموذج الانضمام واختر اللجنة اللي تناسبك.">
+<meta property="og:url" content="https://biosci-ku.com/join.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="انضم لنادي العلوم البيولوجية | BSC KU">
+<meta name="twitter:description" content="سجّل عضويتك في نادي العلوم البيولوجية بجامعة الكويت — املأ نموذج الانضمام واختر اللجنة اللي تناسبك.">
+<meta name="twitter:image" content="https://biosci-ku.com/logo.png">
+<link href="navbar.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#6366f1;--ink2:#8b5cf6;--green:#10b981;--bg:#101010;--surface:rgba(255,255,255,.05);--border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.18);--text:#f1f5f9;--muted:#94a3b8;--radius:20px;--radius-lg:28px;--ease:cubic-bezier(.4,0,.2,1);--bounce:cubic-bezier(.68,-.55,.265,1.55)}
+body{font-family:'Tajawal','Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.bg-canvas{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bg-canvas::before{content:'';position:absolute;width:700px;height:700px;top:-150px;right:-150px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.2)0%,transparent 70%);animation:orb1 18s ease-in-out infinite}
+.bg-canvas::after{content:'';position:absolute;width:500px;height:500px;bottom:-80px;left:-80px;border-radius:50%;background:radial-gradient(circle,rgba(16,185,129,.14)0%,transparent 70%);animation:orb2 22s ease-in-out infinite}
+@keyframes orb1{0%,100%{transform:translate(0,0)}50%{transform:translate(-60px,80px)scale(1.2)}}
+@keyframes orb2{0%,100%{transform:translate(0,0)}50%{transform:translate(80px,-60px)scale(1.15)}}
+.bg-grid{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(255,255,255,.025)1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025)1px,transparent 1px);background-size:64px 64px}
+.particle{position:fixed;pointer-events:none;z-index:1;font-size:18px;opacity:0;animation:pf linear infinite}
+@keyframes pf{0%{transform:translateY(105vh)rotate(0deg);opacity:0}8%{opacity:.055}92%{opacity:.055}100%{transform:translateY(-8vh)rotate(540deg);opacity:0}}
+
+.page-hero{position:relative;z-index:2;padding:5rem 6% 2.5rem;text-align:center;animation:fu .9s ease both}
+@keyframes fu{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+.page-badge{display:inline-flex;align-items:center;gap:.5rem;padding:.36rem 1.1rem;background:rgba(16,185,129,.13);border:1px solid rgba(16,185,129,.32);border-radius:999px;font-size:.78rem;font-weight:700;color:#6ee7b7;margin-bottom:1.25rem}
+.page-badge::before{content:'';width:6px;height:6px;background:#10b981;border-radius:50%;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.page-hero h1{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:900;letter-spacing:-.03em;margin-bottom:1rem;background:linear-gradient(135deg,#fff,#d1fae5);-webkit-background-clip:text;background-clip:text;color:transparent}
+.page-hero p{font-size:1.05rem;color:var(--muted);max-width:560px;margin:0 auto}
+
+.main-content{position:relative;z-index:2;padding:0 6% 5rem;max-width:1180px;margin:0 auto}
+
+/* ── مزايا العضوية ── */
+.perks{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1rem;margin-bottom:2.5rem}
+.perk{background:rgba(22,22,22,.75);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius);padding:1.35rem 1.2rem;transition:all .35s var(--ease)}
+.perk:hover{transform:translateY(-6px);border-color:rgba(16,185,129,.35);box-shadow:0 18px 44px rgba(16,185,129,.14)}
+.perk-ico{font-size:1.6rem;display:block;margin-bottom:.55rem}
+.perk h3{font-size:.94rem;font-weight:800;margin-bottom:.3rem;color:var(--text)}
+.perk p{font-size:.82rem;color:var(--muted);line-height:1.65}
+
+/* ── بطاقة الفورم ── */
+.form-card{background:rgba(22,22,22,.78);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.25rem;position:relative;overflow:hidden}
+.form-card::before{content:'';position:absolute;top:0;inset-inline:0;height:2px;background:linear-gradient(90deg,#10b981,#6366f1,#8b5cf6)}
+.form-head{margin-bottom:1.75rem}
+.form-head h2{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.45rem;font-weight:900;letter-spacing:-.02em;margin-bottom:.35rem}
+.form-head p{font-size:.86rem;color:var(--muted)}
+
+.fieldset{border:0;margin-bottom:1.9rem}
+.legend{display:flex;align-items:center;gap:.55rem;font-size:.72rem;font-weight:800;color:#6ee7b7;text-transform:uppercase;letter-spacing:.09em;margin-bottom:1rem}
+.legend::before{content:'';width:16px;height:2px;background:#10b981;border-radius:2px}
+
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1.05rem}
+.field{display:flex;flex-direction:column;gap:.4rem}
+/* display:flex فوق يتغلّب على خاصية hidden، فنرجّعها صراحة */
+.field[hidden]{display:none}
+.field.full{grid-column:1/-1}
+.field label{font-size:.82rem;font-weight:700;color:#cbd5e1}
+.field label .req{color:#f87171;margin-inline-start:.15rem}
+.field .hint{font-size:.72rem;color:#7b8699;line-height:1.6}
+.input,select.input,textarea.input{width:100%;padding:.72rem .95rem;background:rgba(255,255,255,.045);border:1px solid var(--border2);border-radius:12px;color:var(--text);font-size:.88rem;font-family:'Tajawal',sans-serif;transition:all .22s;outline:none}
+.input:focus{border-color:#10b981;background:rgba(255,255,255,.07);box-shadow:0 0 0 3px rgba(16,185,129,.14)}
+.input::placeholder{color:#5f6b80}
+.input[aria-invalid="true"]{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.12)}
+select.input{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='3'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left .9rem center;padding-inline-start:2.2rem}
+select.input option{background:#16161e;color:#f1f5f9}
+textarea.input{resize:vertical;min-height:104px;line-height:1.8}
+.err-line{font-size:.74rem;font-weight:700;color:#fca5a5;display:none}
+.field.bad .err-line{display:block}
+
+/* رفع صورة الجدول */
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;padding:1.6rem 1rem;border:1.5px dashed var(--border2);border-radius:14px;background:rgba(255,255,255,.03);cursor:pointer;text-align:center;transition:all .25s}
+.drop:hover,.drop.over{border-color:#10b981;background:rgba(16,185,129,.06)}
+.drop-ico{font-size:1.7rem}
+.drop b{font-size:.86rem;font-weight:800;color:#cbd5e1}
+.drop span{font-size:.75rem;color:var(--muted)}
+.drop input{display:none}
+.preview{display:none;margin-top:.85rem;align-items:center;gap:.85rem;padding:.7rem;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px}
+.preview.on{display:flex}
+.preview img{width:78px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border2);flex-shrink:0}
+.preview-meta{flex:1;min-width:0}
+.preview-meta b{display:block;font-size:.82rem;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.preview-meta span{font-size:.73rem;color:var(--muted)}
+.preview button{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:9px;padding:.35rem .7rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;flex-shrink:0}
+
+/* شريط التنبيه فوق الفورم */
+.notice-bar{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;padding:.95rem 1.2rem;border-radius:14px;background:rgba(16,185,129,.09);border:1px solid rgba(16,185,129,.26);margin-bottom:1.75rem}
+.notice-bar .nb-ico{font-size:1.25rem}
+.notice-bar .nb-txt{flex:1;min-width:190px;font-size:.8rem;color:#b6c0d8;line-height:1.65}
+.notice-bar .nb-txt b{color:#6ee7b7;display:block;font-size:.86rem}
+
+/* زر الإرسال */
+.submit-row{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-top:.5rem}
+.btn-submit{display:inline-flex;align-items:center;justify-content:center;gap:.55rem;padding:.9rem 2.3rem;border-radius:999px;border:0;cursor:pointer;font-size:.95rem;font-weight:900;font-family:'Tajawal',sans-serif;color:#fff;background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 10px 30px rgba(16,185,129,.28);transition:all .28s var(--ease)}
+.btn-submit:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 16px 40px rgba(16,185,129,.38)}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.submit-note{font-size:.75rem;color:var(--muted);line-height:1.65;flex:1;min-width:200px}
+.submit-note a{color:#6ee7b7;text-decoration:underline}
+
+/* رسائل الحالة */
+.state-card{display:none;text-align:center;padding:3rem 2rem;background:rgba(22,22,22,.78);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius-lg)}
+.state-card.on{display:block;animation:fu .6s ease both}
+.state-ico{font-size:3.2rem;display:block;margin-bottom:1rem}
+.state-card h2{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.5rem;font-weight:900;margin-bottom:.6rem}
+.state-card p{font-size:.9rem;color:var(--muted);max-width:460px;margin:0 auto 1.4rem;line-height:1.85}
+.state-pill{display:inline-flex;align-items:center;gap:.45rem;padding:.4rem 1.15rem;border-radius:999px;font-size:.8rem;font-weight:800}
+.state-pill.pending{background:rgba(245,158,11,.13);border:1px solid rgba(245,158,11,.32);color:#fcd34d}
+.state-pill.approved{background:rgba(16,185,129,.13);border:1px solid rgba(16,185,129,.32);color:#6ee7b7}
+.state-pill.rejected{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+.state-recap{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.7rem;max-width:620px;margin:1.6rem auto 0;text-align:start}
+.recap-item{padding:.65rem .9rem;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:11px}
+.recap-item span{display:block;font-size:.7rem;color:var(--muted);margin-bottom:.15rem}
+.recap-item b{font-size:.84rem;color:#e2e8f0;font-weight:700}
+
+.form-msg{display:none;margin-top:1.15rem;padding:.85rem 1.1rem;border-radius:12px;font-size:.84rem;font-weight:700;line-height:1.7}
+.form-msg.on{display:block}
+.form-msg.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.28);color:#fca5a5}
+.form-msg.ok{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#6ee7b7}
+
+.loading-box{text-align:center;padding:3.5rem;color:var(--muted);font-size:.9rem}
+
+.footer{position:relative;z-index:2;margin:2rem 6% 0;padding:2rem 2.5rem;background:rgba(22,22,22,.6);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:28px 28px 0 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.25rem}
+.footer-brand{display:flex;align-items:center;gap:.75rem}
+.footer-brand img{height:36px;mix-blend-mode:screen;filter:brightness(1.1)drop-shadow(0 0 8px rgba(99,102,241,.4))}
+.footer-copy{font-size:.76rem;color:var(--muted)}
+.footer-copy strong{color:#e2e8f0;font-size:.86rem;display:block}
+.footer-socials{display:flex;gap:.75rem}
+.social-btn{display:inline-flex;align-items:center;gap:.5rem;padding:.48rem 1.05rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:999px;font-size:.8rem;font-weight:700;color:var(--muted);transition:all .25s}
+.social-btn:hover{color:#fff;background:rgba(99,102,241,.18);border-color:rgba(99,102,241,.5);transform:translateY(-3px)}
+.social-btn svg{width:14px;height:14px;fill:currentColor}
+@media(max-width:768px){.main-content{padding:0 5% 4rem}.form-card{padding:1.5rem 1.15rem}.footer{flex-direction:column;align-items:center;text-align:center}}
+
+/* ════════════ LIGHT MODE ════════════ */
+[data-theme="light"]{color-scheme:light}
+[data-theme="light"] body{background:#fff;color:#161616}
+[data-theme="light"] .bg-canvas::before{background:radial-gradient(circle,rgba(99,102,241,.08)0%,transparent 70%)}
+[data-theme="light"] .bg-canvas::after{background:radial-gradient(circle,rgba(16,185,129,.06)0%,transparent 70%)}
+[data-theme="light"] .bg-grid{background-image:linear-gradient(rgba(99,102,241,.04)1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,.04)1px,transparent 1px)}
+[data-theme="light"] .page-hero h1{background:linear-gradient(135deg,#064e3b,#059669)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important}
+[data-theme="light"] .page-hero p{color:#475569}
+[data-theme="light"] .page-badge{background:rgba(16,185,129,.08)!important;border-color:rgba(16,185,129,.25)!important;color:#047857!important}
+[data-theme="light"] .perk,
+[data-theme="light"] .form-card,
+[data-theme="light"] .state-card{background:#fff!important;border-color:rgba(99,102,241,.15)!important;box-shadow:0 2px 16px rgba(99,102,241,.08)!important;backdrop-filter:none!important}
+[data-theme="light"] .perk h3,
+[data-theme="light"] .form-head h2,
+[data-theme="light"] .state-card h2{color:#161616!important}
+[data-theme="light"] .perk p,
+[data-theme="light"] .form-head p,
+[data-theme="light"] .state-card p,
+[data-theme="light"] .submit-note,
+[data-theme="light"] .field .hint{color:#64748b!important}
+[data-theme="light"] .legend{color:#047857!important}
+[data-theme="light"] .field label{color:#334155!important}
+[data-theme="light"] .input,
+[data-theme="light"] select.input,
+[data-theme="light"] textarea.input{background:#f8fafc!important;border-color:rgba(99,102,241,.2)!important;color:#161616!important}
+[data-theme="light"] .input:focus{background:#fff!important;border-color:#10b981!important}
+[data-theme="light"] .input::placeholder{color:#94a3b8!important}
+[data-theme="light"] select.input option{background:#fff;color:#161616}
+[data-theme="light"] .drop{background:#f8fafc!important;border-color:rgba(99,102,241,.25)!important}
+[data-theme="light"] .drop b{color:#334155!important}
+[data-theme="light"] .preview{background:#f8fafc!important;border-color:rgba(99,102,241,.15)!important}
+[data-theme="light"] .preview-meta b{color:#161616!important}
+[data-theme="light"] .notice-bar{background:rgba(16,185,129,.07)!important;border-color:rgba(16,185,129,.22)!important}
+[data-theme="light"] .notice-bar .nb-txt{color:#475569!important}
+[data-theme="light"] .notice-bar .nb-txt b{color:#047857!important}
+[data-theme="light"] .recap-item{background:#f8fafc!important;border-color:rgba(99,102,241,.15)!important}
+[data-theme="light"] .recap-item b{color:#161616!important}
+[data-theme="light"] .footer{background:rgba(248,250,252,.97)!important;border-color:rgba(99,102,241,.12)!important}
+[data-theme="light"] .footer-copy{color:#64748b!important}
+[data-theme="light"] .footer-copy strong{color:#161616!important}
+[data-theme="light"] .social-btn{background:#f1f5f9!important;border-color:rgba(99,102,241,.15)!important;color:#475569!important}
+[data-theme="light"] .social-btn:hover{background:rgba(99,102,241,.1)!important;color:#4f46e5!important}
+</style>
+
+<link href="aurora.css" rel="stylesheet">
+<script src="splash.js"></script>
+</head>
+<body>
+<div class="bg-canvas"></div><div class="bg-grid"></div>
+<div class="particle" style="left:12%;animation-duration:20s;animation-delay:0s">🧬</div>
+<div class="particle" style="left:68%;animation-duration:24s;animation-delay:7s">🔬</div>
+
+<header class="navbar" id="navbar">
+  <a class="brand" href="index.html">
+    <img src="logo.png" alt="BSC KU Logo">
+    <div class="brand-text">
+      <strong data-ar="نادي العلوم البيولوجية" data-en="Biological Sciences Club">نادي العلوم البيولوجية</strong>
+      <span data-ar="جامعة الكويت" data-en="Kuwait University">جامعة الكويت</span>
+    </div>
+  </a>
+
+  <nav class="nav-links" id="navLinks">
+    <a href="index.html" data-ar="الرئيسية" data-en="Home">الرئيسية</a>
+    <a href="services.html" data-ar="الخدمات" data-en="Services">الخدمات</a>
+    <a href="majors.html" data-ar="التخصصات" data-en="Majors">التخصصات</a>
+    <a href="notes.html" data-ar="المراجعات" data-en="Study Resources">المراجعات</a>
+    <a href="explain.html" data-ar="شرح المواد" data-en="Course Explainers">شرح المواد</a>
+    <a href="advisors.html" data-ar="المرشدون" data-en="Advisors">المرشدون</a>
+    <a href="events.html" data-ar="الأنشطة" data-en="Activities">الأنشطة</a>
+    <a href="about.html" data-ar="عن النادي" data-en="About">عن النادي</a>
+    <a href="join.html" class="active" data-ar="انضم للنادي" data-en="Join Us">انضم للنادي</a>
+    <a href="ask.html" data-ar="اسأل النادي" data-en="Ask Us">اسأل النادي</a>
+  </nav>
+
+  <div class="nav-utils">
+    <div class="ku-dropdown">
+      <button class="ku-btn" id="kuBtn" onclick="toggleKuMenu()" title="روابط الجامعة">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span data-ar="الجامعة" data-en="KU">الجامعة</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="ku-menu" id="kuMenu">
+        <a href="https://moodle.ku.edu.kw/login/index.php" target="_blank" class="ku-item">
+          <span class="ku-item-icon">📚</span>
+          <div><strong data-ar="Moodle" data-en="Moodle">Moodle</strong><span data-ar="نظام التعلم الإلكتروني" data-en="E-Learning System">نظام التعلم الإلكتروني</span></div>
+        </a>
+        <a href="https://portal.ku.edu.kw/sisapp/faces/login.jspx?_afrWindowMode=0&_afrLoop=568619832527342&_adf.ctrl-state=11k7p38dec_4" target="_blank" class="ku-item">
+          <span class="ku-item-icon">🏛️</span>
+          <div><strong data-ar="سستم الجامعة" data-en="KU Portal">سستم الجامعة</strong><span data-ar="النظام الأكاديمي" data-en="Academic System">النظام الأكاديمي</span></div>
+        </a>
+      </div>
+    </div>
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()" title="Switch Language">
+      <span id="langLabel">EN</span>
+    </button>
+    <button id="themeToggle" onclick="toggleTheme()" title="الوضع الصباحي"></button>
+    <button id="installBtn" onclick="installPWA()" title="تثبيت التطبيق" style="display:none;align-items:center;gap:.35rem;padding:.35rem .7rem;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);border-radius:8px;color:#34d399;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;white-space:nowrap">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 16l-4-4h3V4h2v8h3l-4 4z"/><path d="M20 18H4v2h16v-2z"/></svg>
+      تثبيت
+    </button>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="القائمة">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <nav class="mobile-nav">
+    <a href="index.html" data-ar="🏠 الرئيسية" data-en="🏠 Home">🏠 الرئيسية</a>
+    <a href="services.html" data-ar="⚙️ الخدمات" data-en="⚙️ Services">⚙️ الخدمات</a>
+    <a href="majors.html" data-ar="🧬 التخصصات" data-en="🧬 Majors">🧬 التخصصات</a>
+    <a href="notes.html" data-ar="📚 المراجعات" data-en="📚 Study Resources">📚 المراجعات</a>
+    <a href="explain.html" data-ar="🎬 شرح المواد" data-en="🎬 Course Explainers">🎬 شرح المواد</a>
+    <a href="advisors.html" data-ar="🎓 المرشدون" data-en="🎓 Advisors">🎓 المرشدون</a>
+    <a href="events.html" data-ar="🎉 الأنشطة" data-en="🎉 Activities">🎉 الأنشطة</a>
+    <a href="about.html" data-ar="ℹ️ عن النادي" data-en="ℹ️ About">ℹ️ عن النادي</a>
+    <a href="join.html" class="active" data-ar="✍️ انضم للنادي" data-en="✍️ Join Us">✍️ انضم للنادي</a>
+    <a href="ask.html" data-ar="💬 اسأل النادي" data-en="💬 Ask Us">💬 اسأل النادي</a>
+    <div class="mobile-divider"></div>
+    <a href="https://moodle.ku.edu.kw/login/index.php" target="_blank">📖 Moodle</a>
+    <a href="https://portal.ku.edu.kw/sisapp/faces/login.jspx?_afrWindowMode=0&_afrLoop=568619832527342&_adf.ctrl-state=11k7p38dec_4" target="_blank" data-ar="🏛️ سستم الجامعة" data-en="🏛️ KU Portal">🏛️ سستم الجامعة</a>
+  </nav>
+</div>
+
+<div class="page-hero">
+  <div class="page-badge" data-ar="عضوية النادي" data-en="Club Membership">عضوية النادي</div>
+  <h1 data-ar="انضم لنادي العلوم البيولوجية" data-en="Join the Biological Sciences Club">انضم لنادي العلوم البيولوجية</h1>
+  <p data-ar="عبّي النموذج واختر اللجنة اللي تناسبك — وفريق النادي بيتواصل وياك بعد المراجعة." data-en="Fill in the form, pick the committee that suits you, and the club team will get back to you after review.">عبّي النموذج واختر اللجنة اللي تناسبك — وفريق النادي بيتواصل وياك بعد المراجعة.</p>
+</div>
+
+<main class="main-content">
+
+  <div class="perks">
+    <div class="perk"><span class="perk-ico">🤝</span><h3>شبكة زملاء</h3><p>تتعرف على طلبة من كل تخصصات القسم وتشتغلون سوا على فعاليات حقيقية.</p></div>
+    <div class="perk"><span class="perk-ico">🎓</span><h3>خبرة عملية</h3><p>تنظيم ورش، محاضرات، ومحتوى علمي — خبرة تنفعك في السيرة الذاتية.</p></div>
+    <div class="perk"><span class="perk-ico">📣</span><h3>صوتك مسموع</h3><p>النادي يوصل ملاحظات الطلبة واحتياجاتهم للقسم.</p></div>
+    <div class="perk"><span class="perk-ico">🏅</span><h3>شهادات مشاركة</h3><p>شهادات موثّقة عن الأنشطة اللي تشارك فيها خلال السنة.</p></div>
+  </div>
+
+  <!-- شاشة التحميل الأولية -->
+  <div class="loading-box" id="loadingBox">⏳ جاري التحميل…</div>
+
+  <!-- التسجيل مقفل -->
+  <div class="state-card" id="closedCard">
+    <span class="state-ico">🔒</span>
+    <h2>التسجيل مغلق حالياً</h2>
+    <p id="closedMsg">باب العضوية مسكّر هالفترة. تابعنا على الإنستقرام عشان توصلك أخبار فتح التسجيل الجاي.</p>
+    <a class="social-btn" href="https://instagram.com/biosci_club" target="_blank" style="justify-content:center">📷 @biosci_club</a>
+  </div>
+
+  <!-- عنده طلب مسجّل من قبل -->
+  <div class="state-card" id="statusCard">
+    <span class="state-ico" id="statusIco">⏳</span>
+    <h2 id="statusTitle">طلبك وصلنا</h2>
+    <p id="statusText"></p>
+    <span class="state-pill pending" id="statusPill">قيد المراجعة</span>
+    <div class="state-recap" id="statusRecap"></div>
+  </div>
+
+  <!-- الفورم -->
+  <div class="form-card" id="formCard" style="display:none">
+    <div class="form-head">
+      <h2>نموذج طلب العضوية</h2>
+      <p>كل الحقول المعلّمة بـ <span style="color:#f87171">*</span> مطلوبة. يستغرق دقيقتين تقريباً.</p>
+    </div>
+
+    <div class="notice-bar">
+      <span class="nb-ico">📞</span>
+      <div class="nb-txt">
+        <b>في حال تم القبول سيتم التواصل عبر رقم الهاتف</b>
+        تأكد إن الرقم اللي تكتبه صحيح وفعّال — هو طريقتنا الوحيدة للوصول لك.
+      </div>
+    </div>
+
+    <form id="joinForm" novalidate>
+
+      <fieldset class="fieldset">
+        <div class="legend">البيانات الشخصية</div>
+        <div class="grid2">
+          <div class="field">
+            <label for="fName">الاسم الكامل <span class="req">*</span></label>
+            <input class="input" id="fName" type="text" placeholder="مثال: نورة عبدالله السالم" autocomplete="name" maxlength="70">
+            <div class="err-line">اكتب اسمك الكامل.</div>
+          </div>
+          <div class="field">
+            <label for="fSid">الرقم الجامعي <span class="req">*</span></label>
+            <input class="input" id="fSid" type="text" inputmode="numeric" placeholder="مثال: 2023123456" maxlength="12">
+            <div class="err-line">الرقم الجامعي لازم يكون أرقام فقط (٦ خانات فأكثر).</div>
+          </div>
+          <div class="field">
+            <label for="fEmail">البريد الإلكتروني <span class="req">*</span></label>
+            <input class="input" id="fEmail" type="email" placeholder="you@example.com" autocomplete="email" dir="ltr" maxlength="90">
+            <div class="err-line">حط بريد إلكتروني صحيح.</div>
+          </div>
+          <div class="field">
+            <label for="fPhone">رقم التلفون <span class="req">*</span></label>
+            <input class="input" id="fPhone" type="tel" inputmode="tel" placeholder="مثال: 99887766" autocomplete="tel" dir="ltr" maxlength="15">
+            <div class="err-line">رقم كويتي من ٨ خانات يبدأ بـ ٥ أو ٦ أو ٩.</div>
+          </div>
+          <div class="field full">
+            <label for="fInsta">حساب الإنستقرام <span class="hint" style="display:inline">(اختياري)</span></label>
+            <input class="input" id="fInsta" type="text" placeholder="@username" dir="ltr" maxlength="40">
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <div class="legend">البيانات الأكاديمية</div>
+        <div class="grid2">
+          <div class="field">
+            <label for="fMajor">التخصص الرئيسي <span class="req">*</span></label>
+            <select class="input" id="fMajor">
+              <option value="">— اختر —</option>
+              <option value="molecular">البيولوجيا الجزيئية</option>
+              <option value="micro">علم الميكروبيولوجي</option>
+              <option value="plant">بيولوجيا النبات</option>
+              <option value="animal">بيولوجيا الحيوان</option>
+              <option value="biochem">الكيمياء الحيوية</option>
+            </select>
+            <div class="err-line">اختر تخصصك الرئيسي.</div>
+          </div>
+          <div class="field">
+            <label for="fSupport">التخصص المساند <span class="req">*</span></label>
+            <select class="input" id="fSupport">
+              <option value="">— اختر —</option>
+              <option value="forensic">علم الأدلة الجنائية</option>
+              <option value="agri">النبات الزراعي</option>
+              <option value="biotech">التقنية الحيوية</option>
+              <option value="molecular">البيولوجيا الجزيئية</option>
+              <option value="micro">علم الميكروبيولوجي</option>
+              <option value="plant">بيولوجيا النبات</option>
+              <option value="animal">بيولوجيا الحيوان</option>
+              <option value="biochem">الكيمياء الحيوية</option>
+              <option value="__other">تخصص مساند من خارج القسم…</option>
+              <option value="__none">ما اخترت مساند بعد</option>
+            </select>
+            <div class="err-line">اختر تخصصك المساند.</div>
+          </div>
+          <div class="field full" id="supportOtherWrap" hidden>
+            <label for="fSupportOther">اسم التخصص المساند <span class="req">*</span></label>
+            <input class="input" id="fSupportOther" type="text" placeholder="مثال: تغذية، علوم بحار، إعلام…" maxlength="50">
+            <div class="err-line">اكتب اسم التخصص المساند.</div>
+          </div>
+          <div class="field">
+            <label for="fYear">السنة الدراسية <span class="req">*</span></label>
+            <select class="input" id="fYear">
+              <option value="">— اختر —</option>
+              <option value="1">السنة الأولى</option>
+              <option value="2">السنة الثانية</option>
+              <option value="3">السنة الثالثة</option>
+              <option value="4">السنة الرابعة</option>
+              <option value="5">السنة الخامسة فأكثر</option>
+            </select>
+            <div class="err-line">اختر سنتك الدراسية.</div>
+          </div>
+          <div class="field">
+            <label for="fGpa">المعدل التراكمي <span class="req">*</span></label>
+            <input class="input" id="fGpa" type="number" step="0.01" min="0" max="4" placeholder="مثال: 3.25" dir="ltr">
+            <div class="hint">من ٠ إلى ٤. يستخدم لتوزيع الأعضاء على اللجان فقط.</div>
+            <div class="err-line">حط معدل بين ٠ و ٤.</div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <div class="legend">اللجنة والدافع</div>
+        <div class="grid2">
+          <div class="field">
+            <label for="fCommittee">اللجنة اللي تبي تنضم لها <span class="req">*</span></label>
+            <select class="input" id="fCommittee">
+              <option value="">— اختر —</option>
+              <option value="academic">اللجنة الثقافية</option>
+              <option value="media">اللجنة الإعلامية</option>
+            </select>
+            <div class="err-line">اختر اللجنة.</div>
+          </div>
+          <div class="field">
+            <label for="fSkills">مهاراتك <span class="hint" style="display:inline">(اختياري)</span></label>
+            <input class="input" id="fSkills" type="text" placeholder="تصميم، تصوير، كتابة، تنظيم…" maxlength="90">
+          </div>
+          <div class="field full">
+            <label for="fReason">ليش تبي تنضم للنادي؟ <span class="req">*</span></label>
+            <textarea class="input" id="fReason" placeholder="اكتب بكلماتك — ما نبي كلام رسمي، نبي نعرفك." maxlength="600"></textarea>
+            <div class="hint"><span id="reasonCount">0</span>/600 حرف</div>
+            <div class="err-line">اكتب سطرين على الأقل (٢٠ حرف فأكثر).</div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <div class="legend">الجدول الدراسي</div>
+        <div class="field full">
+          <label for="fSchedule">صورة من جدولك الدراسي لهذا الفصل <span class="req">*</span></label>
+          <div class="hint" style="margin-bottom:.6rem">تساعدنا نعرف أوقات فراغك عشان نحط اجتماعات اللجنة في وقت يناسبك. صورة من سستم الجامعة تكفي.</div>
+          <label class="drop" id="dropZone">
+            <span class="drop-ico">📅</span>
+            <b>اضغط لاختيار صورة الجدول</b>
+            <span>PNG أو JPG · حتى ٥ ميجابايت</span>
+            <input type="file" id="fSchedule" accept="image/*">
+          </label>
+          <div class="preview" id="schedPreview">
+            <img id="schedThumb" alt="معاينة الجدول">
+            <div class="preview-meta">
+              <b id="schedName"></b>
+              <span id="schedSize"></span>
+            </div>
+            <button type="button" id="schedRemove">إزالة</button>
+          </div>
+          <div class="err-line">أرفق صورة جدولك الدراسي.</div>
+        </div>
+      </fieldset>
+
+      <div class="submit-row">
+        <button class="btn-submit" id="submitBtn" type="submit">إرسال الطلب ✨</button>
+        <p class="submit-note">
+          بإرسالك الطلب توافق على أن يحتفظ النادي ببياناتك لغرض إدارة العضوية.
+          تفاصيل أكثر في <a href="privacy.html">صفحة الخصوصية</a>.
+        </p>
+      </div>
+      <div class="form-msg" id="formMsg"></div>
+    </form>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-brand"><img src="logo.png" alt="BSC KU"><div class="footer-copy"><strong data-ar="BSC KU — نادي العلوم البيولوجية" data-en="BSC KU — Biological Sciences Club">BSC KU — نادي العلوم البيولوجية</strong><span data-ar="© 2025 جامعة الكويت · جميع الحقوق محفوظة" data-en="© 2025 Kuwait University · All Rights Reserved">© 2025 جامعة الكويت · جميع الحقوق محفوظة</span></div></div>
+  <div class="footer-socials">
+    <a class="social-btn" href="https://instagram.com/biosci_club" target="_blank"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>Instagram</a>
+    <a class="social-btn" href="https://x.com/biosci_club" target="_blank"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>Twitter / X</a>
+  </div>
+</footer>
+
+<script src="theme.js"></script>
+<script type="module" src="urgent-ann.js"></script>
+<script type="module">
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const CFG={apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"};
+// account.js يهيّئ نفس التطبيق — نعيد استخدامه بدل ما ننشئ نسخة ثانية
+const app=getApps().length?getApp():initializeApp(CFG);
+const auth=getAuth(app), db=getFirestore(app);
+// صورة الجدول تُخزَّن base64 داخل Firestore (Storage مو مفعّل على المشروع
+// حالياً)، فلازم تبقى تحت حد المستند الواحد (١ ميجابايت). نضغطها لتحت هالسقف
+// بهامش أمان يكفي بقية حقول الطلب.
+const MAX_PHOTO_BASE64 = 900 * 1024;
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+const MAJOR_AR={molecular:"البيولوجيا الجزيئية",micro:"علم الميكروبيولوجي",plant:"بيولوجيا النبات",animal:"بيولوجيا الحيوان",biochem:"الكيمياء الحيوية",forensic:"علم الأدلة الجنائية",agri:"النبات الزراعي",biotech:"التقنية الحيوية"};
+const COMMITTEE_AR={academic:"اللجنة الثقافية",media:"اللجنة الإعلامية"};
+const YEAR_AR={1:"السنة الأولى",2:"السنة الثانية",3:"السنة الثالثة",4:"السنة الرابعة",5:"السنة الخامسة فأكثر"};
+
+let me=null;           // مستخدم Firebase (مجهول أو مربوط بجوجل)
+let pendingPhoto=null; // صورة الجدول بعد الضغط، بصيغة data URL جاهزة للتخزين
+
+/* ═════════ الإقلاع ═════════ */
+// account.js هو اللي يسجّل الزائر دخول مجهول. ننتظره بدل ما نستدعي
+// signInAnonymously بنفسنا وننتهي بحسابين مجهولين لنفس الشخص.
+let anonFallback=setTimeout(()=>{ if(!auth.currentUser) signInAnonymously(auth).catch(()=>{}); },6000);
+
+// لو الدخول المجهول مو مفعّل في Firebase ما راح توصلنا هوية أبداً — بدل ما
+// يعلّق الزائر على «جاري التحميل» للأبد، نوضح له إن الخلل من عندنا.
+const authTimeout=setTimeout(()=>{
+  if(me) return;
+  $("loadingBox").innerHTML='⚠️ ما قدرنا نجهّز الاتصال بالخادم.<br>'+
+    '<span style="font-size:.82rem">حدّث الصفحة، ولو تكرر الخطأ بلّغ إدارة النادي.</span>';
+},12000);
+
+onAuthStateChanged(auth,async user=>{
+  if(!user) return;
+  clearTimeout(anonFallback); clearTimeout(authTimeout);
+  me=user;
+  // لو الزائر مسجّل دخول بجوجل من صفحة ثانية، نعبّي إيميله توفيراً لخطوة
+  const em=$("fEmail");
+  if(user.email && em && !em.value) em.value=user.email;
+  await route();
+});
+
+async function route(){
+  let open=true, closedMsg="";
+  try{
+    const cfg=await getDoc(doc(db,"membershipConfig","settings"));
+    if(cfg.exists()){
+      const d=cfg.data()||{};
+      if(d.open===false) open=false;
+      if(d.closedMessage) closedMsg=d.closedMessage;
+    }
+  }catch(e){ /* ما قدرنا نقرأ الإعدادات — نفترض التسجيل مفتوح */ }
+
+  let mine=null;
+  try{
+    const snap=await getDoc(doc(db,"memberships",me.uid));
+    if(snap.exists()) mine=snap.data()||{};
+  }catch(e){}
+
+  $("loadingBox").style.display="none";
+
+  // الطلب الموجود أهم من حالة التسجيل — الطالب لازم يشوف نتيجته حتى لو سكّرنا الباب
+  if(mine) return showStatus(mine);
+  if(!open){
+    if(closedMsg) $("closedMsg").textContent=closedMsg;
+    $("closedCard").classList.add("on");
+    return;
+  }
+  $("formCard").style.display="block";
+}
+
+/* ═════════ عرض حالة الطلب ═════════ */
+function showStatus(d){
+  const st=d.status||"pending";
+  const map={
+    pending:["⏳","طلبك وصلنا","طلبك تحت المراجعة الحين. في حال تم القبول بيتواصل وياك فريق النادي على رقم الهاتف اللي كتبته.","قيد المراجعة","pending"],
+    approved:["🎉","مبروك — انقبلت!","صرت عضو في نادي العلوم البيولوجية. بيتصل فيك مسؤول لجنتك قريباً على نفس الرقم.","مقبول","approved"],
+    rejected:["📩","ما توفّق الطلب هالمرة","ما انقبل طلبك في هالدورة. لا تحاتي — التسجيل يفتح كل فصل، ونحب نشوفك معانا الجاية.","غير مقبول","rejected"],
+  };
+  const [ico,title,text,pill,cls]=map[st]||map.pending;
+  $("statusIco").textContent=ico;
+  $("statusTitle").textContent=title;
+  $("statusText").textContent=text;
+  const p=$("statusPill"); p.textContent=pill; p.className="state-pill "+cls;
+
+  const supp=d.supportMajor==="__none"?"لم يُحدَّد":(MAJOR_AR[d.supportMajor]||d.supportMajor||"—");
+  const rows=[
+    ["الاسم",d.fullName],
+    ["الرقم الجامعي",d.studentId],
+    ["التخصص الرئيسي",MAJOR_AR[d.major]||d.major],
+    ["التخصص المساند",supp],
+    ["السنة الدراسية",YEAR_AR[d.year]||d.year],
+    ["اللجنة",COMMITTEE_AR[d.committee]||d.committee],
+  ].filter(r=>r[1]);
+  $("statusRecap").innerHTML=rows.map(([k,v])=>
+    `<div class="recap-item"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join("");
+  $("statusCard").classList.add("on");
+}
+
+/* ═════════ تفاعلات الفورم ═════════ */
+$("fSupport").addEventListener("change",function(){
+  const other=this.value==="__other";
+  $("supportOtherWrap").hidden=!other;
+  if(!other) $("fSupportOther").value="";
+});
+$("fReason").addEventListener("input",function(){ $("reasonCount").textContent=this.value.length; });
+
+/* ── اختيار صورة الجدول وضغطها ── */
+const dropZone=$("dropZone");
+["dragenter","dragover"].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.add("over");}));
+["dragleave","drop"].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.remove("over");}));
+dropZone.addEventListener("drop",e=>{ const f=e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) handleFile(f); });
+$("fSchedule").addEventListener("change",function(){ const f=this.files&&this.files[0]; if(f) handleFile(f); });
+$("schedRemove").addEventListener("click",()=>{
+  pendingPhoto=null; $("fSchedule").value="";
+  $("schedPreview").classList.remove("on"); dropZone.style.display="";
+});
+
+async function handleFile(file){
+  if(!/^image\//.test(file.type)) return showMsg("err","الملف لازم يكون صورة (PNG أو JPG).");
+  if(file.size>8*1024*1024) return showMsg("err","حجم الصورة أكبر من ٨ ميجابايت. صغّرها وحاول مرة ثانية.");
+  hideMsg();
+  let dataUrl;
+  try{ dataUrl=await shrinkToDataUrl(file); }
+  catch(e){ return showMsg("err","تعذّرت قراءة هالصورة. جرّب صورة ثانية."); }
+  if(dataUrl.length>MAX_PHOTO_BASE64){
+    return showMsg("err","صورة الجدول لسا كبيرة حتى بعد الضغط. جرّب لقطة أوضح لجدولك بس، بدون خلفية أو تفاصيل زايدة.");
+  }
+  pendingPhoto=dataUrl;
+  $("schedThumb").src=dataUrl;
+  $("schedName").textContent=file.name;
+  $("schedSize").textContent=Math.round(dataUrl.length*.73/1024)+" كيلوبايت (بعد الضغط)";
+  $("schedPreview").classList.add("on");
+  dropZone.style.display="none";
+  clearErr($("fSchedule").closest(".field"));
+}
+
+// نحوّل الصورة لـ data URL مضغوطة تحت سقف مستند Firestore. نبدأ بعرض ١٦٠٠px
+// وجودة ٠.٨، ولو لسا كبيرة نقلّل الجودة ثم الأبعاد تدريجياً حتى تصير تحت السقف.
+function loadImg(file){
+  return new Promise((res,rej)=>{
+    const img=new Image();
+    img.onload=()=>res(img);
+    img.onerror=()=>rej(new Error("decode"));
+    img.src=URL.createObjectURL(file);
+  });
+}
+async function shrinkToDataUrl(file){
+  const img=await loadImg(file);
+  let maxDim=1600, quality=.8, dataUrl="";
+  for(let i=0;i<7;i++){
+    const scale=Math.min(1,maxDim/Math.max(img.width,img.height));
+    const c=document.createElement("canvas");
+    c.width=Math.max(1,Math.round(img.width*scale));
+    c.height=Math.max(1,Math.round(img.height*scale));
+    c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+    dataUrl=c.toDataURL("image/jpeg",quality);
+    if(dataUrl.length<=MAX_PHOTO_BASE64) break;
+    if(quality>.5) quality-=.12; else maxDim=Math.round(maxDim*.75);
+  }
+  return dataUrl;
+}
+
+/* ── التحقق ── */
+function setErr(field,on){ field.classList.toggle("bad",on); const i=field.querySelector(".input"); if(i) i.setAttribute("aria-invalid",on?"true":"false"); }
+function clearErr(field){ setErr(field,false); }
+
+function validate(){
+  let firstBad=null;
+  const check=(el,ok)=>{
+    const f=el.closest(".field"); setErr(f,!ok);
+    if(!ok && !firstBad) firstBad=f;
+    return ok;
+  };
+  const v=id=>$(id).value.trim();
+
+  check($("fName"), v("fName").length>=3);
+  check($("fSid"), /^\d{6,12}$/.test(v("fSid").replace(/\s/g,"")));
+  check($("fEmail"), /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v("fEmail")));
+  check($("fPhone"), /^[569]\d{7}$/.test(v("fPhone").replace(/[\s+\-]/g,"").replace(/^965/,"")));
+  check($("fMajor"), !!v("fMajor"));
+  check($("fSupport"), !!v("fSupport"));
+  if($("fSupport").value==="__other") check($("fSupportOther"), v("fSupportOther").length>=2);
+  check($("fYear"), !!v("fYear"));
+  const gpa=parseFloat(v("fGpa"));
+  check($("fGpa"), !isNaN(gpa) && gpa>=0 && gpa<=4);
+  check($("fCommittee"), !!v("fCommittee"));
+  check($("fReason"), v("fReason").length>=20);
+  check($("fSchedule"), !!pendingPhoto);
+
+  if(firstBad){ firstBad.scrollIntoView({behavior:"smooth",block:"center"}); return false; }
+  return true;
+}
+
+function showMsg(kind,text){ const m=$("formMsg"); m.className="form-msg on "+kind; m.textContent=text; }
+function hideMsg(){ $("formMsg").className="form-msg"; }
+
+/* ── الإرسال ── */
+$("joinForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  hideMsg();
+  if(!me) return showMsg("err","لحظة — الاتصال ما اكتمل بعد. حاول بعد ثانيتين.");
+  if(!validate()) return showMsg("err","في حقول ناقصة أو غير صحيحة — راجع المعلّم عليها بالأحمر فوق.");
+
+  const btn=$("submitBtn");
+  btn.disabled=true; btn.textContent="⏳ جاري الإرسال…";
+
+  // حزام أمان: لو انقطع الاتصال، setDoc يظل معلّقاً بلا حل ولا رفض — نلغيه بأنفسنا
+  const withTimeout=(p,ms,code)=>{
+    let t;
+    return Promise.race([
+      p,
+      new Promise((_,rej)=>{ t=setTimeout(()=>rej(Object.assign(new Error("timeout"),{code})),ms); })
+    ]).finally(()=>clearTimeout(t));
+  };
+
+  try{
+    // ١) صورة الجدول أولاً، في مستند منفصل — لو فشلت ما نبي طلباً بلا صورة.
+    //    القواعد تمنع الكتابة هنا بعد ما يصير عندنا مستند طلب بنفس الـ uid،
+    //    فهالترتيب (الصورة ثم الطلب) مو اختياري.
+    await withTimeout(
+      setDoc(doc(db,"membershipPhotos",me.uid),{uid:me.uid,dataUrl:pendingPhoto,updatedAt:serverTimestamp()}),
+      20000,"app/photo-timeout"
+    );
+
+    // ٢) الطلب نفسه — معرّف المستند هو الـ uid، فما يقدر يسجّل مرتين
+    const supportSel=$("fSupport").value;
+    await withTimeout(
+      setDoc(doc(db,"memberships",me.uid),{
+        uid:me.uid,
+        fullName:$("fName").value.trim(),
+        studentId:$("fSid").value.trim().replace(/\s/g,""),
+        email:$("fEmail").value.trim(),
+        phone:$("fPhone").value.trim().replace(/[\s+\-]/g,"").replace(/^965/,""),
+        instagram:$("fInsta").value.trim().replace(/^@/,""),
+        major:$("fMajor").value,
+        supportMajor:supportSel,
+        supportMajorOther:supportSel==="__other"?$("fSupportOther").value.trim():"",
+        year:$("fYear").value,
+        gpa:parseFloat($("fGpa").value),
+        committee:$("fCommittee").value,
+        skills:$("fSkills").value.trim(),
+        reason:$("fReason").value.trim(),
+        hasPhoto:true,
+        verifiedEmail:!!(me.providerData&&me.providerData.length),
+        status:"pending",
+        createdAt:serverTimestamp()
+      }),
+      20000,"app/submit-timeout"
+    );
+
+    $("formCard").style.display="none";
+    showStatus({
+      status:"pending",
+      fullName:$("fName").value.trim(),
+      studentId:$("fSid").value.trim(),
+      major:$("fMajor").value,
+      supportMajor:supportSel==="__other"?$("fSupportOther").value.trim():supportSel,
+      year:$("fYear").value,
+      committee:$("fCommittee").value
+    });
+    window.scrollTo({top:200,behavior:"smooth"});
+  }catch(err){
+    btn.disabled=false; btn.textContent="إرسال الطلب ✨";
+    const code=err&&err.code||"";
+    const msg=String((err&&err.message)||"");
+    console.warn("membership submit failed:",code,err);
+    if(code==="permission-denied")
+      showMsg("err","الصلاحيات مو مضبوطة على السيرفر. بلّغ إدارة النادي — القواعد تحتاج نشر.");
+    else if(code==="app/photo-timeout"||code==="app/submit-timeout")
+      showMsg("err","تعذّر الاتصال بالخادم. تأكد من الإنترنت وحاول مرة ثانية.");
+    else if(code==="invalid-argument"||/longer than|exceeds the maximum|too large/i.test(msg))
+      showMsg("err","صورة الجدول لسا كبيرة رغم الضغط. جرّب صورة أوضح وأقرب لجدولك بس.");
+    else
+      showMsg("err","صار خطأ أثناء الإرسال. حاول مرة ثانية، ولو تكرر بلّغنا.");
+  }
+});
+</script>
+
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{ navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
+}
+</script>
+<script type="module" src="visit-counter.js"></script>
+<script type="module" src="account.js"></script>
+</body></html>

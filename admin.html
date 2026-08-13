@@ -87,6 +87,9 @@ a{color:inherit;text-decoration:none}
 .gpa-rec.open .caret{transform:rotate(90deg)}
 .gpa-rec-id{font-family:'Plus Jakarta Sans',system-ui;font-size:.78rem;color:var(--muted);
   direction:ltr;unicode-bidi:isolate}
+.gpa-rec-who{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.gpa-rec-who img{width:24px;height:24px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.gpa-rec-who b{font-size:.9rem;color:var(--text)}
 .gpa-rec-gpa{font-size:1.1rem;font-weight:900;font-family:'Plus Jakarta Sans',system-ui;
   margin-inline-start:auto;direction:ltr;unicode-bidi:isolate}
 .gpa-rec-meta{font-size:.76rem;color:var(--muted)}
@@ -436,6 +439,7 @@ a{color:inherit;text-decoration:none}
       <button class="nav-item active" data-panel="dashboard"><span class="ni">📊</span>لوحة التحكم</button>
       <button class="nav-item" data-panel="notes"><span class="ni">📚</span>النوتات</button>
       <button class="nav-item" data-panel="noteSubs"><span class="ni">📬</span>نوتات الزوار <span id="subsNavBadge" style="display:none;margin-inline-start:auto;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;padding:.1rem .45rem;border-radius:99px"></span></button>
+      <button class="nav-item" data-panel="members"><span class="ni">📝</span>طلبات العضوية <span id="memNavBadge" style="display:none;margin-inline-start:auto;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;padding:.1rem .45rem;border-radius:99px"></span></button>
       <button class="nav-item" data-panel="ratings"><span class="ni">⭐</span>تقييم المواد <span id="ratingsNavBadge" style="display:none;margin-inline-start:auto;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;padding:.1rem .45rem;border-radius:99px"></span></button>
       <button class="nav-item" data-panel="videos"><span class="ni">🎬</span>شرح المواد <span id="videosNavBadge" style="display:none;margin-inline-start:auto;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;padding:.1rem .45rem;border-radius:99px"></span></button>
       <button class="nav-item" data-panel="vcomments"><span class="ni">💬</span>تعليقات الشروحات <span id="vcNavBadge" style="display:none;margin-inline-start:auto;background:#6366f1;color:#fff;font-size:.7rem;font-weight:800;padding:.1rem .45rem;border-radius:99px"></span></button>
@@ -543,6 +547,37 @@ a{color:inherit;text-decoration:none}
       <div class="panel" id="panel-noteSubs">
         <div class="panel-header"><h2>📬 نوتات الزوار</h2><p>نوتات أرسلها الزوار من صفحة المراجعات — اقبلها لتنشر في المكتبة أو ارفضها</p></div>
         <div class="items-list" id="subsList"></div>
+      </div>
+
+      <!-- MEMBERSHIP APPLICATIONS (طلبات العضوية) -->
+      <div class="panel" id="panel-members">
+        <div class="panel-header"><h2>📝 طلبات العضوية</h2><p>طلبات الانضمام المرسلة من صفحة «انضم للنادي» — راجع بيانات الطالب وجدوله قبل القبول</p></div>
+
+        <div class="card" style="margin-bottom:1rem">
+          <h3>🚪 حالة باب التسجيل</h3>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:.75rem">لما تسكّره، صفحة الانضمام تعرض رسالة بدل النموذج. الطلبة اللي مقدّمين من قبل يظلون يشوفون حالة طلبهم.</p>
+          <div class="gpa-tools">
+            <button class="btn btn-sm" id="memToggleOpen">⏳ جاري التحميل…</button>
+            <input id="memClosedMsg" placeholder="رسالة تظهر وقت الإغلاق (اختياري)" autocomplete="off">
+            <button class="btn btn-sm" id="memSaveMsg">💾 حفظ الرسالة</button>
+          </div>
+        </div>
+
+        <div class="stats-row" id="memStats"></div>
+
+        <div class="gpa-tools">
+          <input id="memSearch" placeholder="🔍 بحث بالاسم أو الرقم الجامعي أو التلفون…" autocomplete="off">
+          <select id="memFilter">
+            <option value="">كل الحالات</option>
+            <option value="pending">⏳ قيد المراجعة</option>
+            <option value="approved">✅ مقبول</option>
+            <option value="rejected">❌ مرفوض</option>
+          </select>
+          <button class="btn btn-sm" id="memExport">⬇️ تصدير CSV</button>
+          <button class="btn btn-sm" id="memRefresh">🔄 تحديث</button>
+        </div>
+
+        <div class="items-list" id="membersList"></div>
       </div>
 
       <!-- COURSE RATINGS -->
@@ -1268,6 +1303,7 @@ a{color:inherit;text-decoration:none}
             <option value="courseVideos">🎬 شروحات مصوّرة</option>
             <option value="videoComments">🗨️ تعليقات الشروحات</option>
             <option value="noteSubmissions">📬 نوتات مرسلة</option>
+            <option value="memberships">📝 طلبات عضوية</option>
             <option value="suggestions">💡 اقتراحات مواد</option>
             <option value="gpaData">🧮 بيانات معدلات</option>
           </select>
@@ -1345,13 +1381,21 @@ document.getElementById("emailLoginBtn").onclick=async()=>{
 };
 document.getElementById("logoutBtn").onclick=()=>signOut(auth);
 onAuthStateChanged(auth,user=>{
-  if(!user){document.getElementById("loginArea").classList.remove("hidden");document.getElementById("adminApp").classList.add("hidden");return}
+  // account.js يسجّل كل زائر دخولاً مجهولاً، وجلسة Firebase مشتركة على
+  // مستوى الموقع كله — فأي أدمن تصفّح الموقع قبل ما يفتح هالصفحة بيوصل
+  // هنا وهو «مسجّل دخول» بدون إيميل. نعامل المجهول كأنه مو مسجّل.
+  if(!user||user.isAnonymous||!user.email){
+    document.getElementById("loginArea").classList.remove("hidden");
+    document.getElementById("adminApp").classList.add("hidden");
+    return;
+  }
   const em=user.email.toLowerCase().trim();
   if(!ALLOWED.includes(em)){document.getElementById("statusMsg").textContent="هذا الإيميل غير مصرح له: "+em;return}
   document.getElementById("loginArea").classList.add("hidden");
   document.getElementById("adminApp").classList.remove("hidden");
   document.getElementById("userEmail").textContent=em;
   loadAll();
+  loadMemConfig();
   loadNoteCourses(document.getElementById("noteMajor").value);
 });
 
@@ -1493,6 +1537,206 @@ window.rejectSub_=async id=>{
   await setDoc(doc(db,"noteSubmissions",id),{status:"rejected",reviewedAt:serverTimestamp()},{merge:true});
   loadAll();
 };
+
+// ───────── طلبات العضوية (memberships) ─────────
+// تحمل بيانات شخصية حقيقية (رقم جامعي، تلفون، معدل، صورة جدول)، فما تنعرض
+// إلا هنا — قواعد Firestore تمنع أي قراءة غير قراءة الأدمن أو صاحب الطلب.
+const MEM_COMMITTEE={academic:"اللجنة الثقافية",media:"اللجنة الإعلامية"};
+const MEM_YEAR={1:"السنة الأولى",2:"السنة الثانية",3:"السنة الثالثة",4:"السنة الرابعة",5:"الخامسة فأكثر"};
+const MEM_STATUS={pending:["⏳ قيد المراجعة","#f59e0b"],approved:["✅ مقبول","#10b981"],rejected:["❌ مرفوض","#ef4444"]};
+let _memCache=[];
+
+const memDate=v=>{
+  if(!v) return null;
+  if(typeof v==="object"&&typeof v.toDate==="function"){try{return v.toDate()}catch(e){return null}}
+  if(typeof v==="object"&&typeof v.seconds==="number") return new Date(v.seconds*1000);
+  const d=new Date(v); return isNaN(d.getTime())?null:d;
+};
+const memSupport=m=>{
+  if(m.supportMajor==="__other") return m.supportMajorOther||"خارج القسم";
+  if(m.supportMajor==="__none")  return "لم يُحدَّد";
+  return MN[m.supportMajor]||m.supportMajor||"—";
+};
+
+function memFiltered(){
+  const q=((document.getElementById("memSearch")||{}).value||"").trim().toLowerCase();
+  const st=((document.getElementById("memFilter")||{}).value||"");
+  return _memCache.filter(m=>{
+    if(st && (m.status||"pending")!==st) return false;
+    if(!q) return true;
+    return [m.fullName,m.studentId,m.phone,m.email,m.instagram,m.skills]
+      .some(f=>String(f||"").toLowerCase().includes(q));
+  });
+}
+
+function renderMemberships(items){
+  _memCache=[...items].sort((a,b)=>{
+    const p=((a.status||"pending")==="pending"?0:1)-((b.status||"pending")==="pending"?0:1);
+    if(p) return p;
+    return (memDate(b.createdAt)?.getTime()||0)-(memDate(a.createdAt)?.getTime()||0);
+  });
+  renderMemList();
+}
+
+function renderMemList(){
+  const all=_memCache;
+  const counts={pending:0,approved:0,rejected:0};
+  all.forEach(m=>{const s=m.status||"pending"; if(counts[s]!=null) counts[s]++;});
+
+  const badge=document.getElementById("memNavBadge");
+  if(badge){badge.textContent=counts.pending;badge.style.display=counts.pending?"inline-block":"none";}
+
+  const stats=document.getElementById("memStats");
+  if(stats) stats.innerHTML=
+    `<div class="stat-card"><strong>${all.length}</strong><span>📝 كل الطلبات</span></div>`+
+    `<div class="stat-card"><strong>${counts.pending}</strong><span>⏳ قيد المراجعة</span></div>`+
+    `<div class="stat-card"><strong>${counts.approved}</strong><span>✅ مقبول</span></div>`+
+    `<div class="stat-card"><strong>${counts.rejected}</strong><span>❌ مرفوض</span></div>`;
+
+  const el=document.getElementById("membersList"); if(!el) return;
+  const list=memFiltered();
+  if(!list.length){
+    el.innerHTML=`<p style="color:var(--muted);padding:1rem">${all.length?"ما فيه طلبات مطابقة للبحث.":"ما وصلت طلبات عضوية بعد."}</p>`;
+    return;
+  }
+
+  el.innerHTML=list.map(m=>{
+    const st=m.status||"pending";
+    const[label,color]=MEM_STATUS[st]||MEM_STATUS.pending;
+    const when=memDate(m.createdAt);
+    const gpa=typeof m.gpa==="number"?m.gpa.toFixed(2):(m.gpa||"—");
+    // مكرّر بالرقم الجامعي — يصير لو الطالب قدّم من متصفح ثاني بهوية مجهولة جديدة
+    const dup=m.studentId && all.some(o=>o.id!==m.id && o.studentId===m.studentId);
+    return `<div class="list-item" style="border-inline-start:3px solid ${color};align-items:flex-start">
+      <button onclick="memViewPhoto_('${m.id}',this)" title="فتح صورة الجدول" style="width:82px;height:62px;flex-shrink:0;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;font-size:1.4rem;cursor:pointer;color:var(--muted)">📅</button>
+      <div class="list-item-body">
+        <h4>${escSub(m.fullName)||"طالب"}
+          <span style="font-size:.72rem;font-weight:800;color:${color}">${label}</span>
+          ${m.verifiedEmail?'<span style="font-size:.7rem;color:#6ee7b7" title="سجّل دخوله بجوجل">✓ إيميل موثّق</span>':""}
+          ${dup?'<span style="font-size:.7rem;color:#fca5a5" title="نفس الرقم الجامعي مقدّم في طلب ثاني">⚠ رقم جامعي مكرر</span>':""}
+        </h4>
+        <p>🆔 ${escSub(m.studentId)||"—"} · ${escSub(MN[m.major]||m.major||"—")} · مساند: ${escSub(memSupport(m))} · ${escSub(MEM_YEAR[m.year]||m.year||"—")} · معدل ${escSub(gpa)}</p>
+        <p style="margin-top:.2rem">🎯 ${escSub(MEM_COMMITTEE[m.committee]||m.committee||"—")}${m.skills?" · 🛠 "+escSub(m.skills):""}</p>
+        <p style="margin-top:.2rem;direction:ltr;text-align:start">📞 ${escSub(m.phone)||"—"} · ✉️ ${escSub(m.email)||"—"}${m.instagram?" · 📷 @"+escSub(m.instagram):""}</p>
+        ${m.reason?`<p style="margin-top:.35rem;color:var(--muted);line-height:1.75">💬 ${escSub(m.reason)}</p>`:""}
+        <p style="margin-top:.25rem;font-size:.74rem;color:var(--muted)">${when?when.toLocaleDateString("ar-KW",{year:"numeric",month:"short",day:"numeric"})+" · "+when.toLocaleTimeString("ar-KW",{hour:"2-digit",minute:"2-digit"}):"بدون تاريخ"}</p>
+      </div>
+      <div class="list-item-actions" style="flex-wrap:wrap">
+        <button class="btn btn-sm" style="background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);color:#a5b4fc" onclick="memViewPhoto_('${m.id}',this)">📅 عرض الجدول</button>
+        ${st!=="approved"?`<button class="btn btn-sm" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);color:#6ee7b7" onclick="memApprove_('${m.id}')">✅ قبول</button>`:""}
+        ${st!=="rejected"?`<button class="btn btn-sm" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5" onclick="memReject_('${m.id}')">❌ رفض</button>`:""}
+        <button class="btn btn-danger btn-sm" onclick="memDelete_('${m.id}')">حذف</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+window.memApprove_=async id=>{
+  const m=_memCache.find(x=>x.id===id); if(!m) return;
+  if(!confirm(`قبول «${m.fullName||"الطالب"}» كعضو في النادي؟\n\nبيشوف نتيجة القبول في صفحة الانضمام.`))return;
+  await setDoc(doc(db,"memberships",id),{status:"approved",reviewedAt:serverTimestamp()},{merge:true});
+  loadAll();
+};
+window.memReject_=async id=>{
+  if(!confirm("رفض هذا الطلب؟ (يظل محفوظاً ويمكن حذفه لاحقاً)"))return;
+  await setDoc(doc(db,"memberships",id),{status:"rejected",reviewedAt:serverTimestamp()},{merge:true});
+  loadAll();
+};
+// الحذف هو الطريقة الوحيدة اللي تخلي الطالب يقدر يقدّم من جديد — معرّف المستند
+// هو الـ uid حقه، فوجوده يمنع أي طلب ثاني.
+window.memDelete_=async id=>{
+  if(!confirm("حذف الطلب نهائياً؟\n\nملاحظة: الحذف يسمح لنفس الطالب يقدّم طلب جديد."))return;
+  await deleteDoc(doc(db,"memberships",id));
+  await deleteDoc(doc(db,"membershipPhotos",id)).catch(()=>{});
+  loadAll();
+};
+
+// صورة الجدول تعيش في مستند منفصل (membershipPhotos) عشان قائمة الطلبات ما
+// تجرّ صور كل المتقدمين وهي بس بتفتح واحدة. نجيبها هنا عند الطلب فقط.
+window.memViewPhoto_=async(id,btn)=>{
+  const original=btn.textContent; btn.disabled=true; btn.textContent="⏳";
+  try{
+    const snap=await getDoc(doc(db,"membershipPhotos",id));
+    if(!snap.exists()||!snap.data().dataUrl){ alert("ما فيه صورة جدول محفوظة لهالطلب."); return; }
+    memOpenLightbox(snap.data().dataUrl);
+  }catch(e){ alert("تعذّر تحميل الصورة: "+(e.message||e)); }
+  finally{ btn.disabled=false; btn.textContent=original; }
+};
+function memOpenLightbox(dataUrl){
+  let lb=document.getElementById("memLightbox");
+  if(!lb){
+    lb=document.createElement("div");
+    lb.id="memLightbox";
+    lb.style.cssText="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.88);align-items:center;justify-content:center;padding:2rem;cursor:zoom-out";
+    lb.innerHTML='<img id="memLightboxImg" style="max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.6)">';
+    lb.addEventListener("click",()=>{lb.style.display="none";});
+    document.body.appendChild(lb);
+  }
+  document.getElementById("memLightboxImg").src=dataUrl;
+  lb.style.display="flex";
+}
+
+function memCsv(){
+  const rows=[["الاسم","الرقم الجامعي","الإيميل","إيميل موثّق","التلفون","إنستقرام","التخصص الرئيسي","التخصص المساند","السنة","المعدل","اللجنة","المهارات","سبب الانضمام","صورة الجدول","الحالة","تاريخ التقديم"]];
+  memFiltered().forEach(m=>{
+    const w=memDate(m.createdAt);
+    rows.push([m.fullName,m.studentId,m.email,m.verifiedEmail?"نعم":"لا",m.phone,m.instagram,
+      MN[m.major]||m.major,memSupport(m),MEM_YEAR[m.year]||m.year,m.gpa,
+      MEM_COMMITTEE[m.committee]||m.committee,m.skills,m.reason,m.hasPhoto?"محفوظة — افتحها من لوحة التحكم":"—",
+      (MEM_STATUS[m.status||"pending"]||MEM_STATUS.pending)[0],w?w.toISOString():""]);
+  });
+  const body=rows.map(r=>r.map(c=>{
+    const s=(c==null?"":String(c)).replace(/"/g,'""');
+    return /[",\n]/.test(s)?`"${s}"`:s;
+  }).join(",")).join("\r\n");
+  const blob=new Blob(["﻿"+body],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`bscku-memberships-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},0);
+}
+
+/* ── فتح/إغلاق باب التسجيل ── */
+let _memOpen=true;
+function paintMemToggle(){
+  const b=document.getElementById("memToggleOpen"); if(!b) return;
+  b.textContent=_memOpen?"🟢 التسجيل مفتوح — اضغط للإغلاق":"🔴 التسجيل مغلق — اضغط للفتح";
+  b.style.background=_memOpen?"rgba(16,185,129,.15)":"rgba(239,68,68,.12)";
+  b.style.border="1px solid "+(_memOpen?"rgba(16,185,129,.35)":"rgba(239,68,68,.3)");
+  b.style.color=_memOpen?"#6ee7b7":"#fca5a5";
+}
+async function loadMemConfig(){
+  try{
+    const s=await getDoc(doc(db,"membershipConfig","settings"));
+    const d=s.exists()?(s.data()||{}):{};
+    _memOpen=d.open!==false;
+    const msg=document.getElementById("memClosedMsg");
+    if(msg) msg.value=d.closedMessage||"";
+  }catch(e){ _memOpen=true; }
+  paintMemToggle();
+}
+async function saveMemConfig(patch){
+  await setDoc(doc(db,"membershipConfig","settings"),{...patch,updatedAt:serverTimestamp()},{merge:true});
+}
+
+document.getElementById("memToggleOpen")?.addEventListener("click",async function(){
+  this.disabled=true;
+  try{ _memOpen=!_memOpen; await saveMemConfig({open:_memOpen}); paintMemToggle(); }
+  catch(e){ _memOpen=!_memOpen; alert("تعذّر الحفظ: "+(e.message||e)); }
+  this.disabled=false;
+});
+document.getElementById("memSaveMsg")?.addEventListener("click",async function(){
+  this.disabled=true;
+  try{ await saveMemConfig({closedMessage:document.getElementById("memClosedMsg").value.trim()}); this.textContent="✅ انحفظت"; setTimeout(()=>{this.textContent="💾 حفظ الرسالة";},1600); }
+  catch(e){ alert("تعذّر الحفظ: "+(e.message||e)); }
+  this.disabled=false;
+});
+document.getElementById("memSearch")?.addEventListener("input",renderMemList);
+document.getElementById("memFilter")?.addEventListener("change",renderMemList);
+document.getElementById("memExport")?.addEventListener("click",memCsv);
+document.getElementById("memRefresh")?.addEventListener("click",()=>loadAll());
+document.querySelectorAll('.nav-item[data-panel="members"]').forEach(b=>b.addEventListener("click",loadMemConfig));
 
 // تقييمات المواد (courseRatings): عرض + قبول/رفض
 let _ratingsCache={};
@@ -2570,10 +2814,11 @@ document.addEventListener("click",e=>{
 // LOAD ALL
 async function loadAll(){
   try{
-    const[notes,events,advisors,committee,ann,resources,ai,chats,news,suggestions,scheds,subs,ratings,vids,vcs]=await Promise.all([
+    const[notes,events,advisors,committee,ann,resources,ai,chats,news,suggestions,scheds,subs,ratings,vids,vcs,members]=await Promise.all([
       getItems("notes"),getItems("events"),getItems("advisors"),getItems("scheduleCommittee"),getItems("announcements"),
       getItems("majorResources"),getItems("aiKnowledge"),getItems("aiChats"),getItems("news"),getItems("suggestions"),
-      getItems("schedules"),getItems("noteSubmissions"),getItems("courseRatings"),getItems("courseVideos"),getItems("videoComments")
+      getItems("schedules"),getItems("noteSubmissions"),getItems("courseRatings"),getItems("courseVideos"),getItems("videoComments"),
+      getItems("memberships")
     ]);
     // stats
     document.getElementById("ds-notes").textContent=notes.length;
@@ -2597,6 +2842,7 @@ async function loadAll(){
     // render
     renderItems("notesList",notes,["title","course","term"],"notes");
     renderSubmissions(subs);
+    renderMemberships(members);
     renderRatings(ratings);
     renderVideos(vids);
     renderVComments(vcs,vids);
@@ -3589,11 +3835,35 @@ window.gcSave=async function(){
   let gpaCache=null;
 
   async function fetchGpa(){
-    const snap=await getDocs(collection(db,"gpaData"));
-    gpaCache=snap.docs.map(d=>{
+    // مصدرين: حسابات الطلبة الجديدة (students) والبيانات القديمة المربوطة
+    // بالجهاز (gpaData) اللي انحفظت قبل ما نضيف تسجيل الدخول.
+    const [newSnap,oldSnap]=await Promise.all([
+      getDocs(collection(db,"students")).catch(()=>({docs:[]})),
+      getDocs(collection(db,"gpaData")).catch(()=>({docs:[]})),
+    ]);
+
+    const accounts=newSnap.docs.map(d=>{
       const data=d.data()||{};
-      return {id:d.id,...data,_stats:recStats(data),_when:toDate(data.updatedAt)};
-    });
+      const gpa=data.gpa||{};
+      const p=data.profile||null;
+      return {id:d.id,semesters:gpa.semesters||[],_profile:p,_major:data.major||null,
+        _planner:data.planner||null,
+        _stats:recStats({semesters:gpa.semesters||[]}),
+        _when:toDate(data.updatedAt),_src:"account"};
+    // حساب بلا أي بيانات محفوظة ما يفيد في هالقائمة
+    }).filter(r=>r._stats.semCount||r._profile||r._planner);
+
+    // لو الطالب رحّل بياناته القديمة لحسابه، نتجنّب عرضها مرتين
+    const migrated=new Set();
+    accounts.forEach(a=>{ if(a._stats.courses) migrated.add(JSON.stringify(a.semesters)); });
+
+    const legacy=oldSnap.docs.map(d=>{
+      const data=d.data()||{};
+      return {id:d.id,...data,_profile:null,_stats:recStats(data),
+        _when:toDate(data.updatedAt),_src:"device"};
+    }).filter(r=>!migrated.has(JSON.stringify(r.semesters||[])));
+
+    gpaCache=accounts.concat(legacy);
   }
 
   function gpaFiltered(){
@@ -3601,6 +3871,7 @@ window.gcSave=async function(){
     let list=(gpaCache||[]).slice();
     if(q) list=list.filter(r=>{
       if(r.id.toLowerCase().includes(q)) return true;
+      if(r._profile&&((r._profile.name||"")+" "+(r._profile.email||"")).toLowerCase().includes(q)) return true;
       return (r.semesters||[]).some(s=>
         String(s.name||"").toLowerCase().includes(q)||
         (s.courses||[]).some(c=>String(c.name||"").toLowerCase().includes(q)));
@@ -3652,11 +3923,18 @@ window.gcSave=async function(){
         </div>`;
       }).join("");
 
+      // ما نطلب نطاق profile من جوجل، فالاسم والصورة غالباً فاضية —
+      // الإيميل هو المعرّف الأساسي هنا.
+      const who=r._profile
+        ? `<div class="gpa-rec-who">${r._profile.photo?`<img src="${esc(r._profile.photo)}" alt="" referrerpolicy="no-referrer">`:""}
+             <b class="gpa-rec-id" style="font-size:.85rem;color:var(--text)">${esc(r._profile.email||r.id)}</b>
+             ${r._profile.name?`<span style="font-size:.75rem;color:var(--muted)">${esc(r._profile.name)}</span>`:""}</div>`
+        : `<div class="gpa-rec-id">${esc(r.id)} <span class="badge badge-gold" style="font-size:.62rem">بدون حساب</span></div>`;
       return `<div class="gpa-rec" data-id="${esc(r.id)}">
         <div class="gpa-rec-head">
           <span class="caret">▶</span>
           <div>
-            <div class="gpa-rec-id">${esc(r.id)}</div>
+            ${who}
             <div class="gpa-rec-meta">${s.semCount} فصل · ${s.courses} مادة · ${s.totalH} ساعة · آخر تحديث ${fmtDate(r._when)}</div>
           </div>
           <span class="gpa-rec-gpa" style="color:${s.has?gpaColor(s.cumGPA):"#94a3b8"}">${s.has?s.cumGPA.toFixed(2):"—"}</span>
@@ -3672,9 +3950,14 @@ window.gcSave=async function(){
     if(del){
       e.stopPropagation();
       const id=del.dataset.del;
-      if(!confirm(`حذف بيانات المعدل للجهاز:\n${id}\n\nما ينحذف من جهاز الطالب، بس من السحابة. متأكد؟`)) return;
+      const rec=(gpaCache||[]).find(r=>r.id===id);
+      const isAccount=rec&&rec._src==="account";
+      const who=rec&&rec._profile?(rec._profile.name||rec._profile.email):id;
+      if(!confirm(isAccount
+        ? `حذف حساب «${who}» وكل بياناته (الجدول والتخرج والمعدل)؟\n\nما ينحذف من جهاز الطالب، بس من السحابة.`
+        : `حذف بيانات المعدل للجهاز:\n${id}\n\nما ينحذف من جهاز الطالب، بس من السحابة. متأكد؟`)) return;
       try{
-        await deleteDoc(doc(db,"gpaData",id));
+        await deleteDoc(doc(db,isAccount?"students":"gpaData",id));
         gpaCache=gpaCache.filter(r=>r.id!==id);
         renderGpa();
       }catch(err){ alert("تعذّر الحذف: "+err.message); }
@@ -3688,15 +3971,17 @@ window.gcSave=async function(){
   $("gpaSort").addEventListener("change",renderGpa);
   $("gpaRefresh").addEventListener("click",()=>loadGpa(true));
   $("gpaExport").addEventListener("click",()=>{
-    const rows=[["معرّف الجهاز","الفصل","المقرر","الساعات","الدرجة","درجة سابقة","معدل الفصل","المعدل التراكمي","آخر تحديث"]];
+    const rows=[["المعرّف","الاسم","الإيميل","الفصل","المقرر","الساعات","الدرجة","درجة سابقة","معدل الفصل","المعدل التراكمي","آخر تحديث"]];
     gpaFiltered().forEach(r=>{
+      const nm=r._profile?(r._profile.name||""):"", em=r._profile?(r._profile.email||""):"";
       (r.semesters||[]).forEach(sem=>{
         const ss=semStats(sem);
         const cs=sem.courses||[];
-        if(!cs.length){ rows.push([r.id,sem.name||"",  "","","","",ss.semGPA.toFixed(2),ss.cumGPA.toFixed(2),r._when?r._when.toISOString():""]); return; }
-        cs.forEach(c=>rows.push([r.id,sem.name||"",c.name||"",c.hrs||"",c.grade||"",
+        const when=r._when?r._when.toISOString():"";
+        if(!cs.length){ rows.push([r.id,nm,em,sem.name||"","","","","",ss.semGPA.toFixed(2),ss.cumGPA.toFixed(2),when]); return; }
+        cs.forEach(c=>rows.push([r.id,nm,em,sem.name||"",c.name||"",c.hrs||"",c.grade||"",
           (c.prevGrade&&c.prevGrade!=="غير معادة")?c.prevGrade:"",
-          ss.semGPA.toFixed(2),ss.cumGPA.toFixed(2),r._when?r._when.toISOString():""]));
+          ss.semGPA.toFixed(2),ss.cumGPA.toFixed(2),when]));
       });
     });
     csv(rows,"bscku-gpa");
@@ -3722,6 +4007,11 @@ window.gcSave=async function(){
       title:d=>d.name||"طالب", body:d=>d.text||""},
     {col:"noteSubmissions",ico:"📬", label:"نوتة مرسلة",      panel:"noteSubs",
       title:d=>d.title||"نوتة", body:d=>`${d.course||""}${d.name?" · أرسلها "+d.name:""}`},
+    // بيانات الطلب الحساسة (تلفون، معدل، جدول) تبقى في بانل العضوية وحده —
+    // هنا نعرض السطر الأول بس عشان يبين في الخط الزمني.
+    {col:"memberships",    ico:"📝", label:"طلب عضوية",       panel:"members",
+      title:d=>d.fullName||"طلب عضوية",
+      body:d=>[d.major||"",d.committee||""].filter(Boolean).join(" · ")},
     {col:"suggestions",    ico:"💡", label:"اقتراح مادة",     panel:"suggestions",
       title:d=>`${d.code||""} ${d.nameAr||""}`.trim()||"اقتراح",
       body:d=>`${d.major||""}${d.notes?" · "+d.notes:""}`},

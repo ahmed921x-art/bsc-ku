@@ -72,6 +72,18 @@ a{color:inherit;text-decoration:none}
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
 .reveal.visible{opacity:1;transform:none}
 /* About-specific */
+.join-cta{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;
+  background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(16,185,129,.04));border:1px solid rgba(16,185,129,.28);
+  border-radius:var(--radius-lg);padding:1.75rem 2rem;margin-bottom:3rem;transition:all .35s var(--ease)}
+.join-cta:hover{transform:translateY(-4px);border-color:rgba(16,185,129,.5);box-shadow:0 16px 44px rgba(16,185,129,.2)}
+.join-cta-text strong{display:block;font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:.3rem}
+.join-cta-text span{font-size:.88rem;color:var(--muted)}
+.join-cta-btn{flex-shrink:0;display:inline-flex;align-items:center;padding:.75rem 1.6rem;border-radius:999px;
+  background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-weight:800;font-size:.9rem;
+  box-shadow:0 8px 24px rgba(16,185,129,.3);transition:transform .25s}
+.join-cta:hover .join-cta-btn{transform:scale(1.05)}
+[data-theme="light"] .join-cta{background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(16,185,129,.02))!important;border-color:rgba(16,185,129,.25)!important}
+[data-theme="light"] .join-cta-text strong{color:#161616!important}
 .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center;margin-bottom:3rem}
 .about-text h2{font-family:'Plus Jakarta Sans',sans-serif;font-size:2rem;font-weight:800;color:#fff;margin-bottom:1rem;line-height:1.2}
 .about-text h2 span{background:linear-gradient(90deg,#6366f1,#10b981);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -381,6 +393,7 @@ a{color:inherit;text-decoration:none}
     <a href="advisors.html" data-ar="المرشدون" data-en="Advisors">المرشدون</a>
     <a href="events.html" data-ar="الأنشطة" data-en="Activities">الأنشطة</a>
     <a href="about.html" class="active" data-ar="عن النادي" data-en="About">عن النادي</a>
+    <a href="join.html" class="join-link" data-ar="انضم للنادي" data-en="Join Us">انضم للنادي</a>
     <a href="ask.html" data-ar="اسأل النادي" data-en="Ask Us">اسأل النادي</a>
   </nav>
 
@@ -426,6 +439,7 @@ a{color:inherit;text-decoration:none}
     <a href="advisors.html" data-ar="🎓 المرشدون" data-en="🎓 Advisors">🎓 المرشدون</a>
     <a href="events.html" data-ar="🎉 الأنشطة" data-en="🎉 Activities">🎉 الأنشطة</a>
     <a href="about.html" class="active" data-ar="ℹ️ عن النادي" data-en="ℹ️ About">ℹ️ عن النادي</a>
+    <a href="join.html" data-ar="✍️ انضم للنادي" data-en="✍️ Join Us">✍️ انضم للنادي</a>
     <a href="ask.html" data-ar="💬 اسأل النادي" data-en="💬 Ask Us">💬 اسأل النادي</a>
     <div class="mobile-divider"></div>
     <a href="https://moodle.ku.edu.kw/login/index.php" target="_blank">📖 Moodle</a>
@@ -450,6 +464,14 @@ a{color:inherit;text-decoration:none}
 <main class="main-content">
   <!-- TAB: عن النادي -->
   <div id="tab-about" class="about-tab-panel active">
+  <!-- Join CTA -->
+  <a href="join.html" class="join-cta reveal" style="text-decoration:none">
+    <div class="join-cta-text">
+      <strong data-ar="ودك تكون جزء من النادي؟ 🙋" data-en="Want to be part of the club? 🙋">ودك تكون جزء من النادي؟ 🙋</strong>
+      <span data-ar="سجل بياناتك وانضم لعائلة نادي العلوم البيولوجية" data-en="Register your info and join the Biological Sciences Club family">سجل بياناتك وانضم لعائلة نادي العلوم البيولوجية</span>
+    </div>
+    <span class="join-cta-btn" data-ar="📝 سجل عضويتك" data-en="📝 Register Now">📝 سجل عضويتك</span>
+  </a>
   <!-- About -->
   <div class="about-grid reveal">
     <div class="about-text">
@@ -655,4 +677,5 @@ document.querySelectorAll('.reveal').forEach(el=>_revealObs.observe(el));
 </script>
 
 <script type="module" src="visit-counter.js"></script>
+<script type="module" src="account.js"></script>
 </body></html>

@@ -126,8 +126,63 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    // Club membership applications. These carry real personal data — student
+    // id, phone, GPA, a photo of the schedule — so unlike the other public
+    // submissions they are never world-readable. The applicant reaches their
+    // own application (to see whether it was accepted) through the anonymous
+    // uid they already carry; nobody else reaches it but an admin.
+    //
+    // `list` is deliberately admin-only: a query without a uid filter would
+    // otherwise dump every applicant's phone number in one request. That is
+    // also why the document id IS the uid — the applicant can `get` their own
+    // application by id without ever needing to run a query, and the id itself
+    // enforces one application per student.
+    match /memberships/{uid} {
+      allow create: if request.auth != null
+                    && request.auth.uid == uid
+                    && request.resource.data.status == 'pending';
+      allow get: if isAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow list: if isAdmin();
+      // Applications are final once sent; an admin deletes to let a student
+      // re-apply.
+      allow update, delete: if isAdmin();
+    }
+
+    // The schedule photo, base64 in its own document so the admin list can load
+    // a hundred applications without dragging a hundred images along with them —
+    // the panel fetches one of these only when an admin opens it.
+    //
+    // Writable by the applicant only until their application exists, which both
+    // allows a retry after a half-failed submit and freezes the photo the moment
+    // the application is in.
+    match /membershipPhotos/{uid} {
+      allow write: if request.auth != null
+                   && request.auth.uid == uid
+                   && !exists(/databases/$(database)/documents/memberships/$(uid));
+      allow get: if isAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow list: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Registration window + committee list, edited from the admin panel.
+    // Read is open because join.html has to know whether to show the form.
+    match /membershipConfig/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Student accounts. Every visitor gets an anonymous uid, so this rule
+    // covers everyone, signed in with Google or not: you reach your own
+    // document and nothing else. Admins can read for the admin panel.
+    match /students/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     // GPA calculator save data, keyed by a random device id kept in the
-    // student's own localStorage.
+    // student's own localStorage. Superseded by /students above — kept so
+    // data saved before accounts existed can still be migrated in.
     //
     // `get` is open because the student's browser has to read back its own
     // document and there is no login on the calculator — but the id is random
