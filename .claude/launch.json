@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "bsc-ku",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [".claude/dev-server.js"],
+      "port": 5173
+    },
+    {
+      "name": "bsc-ku-app",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [".claude/dev-server-app.js"],
+      "port": 5174
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+node_modules/
+
+# محتوى التطبيق — يتولّد من صفحات الموقع عبر: npm run sync
+www/
+
+# مخرجات البناء للمنصتين
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+android/capacitor-cordova-android-plugins/
+ios/App/App/public/
+ios/App/App/capacitor.config.json
+ios/App/Pods/
+ios/App/build/
+ios/capacitor-cordova-ios-plugins/
+DerivedData/
+
+desktop.ini
+.DS_Store
+
+# ملف APK المبني — يتولد بأمر npm run apk
+BSC-KU.apk
+assets/
+icons/

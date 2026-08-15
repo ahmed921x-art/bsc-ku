@@ -1,0 +1,71 @@
+# يبني نسخة الآيفون على جهاز macOS حقيقي عند GitHub.
+#
+# ليش: بناء iOS يحتاج Xcode واللي ما يشتغل إلا على macOS. هذا الملف
+# يخلي GitHub يبنيه لنا على ماك سحابي — نعرف إن المشروع سليم فعلاً
+# بدون ما نملك جهاز ماك.
+#
+# النسخة المبنية هنا للمحاكي فقط، وما تحتاج شهادة توقيع ولا حساب
+# مطوّر آبل. للتثبيت على آيفون حقيقي أو النشر على App Store تحتاج
+# حساب مطوّر آبل (٩٩ دولار سنوياً).
+#
+# التشغيل: من تبويب Actions في المستودع → iOS Build → Run workflow
+
+name: iOS Build
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'app-shell/**'
+      - '.claude/sync-app.js'
+      - 'package.json'
+      - '.github/workflows/ios-build.yml'
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # بدون حزم التطوير عمداً: @capacitor/assets يجرّ sharp بملفات
+      # ثنائية لكل نظام، وملف القفل متولّد على ويندوز فقد ما يلقى نسخة
+      # macOS ويفشل التثبيت. الأيقونات متولّدة ومحفوظة بالمستودع أصلاً.
+      - name: تثبيت الحزم
+        run: npm ci --omit=dev
+
+      - name: بناء محتوى التطبيق ومزامنته
+        run: npm run build:app
+
+      # مسارات Package.swift تتولّد بفاصل نظام التشغيل. لو انبنى
+      # المشروع على ويندوز تطلع بشرطات خلفية وما يقبلها Swift هنا.
+      - name: التأكد من مسارات iOS
+        run: node .claude/fix-ios-spm.js
+
+      - name: بناء التطبيق للمحاكي
+        run: |
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: تجهيز الناتج
+        run: |
+          cd build/Build/Products/Debug-iphonesimulator
+          zip -r "$GITHUB_WORKSPACE/BSC-KU-simulator.zip" App.app
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BSC-KU-ios-simulator
+          path: BSC-KU-simulator.zip
+          retention-days: 30
