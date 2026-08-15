@@ -31,7 +31,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          # أداة Capacitor 8 تشترط Node 22 فما فوق
+          node-version: '22'
 
       # بدون حزم التطوير عمداً: @capacitor/assets يجرّ sharp بملفات
       # ثنائية لكل نظام، وملف القفل متولّد على ويندوز فقد ما يلقى نسخة
