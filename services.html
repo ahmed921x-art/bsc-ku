@@ -931,6 +931,13 @@ a{color:inherit;text-decoration:none}
           <input type="number" id="plCustom" min="10" max="720" step="5" value="100"></div>
       </div>
 
+      <div class="pl-form">
+        <div class="pl-f"><label>تاريخ الاختبار النهائي <span class="opt">(اختياري)</span></label>
+          <input type="date" id="plFinalDate"></div>
+        <div class="pl-f"><label>وقت الاختبار النهائي <span class="opt">(اختياري)</span></label>
+          <input type="time" id="plFinalTime"></div>
+      </div>
+
       <div class="pl-actions">
         <button class="btn-calc" id="plAdd">+ أضف للجدول</button>
         <button class="btn-reset" id="plCancel" hidden>إلغاء التعديل</button>
@@ -994,6 +1001,9 @@ a{color:inherit;text-decoration:none}
       </div>
       <div class="pl-foot" id="plFoot"></div>
     </div>
+
+    <!-- final exam conflicts -->
+    <div id="plExamConflicts"></div>
   </div>
 
   <!-- ===== NEWS ===== -->
@@ -2124,6 +2134,7 @@ loadPref();trigReveal();
     {ar:"الخميس", en:"Thu", step:50},
   ];
   const T0=480, T1=1200, SPAN=T1-T0;           // 08:00 → 20:00
+  const EXAM_DUR=120;                          // نفترضها ساعتين لغرض كشف تعارض الاختبارات النهائية
   const NATURE={
     major:{ar:"تخصص",   bg:"rgba(245,158,11,.22)", bd:"#f59e0b", tx:"#fcd34d"},
     support:{ar:"مساند", bg:"rgba(239,68,68,.20)",  bd:"#ef4444", tx:"#fca5a5"},
@@ -2282,6 +2293,37 @@ loadPref();trigReveal();
     return {bad,pairs};
   }
 
+  /* ---- تعارض الاختبارات النهائية (تاريخ+وقت اختياريان، مو أسبوعيين) ---- */
+  function examBlocks(){
+    return cur().items
+      .filter(it=>it.finalDate && it.finalTime)
+      .map(it=>{
+        const start=new Date(it.finalDate+"T"+it.finalTime);
+        return {it, start, end:new Date(start.getTime()+EXAM_DUR*60000)};
+      });
+  }
+  function examClashes(){
+    const bs=examBlocks(), pairs=[];
+    for(let i=0;i<bs.length;i++)for(let j=i+1;j<bs.length;j++){
+      const a=bs[i],b=bs[j];
+      if(a.start<b.end && b.start<a.end) pairs.push({a:a.it,b:b.it,when:a.start<b.start?a.start:b.start});
+    }
+    return pairs;
+  }
+  function renderExamConflicts(){
+    const cw=$("plExamConflicts"); if(!cw)return;
+    const pairs=examClashes();
+    if(!pairs.length){ cw.innerHTML=""; return; }
+    const lines=pairs.map(p=>{
+      const dateStr=p.when.toLocaleDateString("ar-KW",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+      const timeStr=p.when.toLocaleTimeString("ar-KW",{hour:"2-digit",minute:"2-digit"});
+      return `«${esc(p.a.name||p.a.code)}» مع «${esc(p.b.name||p.b.code)}» — ${dateStr}، الساعة ${timeStr}`;
+    });
+    cw.innerHTML=`<div class="pl-warn"><h4>⚠️ فيه ${lines.length} تعارض بالاختبارات النهائية</h4>`+
+      lines.map(l=>`<p>• ${l}</p>`).join("")+
+      `<p style="margin-top:.5rem;font-size:.76rem;opacity:.75">* نفترض إن كل اختبار نهائي يستغرق ساعتين لغرض كشف التعارض.</p></div>`;
+  }
+
   /* ---- grid ---- */
   function renderGrid(){
     const {bad,pairs}=clashes();
@@ -2346,6 +2388,7 @@ loadPref();trigReveal();
       cw.innerHTML=`<div class="pl-warn"><h4>⚠️ فيه ${lines.length} تعارض</h4>`+
         lines.map(l=>`<p>• ${l}</p>`).join("")+`</div>`;
     } else cw.innerHTML="";
+    renderExamConflicts();
 
     // legend + totals
     $("plLegend").innerHTML=Object.entries(NATURE).map(([k,v])=>
@@ -2387,6 +2430,7 @@ loadPref();trigReveal();
     $("plCode").value=""; $("plName").value="";
     $("plDays").querySelectorAll(".on").forEach(b=>b.classList.remove("on"));
     $("plStart").value="08:00"; $("plDur").value="50";
+    $("plFinalDate").value=""; $("plFinalTime").value="";
     [...$("plUnits").children].forEach(b=>b.classList.toggle("on",b.dataset.v==="3"));
     $("plCustomWrap").hidden=true;
     $("plAdd").textContent="+ أضف للجدول";
@@ -2406,9 +2450,10 @@ loadPref();trigReveal();
     if(start<T0||start>=T1) return msg("اختر وقت بداية بين ٨ صباحاً و٨ مساءً.");
     if(start+dur>T1) return msg("المحاضرة تتجاوز ٨ مساءً — قصّر المدة أو قدّم الوقت.");
 
+    const finalDate=$("plFinalDate").value||"", finalTime=$("plFinalTime").value||"";
     const rec={id:editId||uid(),
       code,name,kind:getOne($("plKind"))||"lecture",nature:getOne($("plNature"))||"major",
-      units:+(getOne($("plUnits"))||3), days,start,dur};
+      units:+(getOne($("plUnits"))||3), days,start,dur,finalDate,finalTime};
     const arr=cur().items;
     if(editId){const i=arr.findIndex(x=>x.id===editId); if(i>-1)arr[i]=rec;}
     else arr.push(rec);
@@ -2432,6 +2477,7 @@ loadPref();trigReveal();
       const opt=[...$("plDur").options].find(o=>+o.value===it.dur);
       if(opt){$("plDur").value=String(it.dur);$("plCustomWrap").hidden=true;}
       else{$("plDur").value="custom";$("plCustomWrap").hidden=false;$("plCustom").value=it.dur;}
+      $("plFinalDate").value=it.finalDate||""; $("plFinalTime").value=it.finalTime||"";
       $("plAdd").textContent="💾 حفظ التعديل"; $("plCancel").hidden=false;
       slotHint(); document.getElementById("plName").scrollIntoView({behavior:"smooth",block:"center"});
     }else{
