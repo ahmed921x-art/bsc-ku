@@ -69,6 +69,31 @@ a{color:inherit;text-decoration:none}
 .advisor-email a:hover{color:#c4b5fd}
 .empty-state{grid-column:1/-1;text-align:center;padding:4rem;color:var(--muted)}
 .empty-icon{font-size:3rem;margin-bottom:1rem;display:block}
+/* ── دليل الهيئة الأكاديمية ── */
+.fd-toolbar{display:flex;gap:.85rem;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem}
+.fd-search{width:min(420px,100%);padding:.72rem 1.15rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:999px;color:var(--text);font-family:inherit;font-size:.9rem;outline:none;transition:all .25s}
+.fd-search:focus{border-color:rgba(139,92,246,.5);box-shadow:0 0 0 3px rgba(139,92,246,.12)}
+.fd-search::placeholder{color:var(--muted)}
+.fd-count{font-size:.8rem;font-weight:700;color:var(--muted)}
+.fd-groups{display:flex;flex-direction:column;gap:1rem}
+.fd-group{background:rgba(22,22,22,.75);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .3s,box-shadow .3s}
+.fd-group.open{border-color:var(--mc-bd);box-shadow:0 14px 40px var(--mc-bg)}
+.fd-head{display:flex;align-items:center;gap:.85rem;width:100%;padding:1.05rem 1.3rem;background:none;border:0;cursor:pointer;color:var(--text);font-family:inherit;text-align:start}
+.fd-icon{flex:0 0 44px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:14px;background:var(--mc-bg);border:1px solid var(--mc-bd)}
+.fd-head h3{font-size:1rem;font-weight:800;color:var(--mc);line-height:1.35}
+.fd-head small{display:block;font-size:.75rem;font-weight:600;color:var(--muted)}
+.fd-chev{margin-inline-start:auto;flex:0 0 auto;color:var(--muted);transition:transform .3s}
+.fd-group.open .fd-chev{transform:rotate(180deg)}
+.fd-body{display:none;padding:0 1.3rem 1.1rem}
+.fd-group.open .fd-body{display:block}
+.fd-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:.72rem .15rem;border-top:1px solid var(--border)}
+.fd-name{font-size:.93rem;font-weight:700;color:var(--text)}
+.fd-rank{font-size:.71rem;font-weight:700;color:var(--mc);background:var(--mc-bg);border:1px solid var(--mc-bd);border-radius:999px;padding:.14rem .62rem}
+.fd-role{font-size:.71rem;font-weight:700;color:#fcd34d;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);border-radius:999px;padding:.14rem .62rem}
+.fd-mail{margin-inline-start:auto;font-size:.78rem;color:#a5b4fc;word-break:break-all;transition:color .2s}
+.fd-mail:hover{color:#c4b5fd}
+.fd-noresult{text-align:center;color:var(--muted);padding:2.5rem 1rem;font-size:.9rem}
+@media(max-width:600px){.fd-mail{margin-inline-start:0;width:100%}}
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
 .reveal.visible{opacity:1;transform:none}
 .footer{position:relative;z-index:2;margin:2rem 6% 0;padding:2rem 2.5rem;background:rgba(22,22,22,.6);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:28px 28px 0 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.25rem}
@@ -256,6 +281,33 @@ a{color:inherit;text-decoration:none}
     [data-theme="light"] .tt-code { color: #4f46e5 !important; }
     [data-theme="light"] .tt-name { color: #161616 !important; }
     [data-theme="light"] .tt-hours,[data-theme="light"] .tt-prereq { color: #475569 !important; }
+    /* Faculty directory */
+    [data-theme="light"] .fd-group {
+      background: #ffffff !important;
+      border-color: rgba(99,102,241,.15) !important;
+      box-shadow: 0 2px 16px rgba(99,102,241,.08) !important;
+      backdrop-filter: none !important;
+    }
+    [data-theme="light"] .fd-group.open { box-shadow: 0 8px 32px rgba(99,102,241,.12) !important; }
+    [data-theme="light"] .fd-head { color: #161616 !important; }
+    [data-theme="light"] .fd-head h3 { color: #161616 !important; }
+    [data-theme="light"] .fd-head small { color: #64748b !important; }
+    [data-theme="light"] .fd-name { color: #161616 !important; }
+    [data-theme="light"] .fd-row { border-color: rgba(99,102,241,.12) !important; }
+    [data-theme="light"] .fd-rank { filter: brightness(.72) saturate(1.5); }
+    [data-theme="light"] .fd-role {
+      color: #b45309 !important;
+      background: rgba(245,158,11,.1) !important;
+      border-color: rgba(245,158,11,.28) !important;
+    }
+    [data-theme="light"] .fd-mail { color: #4f46e5 !important; }
+    [data-theme="light"] .fd-search {
+      background: #f8fafc !important;
+      border-color: rgba(99,102,241,.2) !important;
+      color: #161616 !important;
+    }
+    [data-theme="light"] .fd-count,
+    [data-theme="light"] .fd-noresult { color: #64748b !important; }
     /* Footer */
     [data-theme="light"] .footer {
       background: rgba(248,250,252,.97) !important;
@@ -407,6 +459,18 @@ a{color:inherit;text-decoration:none}
     <div style="height:160px;background:rgba(255,255,255,.04);border-radius:28px"></div>
     <div style="height:160px;background:rgba(255,255,255,.04);border-radius:28px;animation-delay:.1s"></div>
   </div>
+
+  <!-- ── دليل الهيئة الأكاديمية حسب التخصص ── -->
+  <div style="text-align:center;margin:4.5rem 0 2rem">
+    <div class="page-badge" data-ar="الهيئة الأكاديمية" data-en="Academic Faculty">الهيئة الأكاديمية</div>
+    <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;letter-spacing:-.02em;color:#fff;margin-bottom:.5rem" data-ar="دكاترة القسم حسب التخصص" data-en="Department Faculty by Major">دكاترة القسم حسب التخصص</h2>
+    <p style="color:var(--muted);font-size:.92rem;max-width:520px;margin:0 auto" data-ar="قائمة أعضاء الهيئة الأكاديمية والمعيدين في قسم العلوم البيولوجية مرتّبة حسب كل تخصص، مع بريد التواصل" data-en="The department's faculty members and teaching assistants, grouped by major, with contact emails">قائمة أعضاء الهيئة الأكاديمية والمعيدين في قسم العلوم البيولوجية مرتّبة حسب كل تخصص، مع بريد التواصل</p>
+  </div>
+  <div class="fd-toolbar">
+    <input type="search" id="fdSearch" class="fd-search" placeholder="ابحث باسم الدكتور أو البريد…" data-ar-ph="ابحث باسم الدكتور أو البريد…" data-en-ph="Search by name or email…">
+    <div class="fd-count" id="fdCount"></div>
+  </div>
+  <div class="fd-groups" id="facultyDirectory"></div>
 </main>
 
 <footer class="footer">
@@ -463,6 +527,84 @@ const defaults=[{major:"molecular"},{major:"micro"},{major:"plant"},{major:"anim
 
   const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add("visible");obs.unobserve(x.target)}})},{threshold:.1});
   document.querySelectorAll(".reveal").forEach(el=>obs.observe(el));
+  if(window.reapplyLang)window.reapplyLang();
+})();
+
+// ── دليل الهيئة الأكاديمية ──────────────────────────────────
+// المصدر: مجموعة `faculty` في Firestore (تتعدّل من لوحة الأدمن).
+// إذا كانت فاضية — قبل أول استيراد — تنعرض النسخة المحلية من faculty-seed.js.
+import { FACULTY_GROUPS, FACULTY_RANKS, FACULTY_SEED } from "./faculty-seed.js";
+(async()=>{
+  const wrap=document.getElementById("facultyDirectory");
+  const countEl=document.getElementById("fdCount");
+  if(!wrap)return;
+  const esc=s=>(s==null?"":String(s)).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+
+  let people=[];
+  try{const s=await getDocs(collection(db,"faculty"));people=s.docs.map(d=>d.data())}catch{}
+  if(!people.length)people=FACULTY_SEED;
+  people=[...people].sort((a,b)=>(+a.order||999)-(+b.order||999));
+
+  const known=new Set(FACULTY_GROUPS.map(g=>g.key));
+  const groups=[...FACULTY_GROUPS];
+  // أي تخصص جديد يُضاف من لوحة الأدمن ولا يوجد له لون معرّف
+  people.forEach(p=>{if(p.group&&!known.has(p.group)){known.add(p.group);groups.push({key:p.group,ar:p.group,en:p.group,icon:"🎓",c:"#c4b5fd",bg:"rgba(139,92,246,.14)",bd:"rgba(139,92,246,.35)"})}});
+
+  wrap.innerHTML=groups.map(g=>{
+    const members=people.filter(p=>p.group===g.key);
+    if(!members.length)return"";
+    const rows=members.map(p=>{
+      const r=FACULTY_RANKS[p.rank];
+      return `<div class="fd-row" data-search="${esc([p.nameAr,p.nameEn,p.email].filter(Boolean).join(" ").toLowerCase())}">
+        <span class="fd-name" data-ar="${esc(p.nameAr||p.nameEn||"")}" data-en="${esc(p.nameEn||p.nameAr||"")}">${esc(p.nameAr||p.nameEn||"")}</span>
+        ${r?`<span class="fd-rank" data-ar="${esc(r.ar)}" data-en="${esc(r.en)}">${esc(r.ar)}</span>`:""}
+        ${p.roleAr||p.roleEn?`<span class="fd-role" data-ar="${esc(p.roleAr||p.roleEn)}" data-en="${esc(p.roleEn||p.roleAr)}">${esc(p.roleAr||p.roleEn)}</span>`:""}
+        ${p.email?`<a class="fd-mail" href="mailto:${esc(p.email)}">${esc(p.email)}</a>`:""}
+      </div>`}).join("");
+    return `<section class="fd-group" style="--mc:${g.c};--mc-bg:${g.bg};--mc-bd:${g.bd}">
+      <button class="fd-head" type="button" aria-expanded="false">
+        <span class="fd-icon">${g.icon}</span>
+        <span>
+          <h3 data-ar="${esc(g.ar)}" data-en="${esc(g.en)}">${esc(g.ar)}</h3>
+          <small>${members.length} <span data-ar="عضو هيئة" data-en="members">عضو هيئة</span></small>
+        </span>
+        <svg class="fd-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="fd-body">${rows}</div>
+    </section>`}).join("")+'<p class="fd-noresult" id="fdNoResult" style="display:none" data-ar="ما فيه نتائج مطابقة للبحث." data-en="No matching results.">ما فيه نتائج مطابقة للبحث.</p>';
+
+  countEl.textContent=`${people.length} عضو هيئة أكاديمية`;
+  countEl.setAttribute("data-ar",`${people.length} عضو هيئة أكاديمية`);
+  countEl.setAttribute("data-en",`${people.length} faculty members`);
+
+  wrap.querySelectorAll(".fd-head").forEach(btn=>btn.addEventListener("click",()=>{
+    const g=btn.parentElement,open=g.classList.toggle("open");
+    btn.setAttribute("aria-expanded",open?"true":"false");
+  }));
+
+  const search=document.getElementById("fdSearch");
+  const syncPh=()=>{search.placeholder=(localStorage.getItem("bscku_lang")||"ar")==="en"?search.dataset.enPh:search.dataset.arPh};
+  syncPh();
+  document.getElementById("langBtn")?.addEventListener("click",()=>setTimeout(syncPh,0));
+  search.addEventListener("input",()=>{
+    const q=search.value.trim().toLowerCase();
+    let hits=0;
+    wrap.querySelectorAll(".fd-group").forEach(g=>{
+      let shown=0;
+      g.querySelectorAll(".fd-row").forEach(row=>{
+        const match=!q||row.dataset.search.includes(q);
+        row.style.display=match?"":"none";
+        if(match)shown++;
+      });
+      hits+=shown;
+      g.style.display=shown?"":"none";
+      if(q)g.classList.toggle("open",shown>0);else g.classList.remove("open");
+      g.querySelector(".fd-head").setAttribute("aria-expanded",g.classList.contains("open")?"true":"false");
+    });
+    document.getElementById("fdNoResult").style.display=q&&!hits?"block":"none";
+  });
+
+  if(window.reapplyLang)window.reapplyLang();
 })();
 </script>
 

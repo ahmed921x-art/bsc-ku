@@ -37,6 +37,11 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+    // الهيئة الأكاديمية للقسم — تُعرض في صفحة المرشدون.
+    match /faculty/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
     match /announcements/{id} {
       allow read: if true;
       allow write: if isAdmin();
