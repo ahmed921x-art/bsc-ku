@@ -20,7 +20,8 @@ const PAGES = [
 
 // ملفات لازمة ما تنذكر داخل وسوم src/href (تنجلب ديناميكياً أو من manifest).
 // logo-light.png يبدّله theme.js عند الوضع الفاتح، فما يظهر في فحص الوسوم.
-const EXTRA_ASSETS = ['manifest.json', 'sw.js', 'favicon-192.png', 'logo-light.png'];
+// faculty-seed.js تنستدعى بـ import من داخل سكربت advisors.html، فما يلقطها ASSET_RE
+const EXTRA_ASSETS = ['manifest.json', 'sw.js', 'favicon-192.png', 'logo-light.png', 'faculty-seed.js'];
 
 const ASSET_RE = /(?:src|href)="([A-Za-z0-9_\-./]+\.(?:js|css|png|jpg|jpeg|webp|svg|json))"/g;
 
