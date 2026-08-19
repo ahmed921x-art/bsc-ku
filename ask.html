@@ -78,6 +78,27 @@ a{color:inherit;text-decoration:none}
 .qp-btn{padding:.4rem .9rem;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:999px;font-size:.78rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .25s;font-family:'Tajawal',sans-serif}
 .qp-btn:hover{color:#fff;background:rgba(99,102,241,.2);border-color:rgba(99,102,241,.4)}
 .ai-status{font-size:.75rem;color:var(--muted);padding:.6rem 1.5rem;background:rgba(16,185,129,.06);border-bottom:1px solid rgba(16,185,129,.12);text-align:center}
+/* اسأل النادي مباشرة (رد بشري) */
+.human-wrap{margin-top:1.25rem;background:rgba(22,22,22,.75);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.human-head{display:flex;align-items:center;gap:.9rem;padding:1.1rem 1.5rem;cursor:pointer;user-select:none}
+.human-ico{font-size:1.3rem}
+.human-txt{flex:1;min-width:0}
+.human-txt b{display:block;font-size:.92rem;color:var(--text)}
+.human-txt span{font-size:.78rem;color:var(--muted)}
+.human-chev{font-size:1.3rem;color:var(--muted);transition:transform .25s;flex-shrink:0}
+.human-wrap.open .human-chev{transform:rotate(90deg)}
+.human-body{padding:0 1.5rem 1.5rem}
+.human-body textarea,.human-body input{width:100%;padding:.8rem 1rem;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.88rem;outline:none;transition:border-color .25s;margin-bottom:.7rem;resize:vertical}
+.human-body textarea{min-height:80px}
+.human-body textarea:focus,.human-body input:focus{border-color:rgba(99,102,241,.5)}
+.human-body textarea::placeholder,.human-body input::placeholder{color:var(--muted)}
+.human-row{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap}
+.human-msg{font-size:.8rem;font-weight:700}
+.human-msg.ok{color:#6ee7b7}
+.human-msg.err{color:#f87171}
+[data-theme="light"] .human-wrap{background:#fff!important;border-color:rgba(99,102,241,.15)!important}
+[data-theme="light"] .human-txt b{color:#161616!important}
+[data-theme="light"] .human-body textarea,[data-theme="light"] .human-body input{background:#f8fafc!important;border-color:rgba(99,102,241,.2)!important;color:#161616!important}
 .footer{position:relative;z-index:2;margin:2rem 6% 0;padding:2rem 2.5rem;background:rgba(22,22,22,.6);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:28px 28px 0 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.25rem}
 .footer-brand{display:flex;align-items:center;gap:.75rem}
 .footer-brand img{height:36px;mix-blend-mode:screen;filter:brightness(1.1)drop-shadow(0 0 8px rgba(99,102,241,.4))}
@@ -395,7 +416,7 @@ a{color:inherit;text-decoration:none}
 <div class="page-hero">
   <div class="page-badge" data-ar="المساعد الذكي" data-en="AI Assistant">المساعد الذكي</div>
   <h1 data-ar="اسأل النادي" data-en="Ask the Club">اسأل النادي</h1>
-  <p data-ar="اسأل عن النوتات، الأنشطة، المرشدين الأكاديميين، أو أي شي يخص النادي" data-en="Ask about notes, activities, academic advisors, or anything related to the club">اسأل عن النوتات، الأنشطة، المرشدين الأكاديميين، أو أي شي يخص النادي</p>
+  <p data-ar="اسأل عن النوتات، الأنشطة، المسبقات، أو أي معلومة موجودة بالموقع — ملاحظة: بايو ما يبني لك جدول ولا يقترح مواد، هذا شغل مرشدك الأكاديمي" data-en="Ask about notes, activities, prerequisites, or anything found on the site — note: Bio doesn't build schedules or suggest courses, that's your academic advisor's job">اسأل عن النوتات، الأنشطة، المسبقات، أو أي معلومة موجودة بالموقع — ملاحظة: بايو ما يبني لك جدول ولا يقترح مواد، هذا شغل مرشدك الأكاديمي</p>
 </div>
 
 <main class="main-content">
@@ -403,15 +424,34 @@ a{color:inherit;text-decoration:none}
     <div class="ai-status" id="aiStatus" data-ar="🤖 جاري تحميل قاعدة المعرفة..." data-en="🤖 Loading knowledge base...">🤖 جاري تحميل قاعدة المعرفة...</div>
     <div class="chat-header">
       <div class="chat-avatar">🤖</div>
-      <div><h3 data-ar="مساعد BSC KU" data-en="BSC KU Assistant">مساعد BSC KU</h3><p data-ar="اسألني عن أي شي يخص النادي" data-en="Ask me anything about the club">اسألني عن أي شي يخص النادي</p></div>
+      <div><h3 data-ar="مساعد BSC KU" data-en="BSC KU Assistant">مساعد BSC KU</h3><p data-ar="معلومات الموقع والمسبقات — مو مرشد جداول" data-en="Site info & prerequisites — not a schedule advisor">معلومات الموقع والمسبقات — مو مرشد جداول</p></div>
     </div>
     <div class="chat-box" id="chatBox">
-      <div class="msg bot">أهلاً! أنا <strong>بايو</strong> 🧬 مساعدك الذكي في نادي العلوم البيولوجية. اسألني عن النوتات، الأنشطة، المرشدين، التخصصات، أو أي شي يخص النادي والدراسة!</div>
+      <div class="msg bot">أهلاً! أنا <strong>بايو</strong> 🧬 مساعدك الذكي في نادي العلوم البيولوجية. اسألني عن النوتات، الأنشطة، المرشدين، التخصصات، أو مسبقات أي مادة!<br><br>⚠️ بايو ما يبني جداول دراسية ولا يقترح مواد تسجّلها — لهذا النوع من الأسئلة لازم موعد مع مرشدك الأكاديمي، وتقدر تحجزه من صفحة المرشدين.</div>
     </div>
     <form class="chat-form" id="chatForm" onsubmit="return false;">
       <input class="chat-input" id="chatInput" type="text" placeholder="اكتب سؤالك هنا..." autocomplete="off">
       <button class="send-btn" type="submit" data-ar="إرسال ←" data-en="Send →">إرسال ←</button>
     </form>
+  </div>
+
+  <div class="human-wrap" id="humanWrap">
+    <div class="human-head" id="humanToggle">
+      <span class="human-ico">🙋</span>
+      <div class="human-txt">
+        <b data-ar="تبي جواب من فريق النادي شخصياً؟" data-en="Want a personal reply from the club team?">تبي جواب من فريق النادي شخصياً؟</b>
+        <span data-ar="اكتب سؤالك ووسيلة تواصلك — يردّون عليك من عندهم" data-en="Write your question and how to reach you — the team replies directly">اكتب سؤالك ووسيلة تواصلك — يردّون عليك من عندهم</span>
+      </div>
+      <span class="human-chev">›</span>
+    </div>
+    <div class="human-body" id="humanBody" hidden>
+      <textarea id="humanQ" maxlength="500" placeholder="اكتب سؤالك بالتفصيل..."></textarea>
+      <input id="humanContact" maxlength="80" placeholder="إيميلك أو رقمك أو إنستقرامك — نحتاجه عشان نرد عليك" autocomplete="off">
+      <div class="human-row">
+        <button class="send-btn" type="button" id="humanSend">إرسال للنادي 🙋</button>
+        <span class="human-msg" id="humanMsg"></span>
+      </div>
+    </div>
   </div>
 </main>
 
@@ -544,7 +584,9 @@ const MAJOR_SHEETS={
     {code:"ح ب 435",nameAr:"الكيمياء الإكلينيكية",hours:3,type:"major",prereqs:["ح ب 415"]},
   ]
 };
+const $=id=>document.getElementById(id);
 let notes=[],events=[],advisors=[],aiKnowledge=[],majorResources=[];
+let lastQuestion="";
 const conversationHistory = []; // remember chat context
 async function get(col){try{const s=await getDocs(query(collection(db,col),orderBy("createdAt","desc")));return s.docs.map(d=>({id:d.id,...d.data()}))}catch{try{const s=await getDocs(collection(db,col));return s.docs.map(d=>({id:d.id,...d.data()}))}catch{return[]}}}
 function norm(v){return(v||"").toString().toLowerCase().replace(/[إأآا]/g,"ا").replace(/[ة]/g,"ه").replace(/[ىي]/g,"ي").replace(/[ؤئ]/g,"ء").replace(/[ًٌٍَُِّْ]/g,"").trim()}
@@ -567,6 +609,7 @@ function addMsg(role,text){
       .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
       .replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>")
       .replace(/\*(.*?)\*/g,"<em>$1</em>")
+      .replace(/\[(.*?)\]\((.*?)\)/g,'<a href="$2" style="color:#a5b4fc;text-decoration:underline">$1</a>')
       .replace(/^[-•]\s(.+)$/gm,"<li>$1</li>")
       .replace(/(<li>.*<\/li>)/gs,"<ul>$1</ul>")
       .replace(/\n/g,"<br>");
@@ -596,9 +639,29 @@ function buildKB(){
   });
   return base.filter(x=>x.answer.trim());
 }
+// أسئلة الجدول الدراسي والمواد المقترحة نحيلها للمرشد الأكاديمي دايماً —
+// ما نجاوب عليها لا بالمعرفة المحلية ولا بالذكاء الاصطناعي، بدون استثناء.
+// نستخدم جذور الكلمات بدل عبارات ثابتة عشان نغطي أشكال الصياغة المختلفة
+// ("اسجلها"، "تسجيل"، "أسجل" كلها تحتوي جذر "سجل" مثلاً) — عبارات ثابتة
+// جربناها فشلت مع صياغات طبيعية زي "شنو المواد اللي أسجلها الفصل الجاي؟".
+function isScheduleQuestion(question){
+  const q=norm(question);
+  // استثناءات واضحة: جدول الفعاليات وجدول الاختبارات مواضيع ثانية تماماً
+  if(/جدول\s*(ال)?(فعاليات|انشطه|احداث)/.test(q)) return false;
+  if(/جدول\s*(ال)?(اختبار|امتحان)/.test(q)) return false;
+  if(q.includes("جدول")) return true; // جدولي، جدول الحصص، رتب لي جدول...
+  const hasCourseWord=q.includes("ماده")||q.includes("مواد");
+  const hasRegisterRoot=q.includes("سجل");   // سجل، اسجل، أسجل، تسجيل، سجلها، اسجلها...
+  const hasSuggestRoot=q.includes("قترح")||q.includes("رشح")||q.includes("نصح"); // مقترح، اقترح، ترشيح، تنصح
+  if(hasCourseWord&&(hasRegisterRoot||hasSuggestRoot)) return true;
+  if(q.includes("خطه")&&q.includes("دراس")) return true; // خطتي الدراسية، خطة دراسي
+  return false;
+}
+const SCHEDULE_REDIRECT="أسئلة الجدول الدراسي والمواد المقترحة تحتاج مراجعة شخصية مع مرشدك الأكاديمي، عشان الإجابة تناسب وضعك بالضبط (مواد سبق رسّبتها، خطتك، وغيرها). احجز موعد من [صفحة المرشدين الأكاديميين](advisors.html) 🎓";
 function answer(question){
   const q=norm(question);
   if(!q)return"اكتب سؤالك عشان أقدر أساعدك.";
+  if(isScheduleQuestion(question))return SCHEDULE_REDIRECT;
   const base=buildKB();
   const words=q.split(/\s+/).filter(w=>w.length>2);
   const scored=base.map(item=>{const h=norm(`${item.title} ${item.answer} ${item.keywords}`);let s=0;words.forEach(w=>{if(h.includes(w))s+=Math.min(w.length+2,12)});if(h.includes(q))s+=35;return{item,s}}).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
@@ -617,6 +680,16 @@ function answer(question){
   async function handleSend(){
     const q=inp.value.trim();if(!q)return;
     inp.value="";inp.focus();addMsg("user",q);
+    lastQuestion=q;
+    if($("humanQ")&&!$("humanQ").value) $("humanQ").value=q;
+
+    // بوابة صارمة: أسئلة الجدول والمواد المقترحة ما تروح للذكاء الاصطناعي إطلاقاً —
+    // نجاوب مباشرة بإحالتها للمرشد الأكاديمي، بدون الاعتماد على تعليمات الموديل.
+    if(isScheduleQuestion(q)){
+      addMsg("bot",SCHEDULE_REDIRECT);
+      try{await addDoc(collection(db,"aiChats"),{question:q,answer:SCHEDULE_REDIRECT,createdAt:serverTimestamp()})}catch{}
+      return;
+    }
     // Show typing indicator
     const typing=document.createElement("div");
     typing.className="msg bot";typing.id="typing";typing.textContent="...";
@@ -639,6 +712,11 @@ ${kb}
 ════════════════════════════════════════
 
 قواعد الإجابة (اتبعها دائماً بدون استثناء):
+
+0. أهم قاعدة — لا استثناء لها أبداً: إذا كان السؤال عن الجدول الدراسي (توزيع المحاضرات، الأيام، الأوقات) أو عن المواد المقترحة/التي يسجّلها الطالب هذا الفصل:
+   → لا تجاوب على السؤال إطلاقاً مهما كانت المعلومات متوفرة عندك.
+   → قل له بالضبط: "${SCHEDULE_REDIRECT.replace(/"/g,'\\"')}"
+   → هذا القرار يحتاج مراجعة شخصية مع المرشد الأكاديمي، مو إجابة عامة.
 
 1. إذا السؤال عن النادي أو الجامعة أو التخصصات أو الأنشطة أو النوتات أو المرشدين:
    → استخدم المعلومات الموجودة أعلاه حصراً، ولا تخترع معلومات غير موجودة.
@@ -682,6 +760,40 @@ ${kb}
   inp.addEventListener("keydown", e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); handleSend(); } });
   document.querySelectorAll("[data-prompt]").forEach(b=>{
     b.addEventListener("click",()=>{inp.value=b.dataset.prompt; handleSend();});
+  });
+
+  /* ── اسأل النادي مباشرة (رد بشري) ── */
+  $("humanToggle").addEventListener("click",()=>{
+    const body=$("humanBody"), wrap=$("humanWrap");
+    const open=body.hidden;
+    body.hidden=!open; wrap.classList.toggle("open",open);
+    if(open){
+      if(!$("humanQ").value&&lastQuestion) $("humanQ").value=lastQuestion;
+      $("humanQ").focus();
+    }
+  });
+  $("humanSend").addEventListener("click",async()=>{
+    const question=$("humanQ").value.trim(), contact=$("humanContact").value.trim();
+    const m=$("humanMsg");
+    m.className="human-msg"; m.textContent="";
+    if(question.length<5){ m.className="human-msg err"; m.textContent="اكتب سؤالك بشكل أوضح."; return; }
+    if(!contact){ m.className="human-msg err"; m.textContent="لازم تحط وسيلة تواصل عشان نقدر نرد عليك."; return; }
+    // حد بسيط ضد التكرار: إرسال واحد كل دقيقة
+    const last=+localStorage.getItem("bscku_hq_last")||0;
+    if(Date.now()-last<60000){ m.className="human-msg err"; m.textContent="استنى دقيقة قبل ما ترسل سؤال ثاني."; return; }
+    const btn=$("humanSend"); btn.disabled=true;
+    try{
+      await addDoc(collection(db,"humanQuestions"),{question,contact,status:"pending",createdAt:serverTimestamp()});
+      localStorage.setItem("bscku_hq_last",Date.now());
+      m.className="human-msg ok"; m.textContent="وصل سؤالك ✅ — فريق النادي بيتواصل وياك قريب.";
+      $("humanQ").value=""; $("humanContact").value="";
+    }catch(e){
+      m.className="human-msg err";
+      m.textContent=e&&e.code==="permission-denied"
+        ? "الصلاحيات مو مضبوطة على السيرفر. بلّغ إدارة النادي — القواعد تحتاج نشر."
+        : "صار خطأ أثناء الإرسال. حاول مرة ثانية.";
+    }
+    btn.disabled=false;
   });
 })();
 </script>

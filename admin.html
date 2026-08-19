@@ -460,6 +460,7 @@ a{color:inherit;text-decoration:none}
       <div class="sidebar-label">الذكاء الاصطناعي</div>
       <button class="nav-item" data-panel="aiknowledge"><span class="ni">🤖</span>معرفة المساعد</button>
       <button class="nav-item" data-panel="aichats"><span class="ni">💬</span>أسئلة الطلبة</button>
+      <button class="nav-item" data-panel="humanq"><span class="ni">🙋</span>أسئلة تحتاج ردّ <span id="humanQNavBadge" style="display:none;margin-inline-start:auto;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;padding:.1rem .45rem;border-radius:99px"></span></button>
       <button class="nav-item" data-panel="suggestions"><span class="ni">💡</span>اقتراحات المواد</button>
       <div class="sidebar-label">بيانات الطلبة</div>
       <button class="nav-item" data-panel="gpadata"><span class="ni">🧮</span>معدلات الطلبة <span id="gpaNavBadge" style="display:none;margin-inline-start:auto;background:#6366f1;color:#fff;font-size:.7rem;font-weight:800;padding:.1rem .45rem;border-radius:99px"></span></button>
@@ -1317,6 +1318,12 @@ a{color:inherit;text-decoration:none}
         <div class="items-list" id="aiChatsList"></div>
       </div>
 
+      <!-- HUMAN-ANSWERED QUESTIONS -->
+      <div class="panel" id="panel-humanq">
+        <div class="panel-header"><h2>🙋 أسئلة تحتاج ردّ</h2><p>طلبة طلبوا رد من فريق النادي مباشرة بدل بايو — رد عليهم من وسيلة التواصل اللي كتبوها، وبعدين علّمها «تم الرد».</p></div>
+        <div class="items-list" id="humanQList"></div>
+      </div>
+
       <!-- GPA DATA -->
       <div class="panel" id="panel-gpadata">
         <div class="panel-header"><h2>🧮 معدلات الطلبة</h2>
@@ -1356,6 +1363,7 @@ a{color:inherit;text-decoration:none}
             <option value="videoComments">🗨️ تعليقات الشروحات</option>
             <option value="noteSubmissions">📬 نوتات مرسلة</option>
             <option value="memberships">📝 طلبات عضوية</option>
+            <option value="humanQuestions">🙋 أسئلة تحتاج رد</option>
             <option value="suggestions">💡 اقتراحات مواد</option>
             <option value="gpaData">🧮 بيانات معدلات</option>
           </select>
@@ -1806,6 +1814,41 @@ document.getElementById("memFilter")?.addEventListener("change",renderMemList);
 document.getElementById("memExport")?.addEventListener("click",memCsv);
 document.getElementById("memRefresh")?.addEventListener("click",()=>loadAll());
 document.querySelectorAll('.nav-item[data-panel="members"]').forEach(b=>b.addEventListener("click",loadMemConfig));
+
+// ───────── أسئلة تحتاج ردّ بشري (humanQuestions) ─────────
+// طالب يطلب رد شخصي من فريق النادي بدل بايو — الرد يصير خارج الموقع
+// (واتساب/إيميل/إنستقرام حسب وسيلة التواصل اللي كتبها)، وهذا البانل بس
+// للتتبع: شفتها، رديت عليها، علّمها.
+const HQ_STATUS={pending:['⏳ بانتظار الرد','#f59e0b'],answered:['✅ تم الرد','#10b981']};
+let _humanQCache={};
+function renderHumanQuestions(items){
+  _humanQCache=Object.fromEntries(items.map(h=>[h.id,h]));
+  const pending=items.filter(h=>(h.status||"pending")==="pending");
+  const badge=document.getElementById("humanQNavBadge");
+  if(badge){badge.textContent=pending.length;badge.style.display=pending.length?"inline-block":"none";}
+  const el=document.getElementById("humanQList");if(!el)return;
+  if(!items.length){el.innerHTML='<p style="color:var(--muted);padding:1rem">ما فيه أسئلة تحتاج ردّ بشري حالياً.</p>';return;}
+  const ordered=[...items].sort((a,b)=>((a.status||"pending")==="pending"?0:1)-((b.status||"pending")==="pending"?0:1));
+  el.innerHTML=ordered.map(h=>{
+    const st=h.status||"pending";const[label,color]=HQ_STATUS[st]||HQ_STATUS.pending;
+    return `<div class="list-item" style="border-inline-start:3px solid ${color}">
+      <div class="list-item-body">
+        <h4>${escSub(h.contact)||"بدون تواصل"} <span style="font-size:.72rem;font-weight:800;color:${color}">${label}</span></h4>
+        <p style="line-height:1.75">${escSub(h.question)||""}</p>
+      </div>
+      <div class="list-item-actions" style="flex-wrap:wrap">
+        ${st==="pending"?`<button class="btn btn-sm" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);color:#6ee7b7" onclick="hqDone_('${h.id}')">✅ تم الرد</button>`:""}
+        <button class="btn btn-danger btn-sm" onclick="delItem_('humanQuestions','${h.id}')">حذف</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+window.hqDone_=async id=>{
+  await setDoc(doc(db,"humanQuestions",id),{status:"answered",repliedAt:serverTimestamp()},{merge:true});
+  loadAll();
+};
+
+// تقييمات المواد (courseRatings): عرض + قبول/رفض
 
 // تقييمات المواد (courseRatings): عرض + قبول/رفض
 let _ratingsCache={};
@@ -2938,11 +2981,11 @@ document.addEventListener("click",e=>{
 // LOAD ALL
 async function loadAll(){
   try{
-    const[notes,events,advisors,committee,ann,resources,ai,chats,news,suggestions,scheds,subs,ratings,vids,vcs,members,faculty]=await Promise.all([
+    const[notes,events,advisors,committee,ann,resources,ai,chats,news,suggestions,scheds,subs,ratings,vids,vcs,members,faculty,humanQs]=await Promise.all([
       getItems("notes"),getItems("events"),getItems("advisors"),getItems("scheduleCommittee"),getItems("announcements"),
       getItems("majorResources"),getItems("aiKnowledge"),getItems("aiChats"),getItems("news"),getItems("suggestions"),
       getItems("schedules"),getItems("noteSubmissions"),getItems("courseRatings"),getItems("courseVideos"),getItems("videoComments"),
-      getItems("memberships"),getItems("faculty")
+      getItems("memberships"),getItems("faculty"),getItems("humanQuestions")
     ]);
     // stats
     document.getElementById("ds-notes").textContent=notes.length;
@@ -2967,6 +3010,7 @@ async function loadAll(){
     renderItems("notesList",notes,["title","course","term"],"notes");
     renderSubmissions(subs);
     renderMemberships(members);
+    renderHumanQuestions(humanQs);
     renderRatings(ratings);
     renderVideos(vids);
     renderVComments(vcs,vids);
@@ -4152,6 +4196,8 @@ window.gcSave=async function(){
     {col:"memberships",    ico:"📝", label:"طلب عضوية",       panel:"members",
       title:d=>d.fullName||"طلب عضوية",
       body:d=>[d.major||"",d.committee||""].filter(Boolean).join(" · ")},
+    {col:"humanQuestions", ico:"🙋", label:"سؤال يحتاج رد",   panel:"humanq",
+      title:d=>d.contact||"سؤال يحتاج رد", body:d=>d.question||""},
     {col:"suggestions",    ico:"💡", label:"اقتراح مادة",     panel:"suggestions",
       title:d=>`${d.code||""} ${d.nameAr||""}`.trim()||"اقتراح",
       body:d=>`${d.major||""}${d.notes?" · "+d.notes:""}`},

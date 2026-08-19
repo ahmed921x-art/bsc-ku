@@ -97,6 +97,14 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // Questions a visitor wants a human (not the AI) to answer, from
+    // ask.html. Reply happens off-site via the contact info they give, so
+    // this is create-only for visitors — same shape as suggestions above.
+    match /humanQuestions/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
     // Visitor note uploads, pending admin review.
     match /noteSubmissions/{id} {
       allow create: if true;
