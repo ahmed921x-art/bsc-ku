@@ -1233,14 +1233,14 @@ a{color:inherit;text-decoration:none}
             <div id="importLog" style="font-size:.78rem;color:var(--muted);max-height:140px;overflow-y:auto;line-height:1.8"></div>
           </div>
           <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
-            <button class="btn btn-primary" id="importMembersBtn" id="importMembersBtn2" style="background:linear-gradient(135deg,#10b981,#059669);border:none">
+            <button class="btn btn-primary" id="importMembersBtn" style="background:linear-gradient(135deg,#10b981,#059669);border:none">
               ⬆️ استيراد الـ 26 عضو
             </button>
             <span id="importStatus" style="font-size:.82rem;color:var(--muted)"></span>
           </div>
         </div>
 
-        <div class="items-list" id="membersList"></div>
+        <div class="items-list" id="teamMembersList"></div>
       </div>
 
       <!-- RESOURCES -->
@@ -3443,7 +3443,7 @@ window.gcSave=async function(){
 (function(){
   async function loadMembers(){
     const members = await getItems('teamMembers').catch(()=>[]);
-    const list = document.getElementById('membersList');
+    const list = document.getElementById('teamMembersList');
     if(!list) return;
     if(!members.length){ list.innerHTML='<p style="color:var(--muted);padding:1rem">لا يوجد أعضاء بعد.</p>'; return; }
     // Sort by order
@@ -4308,6 +4308,7 @@ function toggleMobileMenu(){
 // ── Navbar shrink on scroll ──
 const navbar=document.getElementById('navbar');
 window.addEventListener('scroll',()=>{
+  if(!navbar) return;
   navbar.style.height=window.scrollY>60?'56px':'64px';
   navbar.style.background=window.scrollY>60
     ?(document.documentElement.getAttribute('data-theme')==='light'?'rgba(255,255,255,.98)':'rgba(8,12,20,.97)')
@@ -4340,7 +4341,8 @@ function toggleLang(){
 function applyLang(lang){
   document.documentElement.setAttribute('lang', lang==='ar'?'ar':'en');
   document.documentElement.setAttribute('dir', lang==='ar'?'rtl':'ltr');
-  document.getElementById('langLabel').textContent = lang==='ar'?'EN':'AR';
+  const langLabel=document.getElementById('langLabel');
+  if(langLabel) langLabel.textContent = lang==='ar'?'EN':'AR';
   // Update all elements with data-ar / data-en attributes
   document.querySelectorAll('[data-ar]').forEach(el=>{
     const txt = lang==='ar' ? el.dataset.ar : el.dataset.en;
