@@ -83,6 +83,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // DNA command center. Member names, internal roles, notes and performance
+    // evaluations are private administrative data and never public-readable.
+    match /clubMembers/{id} {
+      allow read, write: if isAdmin();
+    }
+    match /eventEvaluations/{id} {
+      allow read, write: if isAdmin();
+    }
+
     // User-generated content (no login required to create).
 
     // AI chat log: anyone can add, admin reads/deletes.

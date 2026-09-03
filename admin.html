@@ -388,6 +388,45 @@ a{color:inherit;text-decoration:none}
     }
     [data-theme="light"] #themeToggle:hover { background:#e8eeff; color:#4f46e5; }
 
+    /* DNA command center — private admin tools */
+    .cc-hero {
+      position:relative;overflow:hidden;padding:1.35rem 1.5rem;
+      background:linear-gradient(135deg,rgba(99,102,241,.18),rgba(16,185,129,.08));
+      border:1px solid rgba(129,140,248,.28);border-radius:18px;margin-bottom:1rem;
+    }
+    .cc-hero::after { content:"🧬";position:absolute;left:1.1rem;top:50%;transform:translateY(-50%);font-size:4.5rem;opacity:.1; }
+    .cc-hero h3 { margin:0 0 .35rem;color:#c7d2fe;font-size:1.08rem; }
+    .cc-hero p { margin:0;color:var(--muted);font-size:.84rem;line-height:1.75;max-width:720px; }
+    .cc-toolbar { display:flex;gap:.65rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem; }
+    .cc-toolbar input,.cc-toolbar select { min-width:180px;flex:1; }
+    .cc-table-wrap { width:100%;overflow-x:auto;border:1px solid var(--border);border-radius:14px; }
+    .cc-table { width:100%;border-collapse:collapse;min-width:760px;background:rgba(255,255,255,.015); }
+    .cc-table th,.cc-table td { padding:.82rem .75rem;text-align:right;border-bottom:1px solid var(--border);font-size:.82rem;vertical-align:middle; }
+    .cc-table th { color:#a5b4fc;background:rgba(99,102,241,.08);font-size:.74rem;white-space:nowrap; }
+    .cc-table tbody tr:last-child td { border-bottom:0; }
+    .cc-table tbody tr:hover { background:rgba(99,102,241,.045); }
+    .cc-score { display:inline-flex;align-items:center;justify-content:center;min-width:54px;padding:.28rem .55rem;border-radius:999px;font-weight:900;direction:ltr; }
+    .cc-score.good { background:rgba(16,185,129,.14);color:#6ee7b7; }
+    .cc-score.mid { background:rgba(245,158,11,.14);color:#fcd34d; }
+    .cc-score.low { background:rgba(239,68,68,.14);color:#fca5a5; }
+    .cc-rating-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.85rem 1.25rem;margin-top:.75rem; }
+    .cc-rating { padding:.8rem;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.02); }
+    .cc-rating-head { display:flex;justify-content:space-between;gap:1rem;margin-bottom:.45rem;font-size:.8rem;font-weight:700; }
+    .cc-rating output { color:#a5b4fc;font-weight:900;direction:ltr; }
+    .cc-rating input[type="range"] { width:100%;accent-color:#6366f1; }
+    .cc-score-preview { display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:118px;border-radius:16px;background:linear-gradient(135deg,rgba(99,102,241,.16),rgba(16,185,129,.09));border:1px solid rgba(129,140,248,.25); }
+    .cc-score-preview strong { font-size:2rem;color:#c7d2fe;direction:ltr; }
+    .cc-score-preview span { font-size:.75rem;color:var(--muted); }
+    .cc-dna-shell { display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:1rem; }
+    .cc-dna-output { min-height:190px;padding:1.15rem;border:1px solid rgba(129,140,248,.25);border-radius:14px;background:rgba(10,15,30,.55);white-space:pre-wrap;line-height:1.9;font-size:.9rem; }
+    .cc-quick { display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0; }
+    .cc-quick button { border:1px solid rgba(129,140,248,.25);background:rgba(99,102,241,.09);color:#c7d2fe;border-radius:999px;padding:.45rem .72rem;font:inherit;font-size:.76rem;cursor:pointer; }
+    .cc-empty { color:var(--muted);text-align:center;padding:1.25rem; }
+    .cc-status { min-height:1.3em;margin-top:.7rem;font-size:.82rem;color:#a5b4fc; }
+    [data-theme="light"] .cc-hero,[data-theme="light"] .cc-score-preview { background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(16,185,129,.06)); }
+    [data-theme="light"] .cc-dna-output { background:#f8fafc; }
+    @media(max-width:760px){ .cc-rating-grid,.cc-dna-shell{grid-template-columns:1fr}.cc-dna-shell>aside{order:-1}.cc-hero::after{display:none} }
+
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap" rel="stylesheet">
 
@@ -423,7 +462,7 @@ a{color:inherit;text-decoration:none}
   <header class="admin-header">
     <div class="admin-brand">
       <img src="logo.png" alt="BSC KU">
-      <strong>BSC KU Admin</strong>
+      <strong>BSC KU Admin · DNA</strong>
     </div>
     <div class="header-actions">
       <span class="status-text" id="userEmail"></span>
@@ -457,6 +496,10 @@ a{color:inherit;text-decoration:none}
       <button class="nav-item" data-panel="faculty"><span class="ni">🏛️</span>الهيئة الأكاديمية</button>
       <button class="nav-item" data-panel="resources"><span class="ni">📁</span>ملفات التخصصات</button>
       <button class="nav-item" data-panel="team"><span class="ni">👥</span>عائلة النادي</button>
+      <div class="sidebar-label">مركز القيادة DNA</div>
+      <button class="nav-item" data-panel="clubmembers"><span class="ni">👤</span>أعضاء النادي</button>
+      <button class="nav-item" data-panel="eventevals"><span class="ni">⭐</span>تقييم الفعاليات</button>
+      <button class="nav-item" data-panel="dnacenter"><span class="ni">🧬</span>مساعد DNA</button>
       <div class="sidebar-label">الذكاء الاصطناعي</div>
       <button class="nav-item" data-panel="aiknowledge"><span class="ni">🤖</span>معرفة المساعد</button>
       <button class="nav-item" data-panel="aichats"><span class="ni">💬</span>أسئلة الطلبة</button>
@@ -493,6 +536,8 @@ a{color:inherit;text-decoration:none}
             <button class="btn btn-primary" onclick="goPanel('notes')">+ نوتة</button>
             <button class="btn btn-green" onclick="goPanel('news')">+ خبر</button>
             <button class="btn btn-gold" onclick="goPanel('announcements')">+ إعلان</button>
+            <button class="btn btn-primary" onclick="goPanel('clubmembers')">👤 أعضاء النادي</button>
+            <button class="btn btn-green" onclick="goPanel('eventevals')">⭐ تقييم فعالية</button>
             <button class="btn btn-ghost" onclick="goPanel('majorsheet')">تعديل الميجرشيت</button>
             <button class="btn btn-ghost" onclick="goPanel('schedules')">+ جدول مقترح</button>
           </div>
@@ -1298,6 +1343,113 @@ a{color:inherit;text-decoration:none}
         <div class="items-list" id="resourcesList"></div>
       </div>
 
+      <!-- DNA COMMAND CENTER: CLUB MEMBERS -->
+      <div class="panel" id="panel-clubmembers">
+        <div class="panel-header"><h2>👤 أعضاء النادي</h2><p>سجل داخلي خاص بالأدمن — الأسماء والتقييمات ما تظهر لزوار الموقع.</p></div>
+        <div class="cc-hero">
+          <h3>🧬 مركز القيادة DNA</h3>
+          <p>أضف أعضاء النادي، رتّبهم حسب اللجنة والدور، وتابع متوسط أدائهم المبني على تقييمات الفعاليات.</p>
+        </div>
+        <div class="stats-row" id="ccMemberStats"></div>
+        <div class="card">
+          <h3>➕ إضافة أعضاء</h3>
+          <div class="form-grid">
+            <div class="form-group form-full"><label>أسماء الأعضاء</label><textarea id="ccMemberNames" rows="4" placeholder="اكتب كل اسم في سطر مستقل&#10;أحمد محمد&#10;فاطمة عبدالله"></textarea></div>
+            <div class="form-group"><label>اللجنة</label>
+              <select id="ccMemberCommittee">
+                <option value="عام">عام</option><option value="اللجنة العلمية">اللجنة العلمية</option><option value="لجنة الأنشطة">لجنة الأنشطة</option>
+                <option value="لجنة الإعلام">لجنة الإعلام</option><option value="لجنة التصميم">لجنة التصميم</option><option value="لجنة العلاقات العامة">لجنة العلاقات العامة</option>
+                <option value="لجنة التنظيم">لجنة التنظيم</option><option value="لجنة التطوع">لجنة التطوع</option>
+              </select>
+            </div>
+            <div class="form-group"><label>الدور</label>
+              <select id="ccMemberRole"><option value="عضو">عضو</option><option value="قائد لجنة">قائد لجنة</option><option value="نائب قائد">نائب قائد</option><option value="نائب الرئيس">نائب الرئيس</option><option value="رئيس النادي">رئيس النادي</option></select>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="ccAddMembers">حفظ الأعضاء</button>
+            <button class="btn btn-green" id="ccImportApproved">استيراد المقبولين من طلبات العضوية</button>
+          </div>
+          <div class="cc-status" id="ccMemberStatus"></div>
+        </div>
+        <div class="card">
+          <div class="cc-toolbar">
+            <input id="ccMemberSearch" placeholder="🔍 ابحث بالاسم أو اللجنة أو الدور…" autocomplete="off">
+            <select id="ccMemberFilter"><option value="">كل اللجان</option></select>
+            <button class="btn btn-sm" id="ccMembersExport">⬇️ تصدير CSV</button>
+            <button class="btn btn-sm" id="ccMembersRefresh">🔄 تحديث</button>
+          </div>
+          <div class="cc-table-wrap">
+            <table class="cc-table">
+              <thead><tr><th>العضو</th><th>اللجنة</th><th>الدور</th><th>عدد التقييمات</th><th>متوسط الأداء</th><th>إدارة</th></tr></thead>
+              <tbody id="ccMembersList"><tr><td colspan="6" class="cc-empty">⏳ جاري التحميل…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- DNA COMMAND CENTER: EVENT EVALUATIONS -->
+      <div class="panel" id="panel-eventevals">
+        <div class="panel-header"><h2>⭐ تقييم الأعضاء داخل الفعاليات</h2><p>اختر الفعالية والعضو، ثم قيّم أداءه. النتيجة تحدّث ترتيب الأعضاء تلقائياً.</p></div>
+        <div class="stats-row" id="ccEvalStats"></div>
+        <div class="card">
+          <h3>تقييم جديد أو تحديث تقييم سابق</h3>
+          <div class="form-grid">
+            <div class="form-group"><label>الفعالية</label><select id="ccEvalEvent"><option value="">— اختر فعالية —</option></select></div>
+            <div class="form-group"><label>العضو</label><select id="ccEvalMember"><option value="">— اختر عضواً —</option></select></div>
+            <div class="form-group form-full">
+              <div class="cc-rating-grid">
+                <div class="cc-rating"><div class="cc-rating-head"><span>جودة التنفيذ</span><output id="ccExecutionOut">4/5</output></div><input id="ccExecution" type="range" min="1" max="5" value="4"></div>
+                <div class="cc-rating"><div class="cc-rating-head"><span>العمل الجماعي</span><output id="ccTeamworkOut">4/5</output></div><input id="ccTeamwork" type="range" min="1" max="5" value="4"></div>
+                <div class="cc-rating"><div class="cc-rating-head"><span>الالتزام</span><output id="ccReliabilityOut">4/5</output></div><input id="ccReliability" type="range" min="1" max="5" value="4"></div>
+                <div class="cc-rating"><div class="cc-rating-head"><span>المبادرة</span><output id="ccInitiativeOut">4/5</output></div><input id="ccInitiative" type="range" min="1" max="5" value="4"></div>
+              </div>
+            </div>
+            <div class="form-group form-full"><label>ملاحظة إدارية (اختياري)</label><textarea id="ccEvalNote" rows="3" placeholder="نقطة قوة أو شيء يحتاج تطوير…"></textarea></div>
+            <div class="form-group form-full"><div class="cc-score-preview"><strong id="ccScorePreview">80%</strong><span>النتيجة الإجمالية</span></div></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" id="ccSaveEval">💾 حفظ التقييم</button></div>
+          <div class="cc-status" id="ccEvalStatus"></div>
+        </div>
+        <div class="card">
+          <div class="cc-toolbar">
+            <select id="ccEvalFilter"><option value="">كل الفعاليات</option></select>
+            <input id="ccEvalSearch" placeholder="🔍 ابحث باسم عضو أو فعالية…" autocomplete="off">
+            <button class="btn btn-sm" id="ccEvalsExport">⬇️ تصدير CSV</button>
+            <button class="btn btn-sm" id="ccEvalsRefresh">🔄 تحديث</button>
+          </div>
+          <div class="cc-table-wrap">
+            <table class="cc-table">
+              <thead><tr><th>العضو</th><th>الفعالية</th><th>التنفيذ</th><th>الفريق</th><th>الالتزام</th><th>المبادرة</th><th>النتيجة</th><th>إدارة</th></tr></thead>
+              <tbody id="ccEvaluationsList"><tr><td colspan="8" class="cc-empty">⏳ جاري التحميل…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- DNA COMMAND CENTER: ASSISTANT -->
+      <div class="panel" id="panel-dnacenter">
+        <div class="panel-header"><h2>🧬 مساعد DNA</h2><p>مساعد إداري خاص يقرأ سجل الأعضاء والفعاليات والتقييمات ويعطيك ملخصاً فورياً.</p></div>
+        <div class="cc-dna-shell">
+          <section class="card">
+            <h3>اسأل DNA عن فريقك</h3>
+            <div class="cc-quick">
+              <button data-dna-question="ملخص الفريق">ملخص الفريق</button>
+              <button data-dna-question="من أفضل الأعضاء أداء؟">أفضل الأعضاء</button>
+              <button data-dna-question="من يحتاج دعماً؟">يحتاجون دعماً</button>
+              <button data-dna-question="ما الفعاليات المسجلة؟">الفعاليات</button>
+            </div>
+            <div class="cc-toolbar"><input id="ccDnaInput" placeholder="مثال: من أفضل الأعضاء أداء؟" autocomplete="off"><button class="btn btn-primary" id="ccAskDna">اسأل DNA</button></div>
+            <div class="cc-dna-output" id="ccDnaAnswer">هلا أحمد 👋 أنا DNA. أضف أعضاء وتقييمات، وبعدها اسألني عن أداء الفريق.</div>
+          </section>
+          <aside class="card">
+            <h3>نبض الفريق</h3>
+            <div class="stats-row" id="ccDnaStats"></div>
+            <p style="font-size:.75rem;color:var(--muted);line-height:1.8;margin-top:.7rem">DNA يعمل داخل صفحة الأدمن فقط، ولا يحتاج تسجيل دخول ChatGPT.</p>
+          </aside>
+        </div>
+      </div>
+
       <!-- AI KNOWLEDGE -->
       <div class="panel" id="panel-aiknowledge">
         <div class="panel-header"><h2>🤖 معرفة المساعد الذكي</h2><p>المعلومات التي يستخدمها المساعد للإجابة على أسئلة الطلبة</p></div>
@@ -1413,7 +1565,7 @@ a{color:inherit;text-decoration:none}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, query, orderBy, serverTimestamp, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, query, orderBy, serverTimestamp, getDoc, updateDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import { MAJOR_SHEETS_SEED } from "./majorsheets-seed.js";
 import { CATALOG_SEED, SUPPORT_CATALOG_SEED } from "./catalog-seed.js";
@@ -1456,6 +1608,7 @@ onAuthStateChanged(auth,user=>{
   document.getElementById("adminApp").classList.remove("hidden");
   document.getElementById("userEmail").textContent=em;
   loadAll();
+  ccLoadAll();
   loadMemConfig();
   loadNoteCourses(document.getElementById("noteMajor").value);
 });
@@ -3060,6 +3213,281 @@ window.addSuggToSheet=async function(id){
 };
 // expose for inline calls
 window.addItem=addItem;window.delItem=delItem;
+
+// ══════════════════════════════════════════════════════════════════════
+// DNA COMMAND CENTER — private members and event evaluations
+// ══════════════════════════════════════════════════════════════════════
+const ccEl=id=>document.getElementById(id);
+const ccEsc=s=>(s==null?"":String(s)).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ccNorm=s=>String(s||"").trim().replace(/\s+/g," ").toLocaleLowerCase("ar");
+let ccMembers=[];
+let ccEvents=[];
+let ccEvaluations=[];
+
+function ccAverage(memberId){
+  const rows=ccEvaluations.filter(x=>x.memberId===memberId);
+  if(!rows.length)return {score:null,count:0};
+  return {score:Math.round(rows.reduce((sum,x)=>sum+(Number(x.score)||0),0)/rows.length),count:rows.length};
+}
+function ccScoreBadge(score){
+  if(score==null)return '<span style="color:var(--muted)">غير مقيّم</span>';
+  const cls=score>=80?"good":score>=60?"mid":"low";
+  return `<span class="cc-score ${cls}">${score}%</span>`;
+}
+function ccWhen(value){
+  if(!value)return 0;
+  if(typeof value.toMillis==="function")return value.toMillis();
+  if(typeof value.seconds==="number")return value.seconds*1000;
+  const parsed=new Date(value).getTime();return Number.isFinite(parsed)?parsed:0;
+}
+function ccDownloadCsv(rows,name){
+  const body=rows.map(row=>row.map(cell=>{
+    const value=String(cell??"").replace(/"/g,'""');
+    return /[",\n]/.test(value)?`"${value}"`:value;
+  }).join(",")).join("\r\n");
+  const blob=new Blob(["\ufeff"+body],{type:"text/csv;charset=utf-8"});
+  const link=document.createElement("a");
+  link.href=URL.createObjectURL(blob);link.download=`${name}-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(link);link.click();
+  setTimeout(()=>{URL.revokeObjectURL(link.href);link.remove();},0);
+}
+function ccSetStatus(id,message,ok=true){
+  const el=ccEl(id);if(!el)return;
+  el.textContent=message;el.style.color=ok?"#6ee7b7":"#fca5a5";
+}
+
+function ccSyncSelectors(){
+  const committees=[...new Set(ccMembers.map(m=>m.committee||"عام"))].sort((a,b)=>a.localeCompare(b,"ar"));
+  const currentCommittee=ccEl("ccMemberFilter").value;
+  ccEl("ccMemberFilter").innerHTML='<option value="">كل اللجان</option>'+committees.map(x=>`<option value="${ccEsc(x)}">${ccEsc(x)}</option>`).join("");
+  if(committees.includes(currentCommittee))ccEl("ccMemberFilter").value=currentCommittee;
+
+  const currentMember=ccEl("ccEvalMember").value;
+  ccEl("ccEvalMember").innerHTML='<option value="">— اختر عضواً —</option>'+ccMembers.map(m=>`<option value="${ccEsc(m.id)}">${ccEsc(m.name)} · ${ccEsc(m.committee||"عام")}</option>`).join("");
+  if(ccMembers.some(m=>m.id===currentMember))ccEl("ccEvalMember").value=currentMember;
+
+  const eventOptions=ccEvents.map(e=>`<option value="${ccEsc(e.id)}">${ccEsc(e.title||e.name||"فعالية بدون اسم")}${e.date?` · ${ccEsc(e.date)}`:""}</option>`).join("");
+  const currentEvent=ccEl("ccEvalEvent").value;
+  ccEl("ccEvalEvent").innerHTML='<option value="">— اختر فعالية —</option>'+eventOptions;
+  if(ccEvents.some(e=>e.id===currentEvent))ccEl("ccEvalEvent").value=currentEvent;
+  const currentFilter=ccEl("ccEvalFilter").value;
+  ccEl("ccEvalFilter").innerHTML='<option value="">كل الفعاليات</option>'+eventOptions;
+  if(ccEvents.some(e=>e.id===currentFilter))ccEl("ccEvalFilter").value=currentFilter;
+}
+
+function ccRenderStats(){
+  const committees=new Set(ccMembers.map(x=>x.committee||"عام")).size;
+  const evaluated=ccMembers.filter(m=>ccAverage(m.id).count).length;
+  const teamScores=ccMembers.map(m=>ccAverage(m.id).score).filter(x=>x!=null);
+  const teamAvg=teamScores.length?Math.round(teamScores.reduce((a,b)=>a+b,0)/teamScores.length):null;
+  ccEl("ccMemberStats").innerHTML=`
+    <div class="stat-card"><strong>${ccMembers.length}</strong><span>👤 عضو مسجل</span></div>
+    <div class="stat-card"><strong>${committees||0}</strong><span>🗂️ لجنة</span></div>
+    <div class="stat-card"><strong>${evaluated}</strong><span>⭐ عضو مقيّم</span></div>
+    <div class="stat-card"><strong>${teamAvg==null?"—":teamAvg+"%"}</strong><span>📈 متوسط الفريق</span></div>`;
+  const eventsCovered=new Set(ccEvaluations.map(x=>x.eventId)).size;
+  const evalAvg=ccEvaluations.length?Math.round(ccEvaluations.reduce((s,x)=>s+(Number(x.score)||0),0)/ccEvaluations.length):null;
+  ccEl("ccEvalStats").innerHTML=`
+    <div class="stat-card"><strong>${ccEvaluations.length}</strong><span>⭐ تقييم محفوظ</span></div>
+    <div class="stat-card"><strong>${eventsCovered}</strong><span>🎤 فعالية مقيّمة</span></div>
+    <div class="stat-card"><strong>${evaluated}</strong><span>👤 عضو مقيّم</span></div>
+    <div class="stat-card"><strong>${evalAvg==null?"—":evalAvg+"%"}</strong><span>📊 متوسط التقييمات</span></div>`;
+  ccEl("ccDnaStats").innerHTML=`
+    <div class="stat-card"><strong>${ccMembers.length}</strong><span>الأعضاء</span></div>
+    <div class="stat-card"><strong>${ccEvents.length}</strong><span>الفعاليات</span></div>
+    <div class="stat-card"><strong>${ccEvaluations.length}</strong><span>التقييمات</span></div>`;
+}
+
+function ccRenderMembers(){
+  const q=ccNorm(ccEl("ccMemberSearch").value);
+  const committee=ccEl("ccMemberFilter").value;
+  const rows=ccMembers.filter(m=>(!committee||(m.committee||"عام")===committee)&&(!q||ccNorm(`${m.name} ${m.committee} ${m.role}`).includes(q)));
+  ccEl("ccMembersList").innerHTML=rows.length?rows.map(m=>{
+    const avg=ccAverage(m.id);
+    return `<tr>
+      <td><strong>${ccEsc(m.name)}</strong></td><td>${ccEsc(m.committee||"عام")}</td><td>${ccEsc(m.role||"عضو")}</td>
+      <td>${avg.count}</td><td>${ccScoreBadge(avg.score)}</td>
+      <td style="white-space:nowrap"><button class="btn btn-sm" data-cc-edit-member="${ccEsc(m.id)}">تعديل</button> <button class="btn btn-danger btn-sm" data-cc-delete-member="${ccEsc(m.id)}">حذف</button></td>
+    </tr>`;
+  }).join(""):'<tr><td colspan="6" class="cc-empty">لا توجد أسماء مطابقة.</td></tr>';
+}
+
+function ccRenderEvaluations(){
+  const q=ccNorm(ccEl("ccEvalSearch").value);
+  const eventId=ccEl("ccEvalFilter").value;
+  const rows=ccEvaluations.filter(x=>(!eventId||x.eventId===eventId)&&(!q||ccNorm(`${x.memberName} ${x.eventTitle} ${x.note}`).includes(q)));
+  ccEl("ccEvaluationsList").innerHTML=rows.length?rows.map(x=>`<tr>
+    <td><strong>${ccEsc(x.memberName||"—")}</strong></td><td>${ccEsc(x.eventTitle||"—")}</td>
+    <td>${Number(x.execution)||0}/5</td><td>${Number(x.teamwork)||0}/5</td><td>${Number(x.reliability)||0}/5</td><td>${Number(x.initiative)||0}/5</td>
+    <td>${ccScoreBadge(Number(x.score)||0)}</td><td><button class="btn btn-danger btn-sm" data-cc-delete-eval="${ccEsc(x.id)}">حذف</button></td>
+  </tr>`).join(""):'<tr><td colspan="8" class="cc-empty">لا توجد تقييمات مطابقة.</td></tr>';
+}
+
+function ccRenderAll(){ccSyncSelectors();ccRenderStats();ccRenderMembers();ccRenderEvaluations();}
+
+async function ccLoadAll(){
+  if(!ccEl("ccMembersList"))return;
+  try{
+    const [members,events,evaluations]=await Promise.all([getItems("clubMembers"),getItems("events"),getItems("eventEvaluations")]);
+    ccMembers=members.sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),"ar"));
+    ccEvents=events;
+    ccEvaluations=evaluations.sort((a,b)=>ccWhen(b.updatedAt||b.createdAt)-ccWhen(a.updatedAt||a.createdAt));
+    ccRenderAll();
+  }catch(error){
+    ccSetStatus("ccMemberStatus","تعذّر تحميل مركز القيادة: "+error.message,false);
+  }
+}
+window.ccLoadAll=ccLoadAll;
+
+async function ccAddMemberRows(rows,successMessage){
+  const existing=new Set(ccMembers.map(m=>ccNorm(m.name)));
+  const unique=[];
+  rows.forEach(row=>{
+    const name=String(row.name||"").trim().replace(/\s+/g," ");
+    const key=ccNorm(name);
+    if(name&&key&&!existing.has(key)){existing.add(key);unique.push({...row,name,normalizedName:key});}
+  });
+  if(!unique.length){ccSetStatus("ccMemberStatus","ما فيه أسماء جديدة لإضافتها.",false);return 0;}
+  if(unique.length>400){ccSetStatus("ccMemberStatus","أضف 400 اسم أو أقل في كل مرة.",false);return 0;}
+  const batch=writeBatch(db);
+  unique.forEach(row=>{
+    const ref=doc(collection(db,"clubMembers"));
+    batch.set(ref,{name:row.name,normalizedName:row.normalizedName,committee:row.committee||"عام",role:row.role||"عضو",status:"active",source:row.source||"manual",createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+  });
+  await batch.commit();
+  ccSetStatus("ccMemberStatus",`${successMessage} (${unique.length})`);
+  await ccLoadAll();
+  return unique.length;
+}
+
+ccEl("ccAddMembers")?.addEventListener("click",async()=>{
+  const btn=ccEl("ccAddMembers");
+  const names=ccEl("ccMemberNames").value.split(/[\n,،;]+/).map(x=>x.trim()).filter(Boolean);
+  if(!names.length){ccSetStatus("ccMemberStatus","اكتب اسم عضو واحد على الأقل.",false);return;}
+  btn.disabled=true;btn.textContent="⏳ جاري الحفظ…";
+  try{
+    const committee=ccEl("ccMemberCommittee").value,role=ccEl("ccMemberRole").value;
+    const count=await ccAddMemberRows(names.map(name=>({name,committee,role,source:"manual"})),"تمت إضافة الأعضاء بنجاح");
+    if(count)ccEl("ccMemberNames").value="";
+  }catch(error){ccSetStatus("ccMemberStatus","تعذّر الحفظ: "+error.message,false);}
+  finally{btn.disabled=false;btn.textContent="حفظ الأعضاء";}
+});
+
+ccEl("ccImportApproved")?.addEventListener("click",async()=>{
+  const btn=ccEl("ccImportApproved");btn.disabled=true;btn.textContent="⏳ جاري الاستيراد…";
+  try{
+    const applications=await getItems("memberships");
+    const approved=applications.filter(x=>x.status==="approved"&&x.fullName).map(x=>({name:x.fullName,committee:x.committee||"عام",role:"عضو",source:"approved-membership"}));
+    if(!approved.length)ccSetStatus("ccMemberStatus","لا توجد طلبات عضوية مقبولة لاستيرادها حالياً.",false);
+    else await ccAddMemberRows(approved,"تم استيراد المقبولين");
+  }catch(error){ccSetStatus("ccMemberStatus","تعذّر الاستيراد: "+error.message,false);}
+  finally{btn.disabled=false;btn.textContent="استيراد المقبولين من طلبات العضوية";}
+});
+
+ccEl("ccMembersList")?.addEventListener("click",async event=>{
+  const edit=event.target.closest("[data-cc-edit-member]");
+  if(edit){
+    const member=ccMembers.find(x=>x.id===edit.dataset.ccEditMember);if(!member)return;
+    const name=prompt("اسم العضو",member.name);if(name===null)return;
+    const committee=prompt("اللجنة",member.committee||"عام");if(committee===null)return;
+    const role=prompt("الدور",member.role||"عضو");if(role===null)return;
+    if(!name.trim()){alert("اسم العضو مطلوب");return;}
+    try{await updateDoc(doc(db,"clubMembers",member.id),{name:name.trim(),normalizedName:ccNorm(name),committee:committee.trim()||"عام",role:role.trim()||"عضو",updatedAt:serverTimestamp()});await ccLoadAll();}
+    catch(error){alert("تعذّر التعديل: "+error.message);}
+    return;
+  }
+  const remove=event.target.closest("[data-cc-delete-member]");
+  if(remove){
+    const member=ccMembers.find(x=>x.id===remove.dataset.ccDeleteMember);if(!member)return;
+    const related=ccEvaluations.filter(x=>x.memberId===member.id);
+    if(!confirm(`حذف ${member.name} وكل تقييماته (${related.length})؟`))return;
+    try{
+      const batch=writeBatch(db);batch.delete(doc(db,"clubMembers",member.id));related.forEach(x=>batch.delete(doc(db,"eventEvaluations",x.id)));await batch.commit();await ccLoadAll();
+    }catch(error){alert("تعذّر الحذف: "+error.message);}
+  }
+});
+
+function ccUpdateScorePreview(){
+  const ids=["ccExecution","ccTeamwork","ccReliability","ccInitiative"];
+  let total=0;ids.forEach(id=>{const value=Number(ccEl(id).value);total+=value;ccEl(id+"Out").value=`${value}/5`;});
+  ccEl("ccScorePreview").textContent=Math.round(total/20*100)+"%";
+}
+function ccPopulateEvaluation(){
+  const eventId=ccEl("ccEvalEvent").value,memberId=ccEl("ccEvalMember").value;
+  const saved=ccEvaluations.find(x=>x.eventId===eventId&&x.memberId===memberId);
+  [["ccExecution","execution"],["ccTeamwork","teamwork"],["ccReliability","reliability"],["ccInitiative","initiative"]].forEach(([id,key])=>ccEl(id).value=saved?Number(saved[key])||4:4);
+  ccEl("ccEvalNote").value=saved?.note||"";
+  ccSetStatus("ccEvalStatus",saved?"تم تحميل التقييم السابق — الحفظ سيحدّثه.":"");
+  ccUpdateScorePreview();
+}
+["ccExecution","ccTeamwork","ccReliability","ccInitiative"].forEach(id=>ccEl(id)?.addEventListener("input",ccUpdateScorePreview));
+ccEl("ccEvalEvent")?.addEventListener("change",ccPopulateEvaluation);
+ccEl("ccEvalMember")?.addEventListener("change",ccPopulateEvaluation);
+
+ccEl("ccSaveEval")?.addEventListener("click",async()=>{
+  const eventId=ccEl("ccEvalEvent").value,memberId=ccEl("ccEvalMember").value;
+  const clubEvent=ccEvents.find(x=>x.id===eventId),member=ccMembers.find(x=>x.id===memberId);
+  if(!clubEvent||!member){ccSetStatus("ccEvalStatus","اختر الفعالية والعضو أولاً.",false);return;}
+  const values={execution:Number(ccEl("ccExecution").value),teamwork:Number(ccEl("ccTeamwork").value),reliability:Number(ccEl("ccReliability").value),initiative:Number(ccEl("ccInitiative").value)};
+  const score=Math.round((values.execution+values.teamwork+values.reliability+values.initiative)/20*100);
+  const id=`${eventId}__${memberId}`,old=ccEvaluations.find(x=>x.id===id);
+  const btn=ccEl("ccSaveEval");btn.disabled=true;btn.textContent="⏳ جاري الحفظ…";
+  try{
+    await setDoc(doc(db,"eventEvaluations",id),{eventId,eventTitle:clubEvent.title||clubEvent.name||"فعالية",memberId,memberName:member.name,...values,score,note:ccEl("ccEvalNote").value.trim(),evaluatorEmail:auth.currentUser?.email||"",createdAt:old?.createdAt||serverTimestamp(),updatedAt:serverTimestamp()},{merge:true});
+    ccSetStatus("ccEvalStatus",`تم حفظ تقييم ${member.name}: ${score}%`);await ccLoadAll();
+  }catch(error){ccSetStatus("ccEvalStatus","تعذّر حفظ التقييم: "+error.message,false);}
+  finally{btn.disabled=false;btn.textContent="💾 حفظ التقييم";}
+});
+
+ccEl("ccEvaluationsList")?.addEventListener("click",async event=>{
+  const button=event.target.closest("[data-cc-delete-eval]");if(!button)return;
+  const row=ccEvaluations.find(x=>x.id===button.dataset.ccDeleteEval);if(!row||!confirm(`حذف تقييم ${row.memberName} في ${row.eventTitle}؟`))return;
+  try{await deleteDoc(doc(db,"eventEvaluations",row.id));await ccLoadAll();}catch(error){alert("تعذّر الحذف: "+error.message);}
+});
+
+ccEl("ccMemberSearch")?.addEventListener("input",ccRenderMembers);
+ccEl("ccMemberFilter")?.addEventListener("change",ccRenderMembers);
+ccEl("ccEvalSearch")?.addEventListener("input",ccRenderEvaluations);
+ccEl("ccEvalFilter")?.addEventListener("change",ccRenderEvaluations);
+ccEl("ccMembersRefresh")?.addEventListener("click",ccLoadAll);
+ccEl("ccEvalsRefresh")?.addEventListener("click",ccLoadAll);
+document.querySelectorAll('.nav-item[data-panel="clubmembers"],.nav-item[data-panel="eventevals"],.nav-item[data-panel="dnacenter"]').forEach(button=>button.addEventListener("click",ccLoadAll));
+
+ccEl("ccMembersExport")?.addEventListener("click",()=>{
+  const rows=[["الاسم","اللجنة","الدور","عدد التقييمات","متوسط الأداء"]];
+  ccMembers.forEach(m=>{const avg=ccAverage(m.id);rows.push([m.name,m.committee||"عام",m.role||"عضو",avg.count,avg.score==null?"":avg.score+"%"]);});
+  ccDownloadCsv(rows,"bsc-club-members");
+});
+ccEl("ccEvalsExport")?.addEventListener("click",()=>{
+  const rows=[["العضو","الفعالية","التنفيذ","العمل الجماعي","الالتزام","المبادرة","النتيجة","الملاحظة","المقيّم"]];
+  ccEvaluations.forEach(x=>rows.push([x.memberName,x.eventTitle,x.execution,x.teamwork,x.reliability,x.initiative,(x.score||0)+"%",x.note||"",x.evaluatorEmail||""]));
+  ccDownloadCsv(rows,"bsc-event-evaluations");
+});
+
+function ccDnaAnswer(question){
+  const q=ccNorm(question);
+  const ranked=ccMembers.map(m=>({...m,...ccAverage(m.id)})).filter(m=>m.count).sort((a,b)=>b.score-a.score);
+  let answer="";
+  if(/أفضل|افضل|مميز|أعلى|اعلى|ترتيب|أداء|اداء/.test(q)){
+    answer=ranked.length?"أفضل الأعضاء حسب متوسط تقييم الفعاليات:\n"+ranked.slice(0,5).map((m,i)=>`${i+1}. ${m.name} — ${m.score}% (${m.count} تقييم)`).join("\n"):"ما عندي تقييمات كافية للحكم حتى الآن. قيّم الأعضاء داخل الفعاليات أولاً.";
+  }else if(/دعم|تطوير|يحتاج|أقل|اقل/.test(q)){
+    const support=ranked.filter(m=>m.score<70).sort((a,b)=>a.score-b.score);
+    answer=support.length?"أعضاء قد يستفيدون من دعم أو متابعة إضافية:\n"+support.map(m=>`• ${m.name} — ${m.score}%`).join("\n")+"\n\nاعتبر النتيجة إشارة للتطوير وليست حكماً نهائياً.":"حالياً ما في عضو متوسطه أقل من 70%، أو البيانات ما زالت غير كافية.";
+  }else if(/فعالية|فعاليات|نشاط|أنشطة|انشطة/.test(q)){
+    answer=ccEvents.length?`عندك ${ccEvents.length} فعالية مسجلة:\n`+ccEvents.slice(0,10).map(e=>`• ${e.title||e.name||"فعالية"}${e.date?" — "+e.date:""}`).join("\n"):"ما في فعاليات مسجلة. أضف فعالية من قسم «الأنشطة» ثم ارجع للتقييم.";
+  }else if(/عضو|أعضاء|اعضاء|لجنة|فريق/.test(q)){
+    const byCommittee={};ccMembers.forEach(m=>{const key=m.committee||"عام";byCommittee[key]=(byCommittee[key]||0)+1;});
+    answer=`الفريق فيه ${ccMembers.length} عضو ضمن ${Object.keys(byCommittee).length} لجنة.\n`+Object.entries(byCommittee).sort((a,b)=>b[1]-a[1]).map(([name,count])=>`• ${name}: ${count}`).join("\n");
+  }else{
+    const avg=ccEvaluations.length?Math.round(ccEvaluations.reduce((s,x)=>s+(Number(x.score)||0),0)/ccEvaluations.length):0;
+    answer=`ملخص DNA:\n• الأعضاء: ${ccMembers.length}\n• الفعاليات: ${ccEvents.length}\n• التقييمات: ${ccEvaluations.length}\n• متوسط التقييمات: ${ccEvaluations.length?avg+"%":"لا توجد تقييمات بعد"}\n\nتقدر تسألني عن أفضل الأعضاء، من يحتاج دعماً، اللجان، أو الفعاليات.`;
+  }
+  ccEl("ccDnaAnswer").textContent=answer;
+}
+ccEl("ccAskDna")?.addEventListener("click",()=>ccDnaAnswer(ccEl("ccDnaInput").value));
+ccEl("ccDnaInput")?.addEventListener("keydown",event=>{if(event.key==="Enter")ccDnaAnswer(ccEl("ccDnaInput").value);});
+document.querySelectorAll("[data-dna-question]").forEach(button=>button.addEventListener("click",()=>{ccEl("ccDnaInput").value=button.dataset.dnaQuestion;ccDnaAnswer(button.dataset.dnaQuestion);}));
+ccUpdateScorePreview();
 
 // ── UNIVERSAL EDIT MODAL ──
 const _MO=[
