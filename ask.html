@@ -77,6 +77,9 @@ a{color:inherit;text-decoration:none}
 .quick-prompts{display:flex;flex-wrap:wrap;gap:.6rem;padding:1rem 1.5rem;border-bottom:1px solid var(--border)}
 .qp-btn{padding:.4rem .9rem;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:999px;font-size:.78rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .25s;font-family:'Tajawal',sans-serif}
 .qp-btn:hover{color:#fff;background:rgba(99,102,241,.2);border-color:rgba(99,102,241,.4)}
+.cohort-choices{align-self:flex-start;display:flex;flex-wrap:wrap;gap:.45rem;max-width:80%;margin-top:-.55rem;animation:fu .3s ease both}
+.cohort-choice{padding:.42rem .72rem;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.3);border-radius:999px;color:#c7d2fe;font-family:'Tajawal',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s}
+.cohort-choice:hover{background:rgba(99,102,241,.28);border-color:rgba(129,140,248,.65);transform:translateY(-1px)}
 .ai-status{font-size:.75rem;color:var(--muted);padding:.6rem 1.5rem;background:rgba(16,185,129,.06);border-bottom:1px solid rgba(16,185,129,.12);text-align:center}
 /* اسأل النادي مباشرة (رد بشري) */
 .human-wrap{margin-top:1.25rem;background:rgba(22,22,22,.75);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
@@ -469,6 +472,7 @@ a{color:inherit;text-decoration:none}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { STATIC_KB } from "./ai-knowledge.js";
+import { COHORT_KB } from "./cohort-knowledge.js";
 const app=initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"});
 const db=getFirestore(app);
 const mn={molecular:"البيولوجيا الجزيئية",micro:"علم الميكروبيولوجي",plant:"بيولوجيا النبات",animal:"بيولوجيا الحيوان",biochem:"الكيمياء الحيوية"};
@@ -587,9 +591,99 @@ const MAJOR_SHEETS={
 const $=id=>document.getElementById(id);
 let notes=[],events=[],advisors=[],aiKnowledge=[],majorResources=[];
 let lastQuestion="";
+let activeCohort="";
+let activeMajor="";
+let activeCourseCode="";
+let pendingCohortQuestion="";
+let pendingMajorQuestion="";
+let awaitingCohort=false;
+let awaitingMajor=false;
 const conversationHistory = []; // remember chat context
+const SUPPORTED_COHORTS=["2019","2020","2021","2022","2023","2024","2025"];
+const MAJOR_DEFS={
+  animal:{name:"بيولوجيا الحيوان",label:"الحيوان",code:"0493"},
+  plant:{name:"بيولوجيا النبات",label:"النبات",code:"0494"},
+  micro:{name:"علم الميكروبيولوجيا",label:"الميكرو",code:"0495"},
+  biochem:{name:"علم الكيمياء الحيوية",label:"الكيمياء الحيوية",code:"0496"},
+  molecular:{name:"علم البيولوجيا الجزيئية",label:"الجزيئية",code:"0497"},
+};
+// نسخة احتياطية مدققة من قائمة المرشدين الحالية (2026-09-04).
+// تبقى بيانات Firestore هي المصدر الأول حتى تتحدث الأسماء والإيميلات تلقائياً.
+const ADVISOR_FALLBACKS=[
+  {major:"animal",name:"د. أماني الزيدان",email:"amani.alzaidan@ku.edu.kw"},
+  {major:"plant",name:"د. أحلام بوعركي",email:"ahlam.bouariky@ku.edu.kw"},
+  {major:"micro",name:"د. دنيا الغربللي",email:"dunia.algharabally@ku.edu.kw"},
+  {major:"biochem",name:"د. هيا الرشيدي",email:"haya.alreshidi@ku.edu.kw"},
+  {major:"molecular",name:"د. عباس الأمير",email:"abbas.alameer@ku.edu.kw"},
+];
+try{
+  const savedCohort=sessionStorage.getItem("bsc_active_cohort")||"";
+  const savedMajor=sessionStorage.getItem("bsc_active_major")||"";
+  const savedCourse=sessionStorage.getItem("bsc_active_course")||"";
+  if(SUPPORTED_COHORTS.includes(savedCohort))activeCohort=savedCohort;
+  if(MAJOR_DEFS[savedMajor])activeMajor=savedMajor;
+  if(/^049\d{4}$/.test(savedCourse))activeCourseCode=savedCourse;
+}catch{}
+function setActiveCohort(year){
+  const changed=Boolean(activeCohort&&year&&activeCohort!==year);
+  activeCohort=year;
+  try{year?sessionStorage.setItem("bsc_active_cohort",year):sessionStorage.removeItem("bsc_active_cohort")}catch{}
+  if(changed){setActiveCourse("");conversationHistory.length=0;}
+}
+function setActiveMajor(key){
+  const changed=Boolean(activeMajor&&key&&activeMajor!==key);
+  activeMajor=key;
+  try{key?sessionStorage.setItem("bsc_active_major",key):sessionStorage.removeItem("bsc_active_major")}catch{}
+  if(changed){setActiveCourse("");conversationHistory.length=0;}
+}
+function setActiveCourse(code){
+  activeCourseCode=code;
+  try{code?sessionStorage.setItem("bsc_active_course",code):sessionStorage.removeItem("bsc_active_course")}catch{}
+}
+function clearAcademicProfile(){setActiveCohort("");setActiveMajor("");setActiveCourse("");}
 async function get(col){try{const s=await getDocs(query(collection(db,col),orderBy("createdAt","desc")));return s.docs.map(d=>({id:d.id,...d.data()}))}catch{try{const s=await getDocs(collection(db,col));return s.docs.map(d=>({id:d.id,...d.data()}))}catch{return[]}}}
-function norm(v){return(v||"").toString().toLowerCase().replace(/[إأآا]/g,"ا").replace(/[ة]/g,"ه").replace(/[ىي]/g,"ي").replace(/[ؤئ]/g,"ء").replace(/[ًٌٍَُِّْ]/g,"").trim()}
+function norm(v){return(v||"").toString().toLowerCase().replace(/[إأآا]/g,"ا").replace(/[ة]/g,"ه").replace(/[ىي]/g,"ي").replace(/[ؤئ]/g,"ء").replace(/[٠-٩]/g,d=>String("٠١٢٣٤٥٦٧٨٩".indexOf(d))).replace(/[۰-۹]/g,d=>String("۰۱۲۳۴۵۶۷۸۹".indexOf(d))).replace(/[ًٌٍَُِّْ]/g,"").replace(/[^\p{L}\p{N}\s-]/gu," ").replace(/\s+/g," ").trim()}
+function extractCohort(value,{allowBare=false}={}){
+  const q=norm(value);
+  let match=q.match(/\b(20(?:19|2[0-5]))\b/);
+  if(!match)match=q.match(/دفعه\s*(1[9]|2[0-5])\b/);
+  if(!match&&allowBare)match=q.match(/^(?:انا\s*)?(?:دفعتي\s*)?(?:دفعه\s*)?(1[9]|2[0-5])$/);
+  if(!match)return"";
+  const raw=match[1];
+  const year=raw.length===2?`20${raw}`:raw;
+  return SUPPORTED_COHORTS.includes(year)?year:"";
+}
+function mentionsUnsupportedCohort(value){
+  const q=norm(value);
+  const match=q.match(/دفعه\s*(20\d{2}|\d{2})\b/);
+  if(!match)return false;
+  const raw=match[1],year=raw.length===2?`20${raw}`:raw;
+  return !SUPPORTED_COHORTS.includes(year);
+}
+function isPlanQuestion(value){
+  const q=norm(value);
+  return /(خطه|تخرج|متطلبات التخصص|وحدات التخصص|مجموع التخرج)/.test(q);
+}
+function extractMajor(value,{allowBare=false,allowLoose=false}={}){
+  const q=norm(value);
+  const patterns={
+    molecular:/^(?:ال)?(?:علم )?(?:ال)?بيولوجيا الجزيءيه$|^الجزيءيه$|^بج$|^0497$/,
+    micro:/^(?:ال)?(?:علم )?الميكروبيولوجيا$|^الميكرو$|^مب$|^0495$/,
+    biochem:/^(?:ال)?(?:علم )?(?:ال)?كيمياء الحيويه$|^بيوكيم$|^حب$|^0496$/,
+    animal:/^(?:ال)?بيولوجيا الحيوان$|^الحيوان$|^حيوان$|^0493$/,
+    plant:/^(?:ال)?بيولوجيا النبات$|^النبات$|^نبات$|^0494$/,
+  };
+  const explicit=q.match(/(?:تخصصي|تخصص|انا تخصص|في تخصص|انا)\s+(.+)$/);
+  const candidate=explicit?explicit[1]:q;
+  for(const [key,pattern] of Object.entries(patterns))if((explicit||allowBare)&&pattern.test(candidate))return key;
+  for(const [key,def] of Object.entries(MAJOR_DEFS))if(new RegExp(`\\b${def.code}\\b`).test(q))return key;
+  if(/(?:في|تخصص)\s+(?:ال)?جزيءيه/.test(q)||(allowLoose&&q.includes("جزيءيه")))return"molecular";
+  if(/(?:في|تخصص)\s+(?:ال)?ميكرو/.test(q)||(allowLoose&&q.includes("ميكرو")))return"micro";
+  if(/(?:في|تخصص)\s+(?:علم )?(?:ال)?كيمياء الحيويه/.test(q)||(allowLoose&&q.includes("كيمياء حيويه")))return"biochem";
+  if(/(?:في|تخصص)\s+(?:بيولوجيا )?(?:ال)?حيوان/.test(q)||(allowLoose&&q.includes("حيوان")))return"animal";
+  if(/(?:في|تخصص)\s+(?:بيولوجيا )?(?:ال)?نبات/.test(q)||(allowLoose&&q.includes("نبات")))return"plant";
+  return"";
+}
 function numCode(code){
   const clean=code.replace(/\s/g,"");
   if(/^\d+$/.test(clean))return clean;
@@ -620,9 +714,64 @@ function addMsg(role,text){
   b.appendChild(d);
   b.scrollTop=b.scrollHeight;
 }
+function addCohortPrompt(text="عشان أعطيك المعلومة الصحيحة من خطتك: **إنت أي دفعة؟** اختر دفعتك أو اكتبها، مثل: 25 أو 2025."){
+  addMsg("bot",text);
+  const row=document.createElement("div");
+  row.className="cohort-choices";
+  row.setAttribute("aria-label","اختر الدفعة");
+  SUPPORTED_COHORTS.forEach(year=>{
+    const button=document.createElement("button");
+    button.type="button";
+    button.className="cohort-choice";
+    button.dataset.cohortChoice=year;
+    button.textContent=year;
+    row.appendChild(button);
+  });
+  const box=document.getElementById("chatBox");
+  box.appendChild(row);
+  box.scrollTop=box.scrollHeight;
+}
+function addMajorPrompt(text="المقرر موجود بأكثر من تخصص، فخلني أحدد جوابك بدقة: **شنو تخصصك؟**"){
+  addMsg("bot",text);
+  const row=document.createElement("div");
+  row.className="cohort-choices";
+  row.setAttribute("aria-label","اختر التخصص");
+  Object.entries(MAJOR_DEFS).forEach(([key,major])=>{
+    const button=document.createElement("button");
+    button.type="button";
+    button.className="cohort-choice";
+    button.dataset.majorChoice=key;
+    button.textContent=major.label;
+    row.appendChild(button);
+  });
+  const box=document.getElementById("chatBox");
+  box.appendChild(row);
+  box.scrollTop=box.scrollHeight;
+}
+function addAnswerActions(){
+  const row=document.createElement("div");
+  row.className="cohort-choices";
+  row.setAttribute("aria-label","خيارات المحادثة");
+  [["change-cohort","غيّر دفعتي"],["change-major","غيّر تخصصي"],["new-course","مقرر آخر"]].forEach(([action,label])=>{
+    const button=document.createElement("button");
+    button.type="button";
+    button.className="cohort-choice";
+    button.dataset.chatAction=action;
+    button.textContent=label;
+    row.appendChild(button);
+  });
+  const box=document.getElementById("chatBox");
+  box.appendChild(row);
+  box.scrollTop=box.scrollHeight;
+}
+function rememberTurn(question,response){
+  conversationHistory.push({role:"user",parts:[{text:question}]},{role:"model",parts:[{text:response}]});
+  if(conversationHistory.length>12)conversationHistory.splice(0,conversationHistory.length-12);
+}
 function buildKB(){
   const base=[];
   STATIC_KB.forEach(k=>base.push({title:k.title||"معلومة",answer:k.answer||"",keywords:k.keywords||"",source:"static"}));
+  COHORT_KB.forEach(k=>base.push({...k,title:k.title||"معلومة دفعة",answer:k.answer||"",keywords:k.keywords||"",source:"cohort"}));
   aiKnowledge.forEach(k=>base.push({title:k.title||"معلومة",answer:k.answer||k.content||"",keywords:k.keywords||"",source:"aiKnowledge"}));
   notes.forEach(n=>base.push({title:n.title||"نوتة",answer:`النوتة: ${n.title||""}\nالمادة: ${n.course||""}\nالتخصص: ${mn[n.major]||n.major||"عام"}\nالنوع: ${n.type||"Note"}\nالرابط: ${n.url||"غير متوفر"}`,keywords:`${n.title||""} ${n.course||""} ${mn[n.major]||""}`,source:"notes"}));
   events.forEach(e=>base.push({title:e.title||"نشاط",answer:`النشاط: ${e.title||""}\nالتاريخ: ${e.date||"يعلن لاحقاً"}\n${e.description||""}${e.url?"\nالرابط: "+e.url:""}`,keywords:`${e.title||""} ${e.date||""} فعاليات أنشطة ورشة`,source:"events"}));
@@ -649,34 +798,216 @@ function isScheduleQuestion(question){
   // استثناءات واضحة: جدول الفعاليات وجدول الاختبارات مواضيع ثانية تماماً
   if(/جدول\s*(ال)?(فعاليات|انشطه|احداث)/.test(q)) return false;
   if(/جدول\s*(ال)?(اختبار|امتحان)/.test(q)) return false;
-  if(q.includes("جدول")) return true; // جدولي، جدول الحصص، رتب لي جدول...
-  const hasCourseWord=q.includes("ماده")||q.includes("مواد");
+  if(q.includes("جدول")||/\b(schedule|timetable)\b/.test(q)) return true;
+  const hasCourseWord=/(ماده|مواد|مقرر|مقررات|كورسات|courses?)/.test(q);
   const hasRegisterRoot=q.includes("سجل");   // سجل، اسجل، أسجل، تسجيل، سجلها، اسجلها...
   const hasSuggestRoot=q.includes("قترح")||q.includes("رشح")||q.includes("نصح"); // مقترح، اقترح، ترشيح، تنصح
-  if(hasCourseWord&&(hasRegisterRoot||hasSuggestRoot)) return true;
+  const hasDecisionRoot=/(رتب|وزع|اختار|شنو اخذ|وش اخذ|ايش اخذ|اقدر اخذ|الفصل الجاي|الترم الجاي|الفصل القادم|الترم القادم|خفيف|سهله|سهلة)/.test(q);
+  if(hasCourseWord&&(hasRegisterRoot||hasSuggestRoot||hasDecisionRoot)) return true;
+  if(/(?:ابني|سوي|سو|رتب)\s*(?:لي)?\s*(?:ال)?خطه/.test(q)) return true;
+  if(/(?:شنو|وش|ايش)\s+(?:اقدر\s+)?(?:اسجل|اخذ)/.test(q)) return true;
   if(q.includes("خطه")&&q.includes("دراس")) return true; // خطتي الدراسية، خطة دراسي
   return false;
 }
-const SCHEDULE_REDIRECT="أسئلة الجدول الدراسي والمواد المقترحة تحتاج مراجعة شخصية مع مرشدك الأكاديمي، عشان الإجابة تناسب وضعك بالضبط (مواد سبق رسّبتها، خطتك، وغيرها). احجز موعد من [صفحة المرشدين الأكاديميين](advisors.html) 🎓";
+function advisorDirectory(){
+  const identity=name=>norm(name).replace(/\s/g,"");
+  const live=advisors.filter(a=>a&&a.name&&a.email&&MAJOR_DEFS[a.major]).map(a=>{
+    const verified=ADVISOR_FALLBACKS.find(f=>f.major===a.major&&(identity(f.name)===identity(a.name)||f.email.toLowerCase()===a.email.toLowerCase()));
+    return verified?{...a,name:verified.name,email:verified.email}:a;
+  });
+  const missing=ADVISOR_FALLBACKS.filter(f=>!live.some(a=>a.major===f.major));
+  return [...live,...missing];
+}
+function advisorContacts(question=""){
+  const requestedMajor=extractMajor(question,{allowBare:true,allowLoose:true})||activeMajor;
+  const directory=advisorDirectory();
+  const selected=requestedMajor?directory.filter(a=>a.major===requestedMajor):directory;
+  return {requestedMajor,list:selected.length?selected:directory};
+}
+function formatAdvisorList(list){
+  return list.map(a=>`- **${a.name}** — ${MAJOR_DEFS[a.major]?.name||"العلوم البيولوجية"}\n  [${a.email}](mailto:${a.email})`).join("\n");
+}
+function advisorAnswer(question="",{schedule=false}={}){
+  const {requestedMajor,list}=advisorContacts(question);
+  const intro=schedule
+    ?"ما أقدر أبني أو أرتب جدولك، ولا أختار لك المواد أو أقرر شنو تسجّل؛ هذا مو اختصاصي، والقرار يعتمد على ملفك الأكاديمي الكامل."
+    :requestedMajor?`مرشد **${MAJOR_DEFS[requestedMajor].name}**:`:"هذي أسماء وإيميلات المرشدين الأكاديميين حسب التخصص:";
+  const heading=schedule?(requestedMajor?`\n\nتواصل مع مرشد **${MAJOR_DEFS[requestedMajor].name}**:`:"\n\nتواصل مع مرشد تخصصك:"):"";
+  return `${intro}${heading}\n\n${formatAdvisorList(list)}\n\n[افتح صفحة المرشدين الأكاديميين](advisors.html) 🎓`;
+}
+function isAdvisorQuestion(question){
+  const q=norm(question);
+  return /(مرشد|مستشار)/.test(q)||/(ايميل|بريد).*(دكتور|دكتوره|تخصص)/.test(q);
+}
+const COHORT_COURSE_NAMES=[...new Set(COHORT_KB
+  .filter(item=>/\((?:049\d{4})\)/.test(item.title))
+  .map(item=>norm(item.title.split(" (")[0]))
+  .filter(name=>name.length>3))];
+function isCourseQuestion(question){
+  const q=norm(question);
+  const hasFullCode=/\b049\d{4}\b/.test(q);
+  const hasShortCode=/\b(?:ب\s*ج|م\s*ب|ح\s*ب|ن|ب)\s*-?\s*\d{3}\b/.test(q);
+  const matchedName=COHORT_COURSE_NAMES.some(name=>q.includes(name));
+  const courseIntent=/(ماده|مقرر|مسبق|متطلب|وحد|ساع|كود|رقم|يفتح|الزام|اجبار|اختيار)/.test(q);
+  const explanationIntent=/(اشرح|شرح|عرف|ما هو|شنو يعني|كيف يعمل)/.test(q);
+  if(explanationIntent&&!courseIntent&&!hasFullCode&&!hasShortCode)return false;
+  return hasFullCode||hasShortCode||(matchedName&&(courseIntent||q.split(/\s+/).length<=4))||(activeCourseCode&&courseIntent);
+}
+function isOrphanCourseFollowup(question){
+  if(activeCourseCode)return false;
+  const q=norm(question);
+  const identifiesCourse=/\b049\d{4}\b/.test(q)||COHORT_COURSE_NAMES.some(name=>q.includes(name));
+  return !identifiesCourse&&!isPlanQuestion(q)&&/(وحدته|ساعاته|مسبقه|متطلبه|يفتح|الزامي|اجباري|اختياري|كم وحد)/.test(q);
+}
+function needsCohort(question){
+  const q=norm(question);
+  if(isCourseQuestion(q))return true;
+  return /(خطه|تخرج|متطلبات الجامعه|متطلبات القسم|تخصص مساند)/.test(q)&&/(بيولوجيا|ميكرو|كيمياء حيويه|جزيءيه|حيوان|نبات)/.test(q);
+}
+function cohortCourses(cohort){
+  return COHORT_KB.filter(item=>item.kind==="course"&&item.cohort===cohort);
+}
+function courseCandidates(question,cohort){
+  const q=norm(question);
+  const records=cohortCourses(cohort);
+  const fullCode=q.match(/\b049\d{4}\b/)?.[0];
+  if(fullCode)return records.filter(item=>item.courseCode===fullCode);
+  const prefixed=q.match(/\b(ب\s*ج|م\s*ب|ح\s*ب|ن|ب)\s*-?\s*(\d{3})\b/);
+  if(prefixed){
+    const code=numCode(`${prefixed[1]} ${prefixed[2]}`);
+    const matches=records.filter(item=>item.courseCode===code);
+    if(matches.length)return matches;
+  }
+  const shortCode=q.match(/\b\d{3}\b/)?.[0];
+  if(shortCode&&/(ماده|مقرر|كود|رقم|مسبق|متطلب|يفتح)/.test(q)){
+    const matches=records.filter(item=>item.courseCode.endsWith(shortCode));
+    if(matches.length)return matches;
+  }
+  const names=[...new Set(records.map(item=>norm(item.courseName)))].sort((a,b)=>b.length-a.length);
+  const matchedName=names.find(name=>q.includes(name));
+  if(matchedName)return records.filter(item=>norm(item.courseName)===matchedName);
+  if(activeCourseCode&&/(مسبق|متطلب|وحد|ساع|يفتح|الزام|اجبار|اختيار|كود|رقم)/.test(q))return records.filter(item=>item.courseCode===activeCourseCode);
+  return[];
+}
+function chooseCourse(question,cohort,majorKey=""){
+  const candidates=courseCandidates(question,cohort);
+  if(!candidates.length)return null;
+  return candidates.find(item=>item.majorKey===majorKey)||candidates.find(item=>item.majorKey==="shared")||candidates[0];
+}
+function inferredCourseMajor(question,cohort){
+  const majors=[...new Set(courseCandidates(question,cohort).map(item=>item.majorKey).filter(key=>key!=="shared"))];
+  return majors.length===1?majors[0]:"";
+}
+function questionNeedsMajor(question,cohort,knownMajor=""){
+  if(knownMajor||extractMajor(question,{allowLoose:isPlanQuestion(question)}))return false;
+  if(isPlanQuestion(question))return true;
+  const majors=[...new Set(courseCandidates(question,cohort).map(item=>item.majorKey).filter(key=>key!=="shared"))];
+  return majors.length>1;
+}
+function withMajor(question,majorKey){
+  if(!majorKey||extractMajor(question,{allowLoose:isPlanQuestion(question)}))return question;
+  return `${question} ${MAJOR_DEFS[majorKey].name}`;
+}
+function asksWhatOpens(question){
+  return /(يفتح|تفتح|بعده|يعتمد عليه|مبني عليه)/.test(norm(question));
+}
+function academicAnswer(question,cohort,majorKey=""){
+  const selectedMajor=extractMajor(question,{allowLoose:isPlanQuestion(question)})||majorKey||inferredCourseMajor(question,cohort);
+  const course=chooseCourse(question,cohort,selectedMajor);
+  if(course)setActiveCourse(course.courseCode);
+  if(course&&asksWhatOpens(question)){
+    const dependents=[];
+    const seen=new Set();
+    cohortCourses(cohort).forEach(item=>{
+      if(item.courseCode===course.courseCode||!norm(item.prerequisites).includes(course.courseCode))return;
+      if(selectedMajor&&item.majorKey!==selectedMajor&&item.majorKey!=="shared")return;
+      if(seen.has(item.courseCode))return;
+      seen.add(item.courseCode);dependents.push(item);
+    });
+    const list=dependents.slice(0,12).map(item=>`- ${item.courseCode} ${item.courseName} — ${item.majorName}`).join("\n");
+    const more=dependents.length>12?`\n- ويوجد ${dependents.length-12} مقرر إضافي؛ حدّد التخصص لعرض نطاق أضيق.`:"";
+    return `**${course.courseName} (${course.courseCode}) — دفعة ${cohort}**\n\n${dependents.length?`المقررات التي يظهر هذا المقرر ضمن متطلباتها:\n${list}${more}`:"ما وجدت في دليل هذه الدفعة مقرراً آخر يذكره كمتطلب مباشر."}\n\nهذه علاقة متطلبات مباشرة من الدليل، وليست توصية تسجيل.\nدرجة الثقة: **مؤكدة من الدليل الرسمي**.`;
+  }
+  if(course){
+    const confidence=course.confidence==="review"?"⚠️ **بحاجة إلى انتباه:** يوجد تنبيه أو تعارض في المصدر الرسمي.":"✅ درجة الثقة: **مؤكدة من الدليل الرسمي**.";
+    return `${course.answer}\n\n${confidence}`;
+  }
+  if(isPlanQuestion(question)&&selectedMajor){
+    const plan=COHORT_KB.find(item=>item.kind==="plan"&&item.cohort===cohort&&item.majorKey===selectedMajor);
+    if(plan){
+      const confidence=plan.confidence==="review"?"⚠️ **بحاجة إلى انتباه:** توجد ملاحظة حسابية في المصدر الرسمي.":"✅ درجة الثقة: **مؤكدة من الدليل الرسمي**.";
+      return `${plan.answer}\n\n${confidence}`;
+    }
+  }
+  return answer(withCohort(withMajor(question,selectedMajor),cohort));
+}
+function withCohort(question,year){
+  if(extractCohort(question))return question;
+  const cleaned=question.replace(/دفعة\s*(?:20)?[0-9٠-٩۰-۹]{2,4}/giu,"").trim();
+  return `${cleaned} دفعة ${year}`;
+}
 function answer(question){
   const q=norm(question);
   if(!q)return"اكتب سؤالك عشان أقدر أساعدك.";
-  if(isScheduleQuestion(question))return SCHEDULE_REDIRECT;
+  if(isScheduleQuestion(question))return advisorAnswer(question,{schedule:true});
+  if(isAdvisorQuestion(question))return advisorAnswer(question);
   const base=buildKB();
   const words=q.split(/\s+/).filter(w=>w.length>2);
-  const scored=base.map(item=>{const h=norm(`${item.title} ${item.answer} ${item.keywords}`);let s=0;words.forEach(w=>{if(h.includes(w))s+=Math.min(w.length+2,12)});if(h.includes(q))s+=35;return{item,s}}).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
-  if(scored.length)return scored.slice(0,2).map(x=>x.item.answer).join("\n\n---\n\n")+"\n\nإذا تبي جواب أدق، اكتب اسم المادة أو التخصص.";
+  const codes=q.match(/\d{4,}/g)||[];
+  const cohortMatch=q.match(/دفعه\s*(20\d{2}|\d{2})\b/);
+  const requestedCohort=cohortMatch?(cohortMatch[1].length===2?`20${cohortMatch[1]}`:cohortMatch[1]):"";
+  const scored=base.map(item=>{
+    const title=norm(item.title),body=norm(item.answer),keys=norm(item.keywords);
+    const h=`${title} ${body} ${keys}`;
+    let s=0;
+    words.forEach(w=>{
+      const weight=Math.min(w.length+2,12);
+      if(title.includes(w))s+=weight*3;
+      else if(keys.includes(w))s+=weight*2;
+      else if(body.includes(w))s+=weight;
+    });
+    codes.forEach(code=>{if(title.includes(code))s+=80;else if(keys.includes(code))s+=40;});
+    if(requestedCohort&&(title.includes(`دفعه ${requestedCohort}`)||keys.includes(`دفعه ${requestedCohort}`)))s+=120;
+    if(h.includes(q))s+=35;
+    return{item,s};
+  }).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
+  if(scored.length){
+    const cohortQuestion=q.includes("دفعه")||/\b20\d{2}\b/.test(q);
+    const focusedQuestion=codes.length>0||(cohortQuestion&&/(مسبق|متطلب|ساع|وحد|مواد|الزام|اختيار|خطه|تخرج)/.test(q));
+    return scored.slice(0,focusedQuestion?1:2).map(x=>x.item.answer).join("\n\n---\n\n")+"\n\nإذا تبي جواب أدق، اكتب اسم المادة أو التخصص.";
+  }
   if(q.includes("نوت")||q.includes("ملخص"))return notes.length?"النوتات موجودة في صفحة المراجعات. اكتب اسم المادة للبحث.":"لا توجد نوتات مضافة حتى الآن.";
   if(q.includes("فعال")||q.includes("ورش"))return events.length?"الأنشطة موجودة في صفحة الأنشطة.":"لا توجد أنشطة حتى الآن.";
-  if(q.includes("مرشد")||q.includes("مستشار"))return advisors.length?"المرشدون الأكاديميون موجودون في صفحة المرشدين.":"لم يضف المرشدون بعد.";
+  if(q.includes("مرشد")||q.includes("مستشار"))return advisorAnswer(question);
   if(q.includes("شلون")||q.includes("كيف حال")||q.includes("اهلا")||q.includes("مرحبا")||q.includes("هلا")||q.includes("هاي")||q.includes("hi")||q.includes("hello")||q.includes("السلام")||q.includes("صباح")||q.includes("مساء"))return"أهلاً وسهلاً! 🌿 أنا بايو، كيف أقدر أساعدك اليوم؟ اسألني عن النوتات، التخصصات، الأنشطة، أو أي شي يخص النادي.";
   return"ما عندي معلومة كافية عن هذا الموضوع. جرب تسأل عن النوتات، التخصصات، الأنشطة، أو المرشدين الأكاديميين! 🧬";
 }
 (async()=>{
   [notes,events,advisors,aiKnowledge,majorResources]=await Promise.all([get("notes"),get("events"),get("advisors"),get("aiKnowledge"),get("majorResources")]);
-  document.getElementById("aiStatus").textContent=`✨ بايو جاهز — ${buildKB().length} معلومة محملة`;
+  function updateStatus(){
+    const profile=[activeCohort?`دفعة ${activeCohort}`:"",activeMajor?MAJOR_DEFS[activeMajor].label:""].filter(Boolean).join(" · ");
+    document.getElementById("aiStatus").textContent=`✨ بايو جاهز — ${buildKB().length} معلومة محملة${profile?` | ${profile}`:""}`;
+  }
+  updateStatus();
   const form=document.getElementById("chatForm");
   const inp=document.getElementById("chatInput");
+  async function deliverAcademic(originalQuestion,cohort,majorKey="",lead=`حسب بيانات **دفعة ${cohort}**:`){
+    const ans=`${lead}\n\n${academicAnswer(originalQuestion,cohort,majorKey)}`;
+    addMsg("bot",ans);addAnswerActions();rememberTurn(originalQuestion,ans);updateStatus();
+    try{await addDoc(collection(db,"aiChats"),{question:originalQuestion,cohort,major:majorKey||null,answer:ans,createdAt:serverTimestamp()})}catch{}
+  }
+  async function continueAcademicQuestion(originalQuestion,cohort,lead){
+    const statedMajor=extractMajor(originalQuestion,{allowLoose:isPlanQuestion(originalQuestion)});
+    const knownMajor=statedMajor||activeMajor;
+    if(questionNeedsMajor(originalQuestion,cohort,knownMajor)){
+      pendingMajorQuestion=originalQuestion;awaitingMajor=true;
+      addMajorPrompt();
+      return;
+    }
+    const resolvedMajor=statedMajor||activeMajor||inferredCourseMajor(originalQuestion,cohort);
+    if(resolvedMajor)setActiveMajor(resolvedMajor);
+    await deliverAcademic(originalQuestion,cohort,resolvedMajor,lead||`حسب بيانات **دفعة ${cohort}**:`);
+  }
   async function handleSend(){
     const q=inp.value.trim();if(!q)return;
     inp.value="";inp.focus();addMsg("user",q);
@@ -686,8 +1017,104 @@ function answer(question){
     // بوابة صارمة: أسئلة الجدول والمواد المقترحة ما تروح للذكاء الاصطناعي إطلاقاً —
     // نجاوب مباشرة بإحالتها للمرشد الأكاديمي، بدون الاعتماد على تعليمات الموديل.
     if(isScheduleQuestion(q)){
-      addMsg("bot",SCHEDULE_REDIRECT);
-      try{await addDoc(collection(db,"aiChats"),{question:q,answer:SCHEDULE_REDIRECT,createdAt:serverTimestamp()})}catch{}
+      const scheduleRedirect=advisorAnswer(q,{schedule:true});
+      addMsg("bot",scheduleRedirect);
+      try{await addDoc(collection(db,"aiChats"),{question:q,answer:scheduleRedirect,redirectedToAdvisor:true,createdAt:serverTimestamp()})}catch{}
+      return;
+    }
+
+    const qNorm=norm(q);
+    if(/(انس|احذف).*(بيانات|دفعه|دفعت|تخصص)/.test(qNorm)){
+      clearAcademicProfile();awaitingCohort=false;awaitingMajor=false;pendingCohortQuestion="";pendingMajorQuestion="";
+      updateStatus();addMsg("bot","تم مسح الدفعة والتخصص المحفوظين من هالجلسة ✅");
+      return;
+    }
+    if(/(غير|بدل|تغيير|اغير).*(دفعه|دفعت)/.test(qNorm)){
+      setActiveCohort("");setActiveCourse("");conversationHistory.length=0;awaitingMajor=false;pendingMajorQuestion="";awaitingCohort=true;
+      updateStatus();addCohortPrompt("أكيد، شنو دفعتك الجديدة؟");
+      return;
+    }
+    if(/(غير|بدل|تغيير|اغير).*(تخصص)/.test(qNorm)){
+      setActiveMajor("");setActiveCourse("");conversationHistory.length=0;awaitingCohort=false;pendingCohortQuestion="";awaitingMajor=true;
+      updateStatus();addMajorPrompt("أكيد، شنو تخصصك الجديد؟");
+      return;
+    }
+    if(isAdvisorQuestion(q)){
+      const advisorReply=advisorAnswer(q);
+      addMsg("bot",advisorReply);
+      try{await addDoc(collection(db,"aiChats"),{question:q,answer:advisorReply,advisorLookup:true,createdAt:serverTimestamp()})}catch{}
+      return;
+    }
+    const cancelChoice=/^(الغاء|الغي|خلاص|مو الحين)$/.test(qNorm);
+    if((awaitingCohort||awaitingMajor||pendingCohortQuestion||pendingMajorQuestion)&&cancelChoice){
+      awaitingCohort=false;awaitingMajor=false;pendingCohortQuestion="";pendingMajorQuestion="";
+      addMsg("bot","تم، ألغيت الاختيار. اسألني بأي وقت 🌿");
+      return;
+    }
+
+    if(awaitingCohort||pendingCohortQuestion){
+      const chosen=extractCohort(q,{allowBare:true});
+      if(!chosen){
+        addCohortPrompt(mentionsUnsupportedCohort(q)?"بيانات هذه الدفعة غير متوفرة عندي حاليًا. الدفعات المتاحة من **2019 إلى 2025** — اختر واحدة منها:":"ما قدرت أحدد الدفعة. اختر سنة من **2019 إلى 2025** أو اكتب آخر رقمين، مثل: 25.");
+        return;
+      }
+      setActiveCohort(chosen);awaitingCohort=false;updateStatus();
+      if(pendingCohortQuestion){
+        const originalQuestion=pendingCohortQuestion;
+        pendingCohortQuestion="";
+        await continueAcademicQuestion(originalQuestion,chosen,`اعتمدت **دفعة ${chosen}** ✅`);
+      }else{
+        addMsg("bot",`تمام، حفظت إنك **دفعة ${chosen}** ✅ الحين اسألني عن أي مقرر أو خطة.`);
+      }
+      return;
+    }
+
+    if(awaitingMajor||pendingMajorQuestion){
+      const chosenMajor=extractMajor(q,{allowBare:true});
+      if(!chosenMajor){addMajorPrompt("ما قدرت أحدد التخصص. اختر واحدًا من التخصصات التالية:");return;}
+      setActiveMajor(chosenMajor);awaitingMajor=false;updateStatus();
+      if(pendingMajorQuestion){
+        const originalQuestion=pendingMajorQuestion;
+        pendingMajorQuestion="";
+        const cohort=activeCohort||extractCohort(originalQuestion);
+        if(!cohort){pendingCohortQuestion=originalQuestion;awaitingCohort=true;addCohortPrompt();return;}
+        await deliverAcademic(originalQuestion,cohort,chosenMajor,`اعتمدت **${MAJOR_DEFS[chosenMajor].name}** ✅`);
+      }else{
+        addMsg("bot",`تمام، حفظت تخصصك: **${MAJOR_DEFS[chosenMajor].name}** ✅`);
+      }
+      return;
+    }
+
+    if(isOrphanCourseFollowup(q)){
+      addMsg("bot","أي مقرر تقصد؟ اكتب **اسم المقرر أو رقمه** أول، وبعدها أقدر أكمل معاك بأسئلة قصيرة مثل: وكم وحدته؟ أو شنو يفتح؟");
+      inp.placeholder="اكتب اسم المقرر أو رقمه...";
+      return;
+    }
+
+    const statedCohort=extractCohort(q);
+    const statedMajor=extractMajor(q,{allowBare:true,allowLoose:isPlanQuestion(q)});
+    if(statedCohort)setActiveCohort(statedCohort);
+    if(statedMajor)setActiveMajor(statedMajor);
+    if(mentionsUnsupportedCohort(q)&&needsCohort(q)){
+      addCohortPrompt("بيانات هذه الدفعة غير متوفرة عندي حاليًا. الدفعات المتاحة من **2019 إلى 2025**:");
+      pendingCohortQuestion=q;awaitingCohort=true;
+      return;
+    }
+    if(needsCohort(q)){
+      if(!statedCohort&&!activeCohort){
+        pendingCohortQuestion=q;awaitingCohort=true;
+        addCohortPrompt();
+        return;
+      }
+      const cohort=statedCohort||activeCohort;
+      await continueAcademicQuestion(q,cohort);
+      return;
+    }
+
+    if(statedCohort||statedMajor){
+      updateStatus();
+      const profile=[statedCohort?`دفعة ${statedCohort}`:"",statedMajor?MAJOR_DEFS[statedMajor].name:""].filter(Boolean).join(" — ");
+      addMsg("bot",`تمام، حفظت بياناتك: **${profile}** ✅ الحين اسألني عن أي مقرر أو خطة.`);
       return;
     }
     // Show typing indicator
@@ -699,13 +1126,15 @@ function answer(question){
     let ans="";
     try{
       const allKB=buildKB();
-      const qNorm=norm(q);
+      const availableKB=activeCohort?allKB.filter(item=>item.source!=="cohort"||item.cohort===activeCohort):allKB;
       const qWords=qNorm.split(/\s+/).filter(w=>w.length>2);
-      const scored=allKB.map(item=>{const h=norm(`${item.title} ${item.answer} ${item.keywords}`);let s=0;qWords.forEach(w=>{if(h.includes(w))s+=Math.min(w.length+2,12)});if(h.includes(qNorm))s+=35;return{item,s}}).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
-      const relevant=scored.length?scored.slice(0,5).map(x=>x.item.answer):allKB.slice(0,3).map(x=>x.answer);
+      const scored=availableKB.map(item=>{const h=norm(`${item.title} ${item.answer} ${item.keywords}`);let s=0;qWords.forEach(w=>{if(h.includes(w))s+=Math.min(w.length+2,12)});if(h.includes(qNorm))s+=35;return{item,s}}).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
+      const relevant=scored.length?scored.slice(0,5).map(x=>x.item.answer):availableKB.slice(0,3).map(x=>x.answer);
       const kb=relevant.join("\n---\n");
+      const profileContext=activeCohort?`دفعة الطالب المحفوظة: ${activeCohort}${activeMajor?`، والتخصص: ${MAJOR_DEFS[activeMajor].name}`:""}. لا تستخدم أي بيانات من دفعة أخرى.`:"دفعة الطالب غير محددة.";
       const sysPrompt=`أنت "بايو" 🧬 — المساعد الذكي الرسمي لنادي العلوم البيولوجية (BSC KU) في جامعة الكويت.
 شخصيتك: ودود، واضح، دقيق، تتكلم بالعربية الكويتية الطبيعية.
+سياق الطالب: ${profileContext}
 
 ═══ قاعدة معرفتك عن النادي والجامعة ═══
 ${kb}
@@ -715,12 +1144,17 @@ ${kb}
 
 0. أهم قاعدة — لا استثناء لها أبداً: إذا كان السؤال عن الجدول الدراسي (توزيع المحاضرات، الأيام، الأوقات) أو عن المواد المقترحة/التي يسجّلها الطالب هذا الفصل:
    → لا تجاوب على السؤال إطلاقاً مهما كانت المعلومات متوفرة عندك.
-   → قل له بالضبط: "${SCHEDULE_REDIRECT.replace(/"/g,'\\"')}"
-   → هذا القرار يحتاج مراجعة شخصية مع المرشد الأكاديمي، مو إجابة عامة.
+   → وضّح أن بناء الجداول واختيار مواد التسجيل ليس من اختصاصك، وحوّله إلى المرشد الأكاديمي مع اسمه وإيميله من المعلومات المتاحة.
+   → هذا القرار يحتاج مراجعة شخصية مع المرشد الأكاديمي، مو إجابة عامة. لا تبنِ جدولاً حتى لو أصر الطالب.
 
 1. إذا السؤال عن النادي أو الجامعة أو التخصصات أو الأنشطة أو النوتات أو المرشدين:
    → استخدم المعلومات الموجودة أعلاه حصراً، ولا تخترع معلومات غير موجودة.
    → إذا ما وجدت المعلومة بالضبط، قل "هذه المعلومة غير متوفرة حالياً، تواصل مع النادي مباشرة."
+
+1.5 إذا كان السؤال عن مقرر جامعي أو مسبقاته أو وحداته أو وضعه في الخطة:
+   → لا تخمّن الدفعة ولا تخلط بين الدفعات.
+   → إذا لم تكن الدفعة محددة في سياق الطالب، اسأل: "إنت أي دفعة؟"
+   → إذا كانت محددة، استخدم معلومات تلك الدفعة فقط.
 
 2. إذا السؤال علمي أكاديمي (بيولوجيا، كيمياء، طب، وراثة، وغيرها):
    → أجب بشكل كامل ودقيق من معرفتك العلمية مع أمثلة وتوضيحات.
@@ -760,6 +1194,17 @@ ${kb}
   inp.addEventListener("keydown", e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); handleSend(); } });
   document.querySelectorAll("[data-prompt]").forEach(b=>{
     b.addEventListener("click",()=>{inp.value=b.dataset.prompt; handleSend();});
+  });
+  document.getElementById("chatBox").addEventListener("click",event=>{
+    const cohortButton=event.target.closest("[data-cohort-choice]");
+    if(cohortButton){inp.value=cohortButton.dataset.cohortChoice;handleSend();return;}
+    const majorButton=event.target.closest("[data-major-choice]");
+    if(majorButton){inp.value=MAJOR_DEFS[majorButton.dataset.majorChoice].label;handleSend();return;}
+    const actionButton=event.target.closest("[data-chat-action]");
+    if(!actionButton)return;
+    const actions={"change-cohort":"غير دفعتي","change-major":"غير تخصصي"};
+    if(actionButton.dataset.chatAction==="new-course"){setActiveCourse("");inp.focus();inp.placeholder="اكتب اسم المقرر أو رقمه...";return;}
+    inp.value=actions[actionButton.dataset.chatAction]||"";handleSend();
   });
 
   /* ── اسأل النادي مباشرة (رد بشري) ── */
