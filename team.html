@@ -402,11 +402,11 @@ a{color:inherit;text-decoration:none}
 <main class="main-content">
   <!-- Supervisor -->
   <div class="supervisor-card reveal">
-    <img class="supervisor-avatar" src="supervisor.jpg" alt="مشرف النادي">
+    <img class="supervisor-avatar" id="supAvatar" src="supervisor.jpg" alt="مشرف النادي">
     <div class="supervisor-info">
-      <div class="supervisor-role" data-ar="مشرف النادي" data-en="Club Supervisor">مشرف النادي</div>
-      <h3>د. أحلام بوعركي</h3>
-      <p data-ar="المشرف الأكاديمي لنادي العلوم البيولوجية في جامعة الكويت" data-en="Academic Supervisor of the Biological Sciences Club at Kuwait University">المشرف الأكاديمي لنادي العلوم البيولوجية في جامعة الكويت</p>
+      <div class="supervisor-role" id="supRole" data-ar="مشرف النادي" data-en="Club Supervisor">مشرف النادي</div>
+      <h3 id="supName">د. أحلام بوعركي</h3>
+      <p id="supBio" data-ar="المشرف الأكاديمي لنادي العلوم البيولوجية في جامعة الكويت" data-en="Academic Supervisor of the Biological Sciences Club at Kuwait University">المشرف الأكاديمي لنادي العلوم البيولوجية في جامعة الكويت</p>
     </div>
   </div>
 
@@ -455,6 +455,23 @@ async function loadTeam(){
     catch(e){ snap=await getDocs(collection(db,"teamMembers")); }
     const members=snap.docs.map(d=>({id:d.id,...d.data()}));
     members.sort((a,b)=>(+a.order||99)-(+b.order||99));
+    // كرت المشرفة يُبنى من Firestore (فئة supervisor) — النص الثابت يبقى احتياط لو ما كانت مضافة
+    const sup = members.find(m=>m.category==="supervisor");
+    if(sup){
+      const lang = localStorage.getItem("bscku_lang")||"ar";
+      const setSup = (id, ar, en) => {
+        const el = document.getElementById(id);
+        if(!el || !ar) return;
+        el.dataset.ar = ar;
+        el.dataset.en = en || ar;
+        el.textContent = lang==="ar" ? ar : (en || ar);
+      };
+      setSup("supRole", sup.role, sup.roleEn);
+      setSup("supName", sup.name, sup.nameEn);
+      setSup("supBio",  sup.bio,  sup.bioEn);
+      const av = document.getElementById("supAvatar");
+      if(av && sup.photo){ av.src = sup.photo; av.style.display = ""; }
+    }
     if(!members.length){
       grid.innerHTML="<p style='grid-column:1/-1;text-align:center;color:var(--muted);padding:3rem'>لا يوجد أعضاء بعد.</p>";
       return;
