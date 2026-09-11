@@ -58,6 +58,19 @@ a{color:inherit;text-decoration:none}
 .perk h3{font-size:.94rem;font-weight:800;margin-bottom:.3rem;color:var(--text)}
 .perk p{font-size:.82rem;color:var(--muted);line-height:1.65}
 
+/* ── شروط الانضمام ── */
+.reqs{background:rgba(22,22,22,.75);backdrop-filter:blur(20px);border:1px solid rgba(16,185,129,.28);border-radius:var(--radius-lg);padding:1.5rem 1.6rem;margin-bottom:2.5rem;position:relative;overflow:hidden}
+.reqs::before{content:'';position:absolute;top:0;inset-inline:0;height:2px;background:linear-gradient(90deg,#10b981,#34d399,#6366f1)}
+.reqs-head{display:flex;align-items:center;gap:.65rem;margin-bottom:1rem}
+.reqs-head .reqs-ico{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:1.15rem;background:rgba(16,185,129,.14);border:1px solid rgba(16,185,129,.3)}
+.reqs-head h3{font-size:1.02rem;font-weight:800;color:var(--text)}
+.reqs-head p{font-size:.8rem;color:var(--muted);margin-top:.1rem}
+.reqs ol{list-style:none;display:grid;gap:.6rem}
+.reqs li{display:flex;align-items:flex-start;gap:.75rem;font-size:.9rem;line-height:1.65;color:var(--text);padding:.7rem .9rem;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--border)}
+.reqs li .n{flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:.78rem;font-weight:900;color:#052e1c;background:linear-gradient(135deg,#34d399,#10b981);margin-top:.1rem}
+.reqs li b{font-weight:800}
+.reqs li small{display:block;font-size:.78rem;color:var(--muted);margin-top:.15rem}
+
 /* ── بطاقة الفورم ── */
 .form-card{background:rgba(22,22,22,.78);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.25rem;position:relative;overflow:hidden}
 .form-card::before{content:'';position:absolute;top:0;inset-inline:0;height:2px;background:linear-gradient(90deg,#10b981,#6366f1,#8b5cf6)}
@@ -173,12 +186,17 @@ textarea.input{resize:vertical;min-height:104px;line-height:1.8}
 [data-theme="light"] .page-hero p{color:#475569}
 [data-theme="light"] .page-badge{background:rgba(16,185,129,.08)!important;border-color:rgba(16,185,129,.25)!important;color:#047857!important}
 [data-theme="light"] .perk,
+[data-theme="light"] .reqs,
 [data-theme="light"] .form-card,
 [data-theme="light"] .state-card{background:#fff!important;border-color:rgba(99,102,241,.15)!important;box-shadow:0 2px 16px rgba(99,102,241,.08)!important;backdrop-filter:none!important}
 [data-theme="light"] .perk h3,
+[data-theme="light"] .reqs-head h3,
+[data-theme="light"] .reqs li,
 [data-theme="light"] .form-head h2,
 [data-theme="light"] .state-card h2{color:#161616!important}
 [data-theme="light"] .perk p,
+[data-theme="light"] .reqs-head p,
+[data-theme="light"] .reqs li small,
 [data-theme="light"] .form-head p,
 [data-theme="light"] .state-card p,
 [data-theme="light"] .submit-note,
@@ -300,6 +318,22 @@ textarea.input{resize:vertical;min-height:104px;line-height:1.8}
     <div class="perk"><span class="perk-ico">🎓</span><h3>خبرة عملية</h3><p>تنظيم ورش، محاضرات، ومحتوى علمي — خبرة تنفعك في السيرة الذاتية.</p></div>
     <div class="perk"><span class="perk-ico">📣</span><h3>صوتك مسموع</h3><p>النادي يوصل ملاحظات الطلبة واحتياجاتهم للقسم.</p></div>
     <div class="perk"><span class="perk-ico">🏅</span><h3>شهادات مشاركة</h3><p>شهادات موثّقة عن الأنشطة اللي تشارك فيها خلال السنة.</p></div>
+  </div>
+
+  <!-- شروط الانضمام -->
+  <div class="reqs" id="reqsCard">
+    <div class="reqs-head">
+      <span class="reqs-ico">📋</span>
+      <div>
+        <h3>شروط الانضمام</h3>
+        <p>تأكد إنك مستوفي الشروط قبل ما تعبّي النموذج</p>
+      </div>
+    </div>
+    <ol>
+      <li><span class="n">١</span><div>أن يكون الطالب من <b>قسم العلوم البيولوجية</b><small>تخصص رئيسي أو تخصص مساند</small></div></li>
+      <li><span class="n">٢</span><div>أن يكون للطالب <b>معدل تخصص</b> (MGPA)</div></li>
+      <li><span class="n">٣</span><div>ألا يكون للطالب <b>إنذار</b> في المعدل الرئيسي أو معدل التخصص</div></li>
+    </ol>
   </div>
 
   <!-- شاشة التحميل الأولية -->
