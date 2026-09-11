@@ -620,7 +620,8 @@ a{color:inherit;text-decoration:none}
             <option value="approved">✅ مقبول</option>
             <option value="rejected">❌ مرفوض</option>
           </select>
-          <button class="btn btn-sm" id="memExport">⬇️ تصدير CSV</button>
+          <button class="btn btn-sm" id="memExportXlsx">📊 تصدير Excel</button>
+          <button class="btn btn-sm" id="memExport">⬇️ CSV</button>
           <button class="btn btn-sm" id="memRefresh">🔄 تحديث</button>
         </div>
 
@@ -1244,6 +1245,7 @@ a{color:inherit;text-decoration:none}
             <div class="form-group">
               <label>الفئة</label>
               <select id="memberCategory">
+                <option value="supervisor">مشرفة النادي — Club Supervisor</option>
                 <option value="board">الهيئة الإدارية — Board of Directors</option>
                 <option value="academic">اللجنة الثقافية — Scientific Affairs Unit</option>
                 <option value="media">اللجنة الإعلامية — Media Affairs Unit</option>
@@ -1265,6 +1267,16 @@ a{color:inherit;text-decoration:none}
           <p style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">يُحدّث حقل nameEn لكل الأعضاء الحاليين بناءً على الاسم العربي — يمكنك التعديل يدوياً بعدها.</p>
           <div class="btn-row"><button class="btn btn-primary" id="seedNamesEnBtn">🌐 تحديث الأسماء الإنجليزية</button></div>
           <div id="seedNamesStatus" style="margin-top:.75rem;font-size:.85rem;color:var(--muted)"></div>
+        </div>
+
+        <!-- مشرفة النادي -->
+        <div class="card" style="border-color:rgba(245,158,11,.25)">
+          <h3 style="color:#f59e0b">⭐ مشرفة النادي</h3>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">تضيف مشرفة النادي للقائمة كعضو عادي تقدر تعدّل عليها من نفس الصفحة — وتظهر بكرت المشرفة في صفحة عائلة النادي. الزر ما يمسح أي تعديل: إذا كانت مضافة من قبل ما يغيّر شي.</p>
+          <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-primary" id="addSupervisorBtn" style="background:linear-gradient(135deg,#f59e0b,#f97316);border:none">⭐ إضافة مشرفة النادي</button>
+            <span id="supervisorStatus" style="font-size:.82rem;color:var(--muted)"></span>
+          </div>
         </div>
 
         <!-- استيراد جماعي -->
@@ -1927,6 +1939,79 @@ function memCsv(){
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},0);
 }
 
+// ملف Excel حقيقي (.xlsx) للمراجعة — ورقة للمتقدمين وورقة ملخص. مكتبة SheetJS تُحمَّل عند أول ضغطة فقط.
+let _xlsxLoading=null;
+function loadXlsx(){
+  if(window.XLSX) return Promise.resolve();
+  if(_xlsxLoading) return _xlsxLoading;
+  _xlsxLoading=new Promise((res,rej)=>{
+    const sc=document.createElement("script");
+    sc.src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+    sc.onload=res; sc.onerror=()=>{_xlsxLoading=null;rej(new Error("xlsx-load"));};
+    document.head.appendChild(sc);
+  });
+  return _xlsxLoading;
+}
+function memXlsxDate(ts){
+  const w=memDate(ts); if(!w) return "";
+  return w.toLocaleString("ar-KW",{timeZone:"Asia/Kuwait",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false});
+}
+async function memXlsx(){
+  const btn=document.getElementById("memExportXlsx");
+  const list=memFiltered();
+  if(!list.length){ alert("ما فيه طلبات مطابقة للتصدير"); return; }
+  if(btn){btn.disabled=true;btn.textContent="⏳ جاري التجهيز…";}
+  try{
+    await loadXlsx();
+    const head=["#","الاسم","الرقم الجامعي","التلفون","الإيميل","إيميل موثّق","إنستقرام","التخصص الرئيسي","التخصص المساند","السنة","GPA","MGPA","اللجنة","مهام اللجنة","المهارات","عضو سابق","عام العضوية السابقة","الدافع للانضمام","يتمنى يتعلم","اقتراحات","صورة الجدول","صورة تأكيد المعدل","الحالة","تاريخ التقديم","ملاحظات المراجعة"];
+    const rows=list.map((m,i)=>[i+1,m.fullName||"",m.studentId||"",m.phone||"",m.email||"",m.verifiedEmail?"نعم":"لا",
+      m.instagram?"@"+m.instagram:"",MN[m.major]||m.major||"",memSupport(m)||"",MEM_YEAR[m.year]||m.year||"",
+      m.gpa??"",m.mgpa??"",MEM_COMMITTEE[m.committee]||m.committee||"",(m.committeeTasks||[]).join("، "),m.skills||"",
+      m.previousMember?"نعم":"لا",m.previousMemberYear||"",m.reason||"",m.hopeToLearn||"",m.suggestions||"",
+      m.hasPhoto?"محفوظة":"—",m.hasGpaProof?"محفوظة":"—",
+      (MEM_STATUS[m.status||"pending"]||MEM_STATUS.pending)[0].replace(/^\S+\s/,""),memXlsxDate(m.createdAt),""]);
+    const ws=XLSX.utils.aoa_to_sheet([head,...rows]);
+    const widths=[5,26,14,13,28,10,16,20,20,14,7,7,16,30,30,9,12,45,45,45,12,14,12,18,30];
+    ws["!cols"]=widths.map(w=>({wch:w}));
+    ws["!rows"]=[{hpt:26}];
+    ws["!freeze"]={xSplit:0,ySplit:1};
+    ws["!views"]=[{RTL:true}];
+    ws["!autofilter"]={ref:XLSX.utils.encode_range({s:{c:0,r:0},e:{c:head.length-1,r:rows.length}})};
+    // جعل الأرقام أرقاماً فعلية (GPA/MGPA) عشان الفرز والمتوسطات تشتغل بإكسل
+    for(let r=1;r<=rows.length;r++){
+      for(const c of [10,11]){ const cell=ws[XLSX.utils.encode_cell({c,r})]; if(cell&&cell.v!==""&&!isNaN(+cell.v)){cell.t="n";cell.v=+cell.v;cell.z="0.00";} }
+    }
+    const wb=XLSX.utils.book_new();
+    wb.Workbook={Views:[{RTL:true}]};
+    XLSX.utils.book_append_sheet(wb,ws,"المتقدمين");
+
+    // ورقة الملخص
+    const count=(fn)=>list.reduce((a,m)=>{const k=fn(m);a[k]=(a[k]||0)+1;return a;},{});
+    const byStatus=count(m=>(MEM_STATUS[m.status||"pending"]||MEM_STATUS.pending)[0]);
+    const byCom=count(m=>MEM_COMMITTEE[m.committee]||m.committee||"—");
+    const byMajor=count(m=>MN[m.major]||m.major||"—");
+    const byYear=count(m=>MEM_YEAR[m.year]||m.year||"—");
+    const gpas=list.map(m=>+m.gpa).filter(n=>!isNaN(n));
+    const avg=gpas.length?(gpas.reduce((a,b)=>a+b,0)/gpas.length):null;
+    const sum=[["ملخص طلبات العضوية",""],["تاريخ التصدير",new Date().toLocaleString("ar-KW",{timeZone:"Asia/Kuwait"})],["عدد الطلبات",list.length],["متوسط المعدل العام",avg==null?"—":+avg.toFixed(2)],[],
+      ["حسب الحالة","العدد"],...Object.entries(byStatus),[],
+      ["حسب اللجنة","العدد"],...Object.entries(byCom),[],
+      ["حسب التخصص","العدد"],...Object.entries(byMajor).sort((a,b)=>b[1]-a[1]),[],
+      ["حسب السنة","العدد"],...Object.entries(byYear)];
+    const ws2=XLSX.utils.aoa_to_sheet(sum);
+    ws2["!cols"]=[{wch:28},{wch:12}];
+    ws2["!views"]=[{RTL:true}];
+    XLSX.utils.book_append_sheet(wb,ws2,"ملخص");
+
+    XLSX.writeFile(wb,`bscku-memberships-${new Date().toISOString().slice(0,10)}.xlsx`);
+  }catch(e){
+    console.error(e);
+    alert(e.message==="xlsx-load"?"تعذّر تحميل مكتبة Excel — تأكد من الإنترنت":"صار خطأ أثناء التصدير");
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent="📊 تصدير Excel";}
+  }
+}
+
 /* ── فتح/إغلاق باب التسجيل ── */
 let _memOpen=true;
 function paintMemToggle(){
@@ -1965,6 +2050,7 @@ document.getElementById("memSaveMsg")?.addEventListener("click",async function()
 document.getElementById("memSearch")?.addEventListener("input",renderMemList);
 document.getElementById("memFilter")?.addEventListener("change",renderMemList);
 document.getElementById("memExport")?.addEventListener("click",memCsv);
+document.getElementById("memExportXlsx")?.addEventListener("click",memXlsx);
 document.getElementById("memRefresh")?.addEventListener("click",()=>loadAll());
 document.querySelectorAll('.nav-item[data-panel="members"]').forEach(b=>b.addEventListener("click",loadMemConfig));
 
@@ -3876,7 +3962,7 @@ window.gcSave=async function(){
     if(!members.length){ list.innerHTML='<p style="color:var(--muted);padding:1rem">لا يوجد أعضاء بعد.</p>'; return; }
     // Sort by order
     members.sort((a,b)=>(+a.order||99)-(+b.order||99));
-    const catNames = {board:'الهيئة الإدارية',academic:'اللجنة الثقافية',media:'اللجنة الإعلامية',events:'فريق الفعاليات',other:'أخرى'};
+    const catNames = {supervisor:'مشرفة النادي',board:'الهيئة الإدارية',academic:'اللجنة الثقافية',media:'اللجنة الإعلامية',events:'فريق الفعاليات',other:'أخرى'};
     list.innerHTML = members.map(m=>`
       <div class="list-item" id="mi-${m.id}">
         <div style="display:flex;align-items:center;gap:.85rem;flex:1;min-width:0">
@@ -4085,6 +4171,40 @@ window.gcSave=async function(){
     btn.textContent = '+ إضافة العضو';
     document.getElementById('memberFormStatus').textContent = '';
     if(typeof clearMemberPhoto==='function') clearMemberPhoto();
+  };
+
+  // ── مشرفة النادي: تُضاف كعضو عادي عشان تنعدّل من نفس الصفحة ──
+  const supBtn = document.getElementById('addSupervisorBtn');
+  if(supBtn) supBtn.onclick = async function(){
+    const st = document.getElementById('supervisorStatus');
+    this.disabled = true;
+    try{
+      const ref = doc(db,'teamMembers','m00');
+      const snap = await getDoc(ref);
+      if(snap.exists()){
+        st.textContent = '✓ مشرفة النادي مضافة من قبل — عدّلي عليها من القائمة تحت.';
+        st.style.color = '#10b981';
+      }else{
+        await setDoc(ref, {
+          order: 0,
+          category: 'supervisor',
+          name: 'د. أحلام بوعركي',
+          nameEn: 'Dr. Ahlam Bouarki',
+          role: 'مشرفة النادي',
+          roleEn: 'Club Supervisor',
+          bio: 'المشرف الأكاديمي لنادي العلوم البيولوجية في جامعة الكويت',
+          photo: 'supervisor.jpg',
+          createdAt: serverTimestamp()
+        });
+        st.textContent = '✅ تمت إضافة مشرفة النادي — تقدر تعدّل عليها الحين.';
+        st.style.color = '#10b981';
+      }
+      await loadMembers();
+    }catch(e){
+      st.textContent = '❌ ' + e.message;
+      st.style.color = '#f87171';
+    }
+    this.disabled = false;
   };
 
   window.loadMembers = loadMembers;
