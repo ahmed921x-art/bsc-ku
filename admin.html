@@ -620,7 +620,8 @@ a{color:inherit;text-decoration:none}
             <option value="approved">✅ مقبول</option>
             <option value="rejected">❌ مرفوض</option>
           </select>
-          <button class="btn btn-sm" id="memExportXlsx">📊 تصدير Excel</button>
+          <button class="btn btn-sm" id="memExportXlsx" title="يضيف الطلبات الجديدة على نفس ملف الإكسل ويحافظ على ملاحظاتك">📊 تحديث ملف Excel</button>
+          <button class="btn btn-sm" id="memExportXlsxPick" title="اختيار/إنشاء ملف إكسل آخر">📁</button>
           <button class="btn btn-sm" id="memExport">⬇️ CSV</button>
           <button class="btn btn-sm" id="memRefresh">🔄 تحديث</button>
         </div>
@@ -1939,7 +1940,10 @@ function memCsv(){
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},0);
 }
 
-// ملف Excel حقيقي (.xlsx) للمراجعة — ورقة للمتقدمين وورقة ملخص. مكتبة SheetJS تُحمَّل عند أول ضغطة فقط.
+// ملف Excel واحد للمراجعة يتحدّث بدل ما ينزّل ملف جديد كل مرة.
+// أول ضغطة تختار مكان الملف (File System Access API — كروم/إيدج على الكمبيوتر) ونحفظ المقبض في IndexedDB.
+// كل ضغطة بعدها: نقرأ الملف الحالي، نضيف المتقدمين الجدد في الآخر، نحدّث بيانات القدامى،
+// ونحافظ على عمود «ملاحظات المراجعة» وأي أعمدة أضفتها أنت. لو المتصفح ما يدعم الـ API نرجع لتنزيل ملف عادي.
 let _xlsxLoading=null;
 function loadXlsx(){
   if(window.XLSX) return Promise.resolve();
@@ -1956,59 +1960,189 @@ function memXlsxDate(ts){
   const w=memDate(ts); if(!w) return "";
   return w.toLocaleString("ar-KW",{timeZone:"Asia/Kuwait",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false});
 }
-async function memXlsx(){
+
+// ── تخزين مقبض الملف ──
+const XLSX_DB="bscku-admin", XLSX_STORE="handles", XLSX_KEY="memXlsx";
+function xlsxDb(){
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open(XLSX_DB,1);
+    r.onupgradeneeded=()=>r.result.createObjectStore(XLSX_STORE);
+    r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);
+  });
+}
+async function xlsxGetHandle(){
+  try{
+    const db=await xlsxDb();
+    return await new Promise((res,rej)=>{
+      const t=db.transaction(XLSX_STORE,"readonly").objectStore(XLSX_STORE).get(XLSX_KEY);
+      t.onsuccess=()=>res(t.result||null); t.onerror=()=>rej(t.error);
+    });
+  }catch(e){ return null; }
+}
+async function xlsxSetHandle(h){
+  try{
+    const db=await xlsxDb();
+    await new Promise((res,rej)=>{
+      const t=db.transaction(XLSX_STORE,"readwrite").objectStore(XLSX_STORE);
+      const q=h?t.put(h,XLSX_KEY):t.delete(XLSX_KEY);
+      q.onsuccess=res; q.onerror=()=>rej(q.error);
+    });
+  }catch(e){}
+}
+const xlsxSupported=()=>typeof window.showSaveFilePicker==="function";
+async function xlsxPickHandle(){
+  const h=await window.showSaveFilePicker({
+    suggestedName:"bscku-memberships.xlsx",
+    types:[{description:"Excel",accept:{"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":[".xlsx"]}}]
+  });
+  await xlsxSetHandle(h);
+  return h;
+}
+async function xlsxEnsureWritable(h){
+  if(!h) return false;
+  const opts={mode:"readwrite"};
+  if((await h.queryPermission(opts))==="granted") return true;
+  return (await h.requestPermission(opts))==="granted";
+}
+
+// ── بناء الصفوف ──
+const MEM_XLSX_HEAD=["#","الاسم","الرقم الجامعي","التلفون","الإيميل","إيميل موثّق","إنستقرام","التخصص الرئيسي","التخصص المساند","السنة","GPA","MGPA","اللجنة","مهام اللجنة","المهارات","عضو سابق","عام العضوية السابقة","الدافع للانضمام","يتمنى يتعلم","اقتراحات","صورة الجدول","صورة تأكيد المعدل","الحالة","تاريخ التقديم","ملاحظات المراجعة","UID"];
+const MEM_XLSX_WIDTHS=[5,26,14,13,28,10,16,20,20,14,7,7,16,30,30,9,12,45,45,45,12,14,12,18,30,4];
+const MEM_XLSX_KEEP=new Set(["#","ملاحظات المراجعة"]); // أعمدة ما نلمسها عند التحديث
+function memXlsxRow(m){
+  const num=v=>(v===""||v==null||isNaN(+v))?"":+v;
+  return {
+    "الاسم":m.fullName||"","الرقم الجامعي":m.studentId||"","التلفون":m.phone||"","الإيميل":m.email||"",
+    "إيميل موثّق":m.verifiedEmail?"نعم":"لا","إنستقرام":m.instagram?"@"+m.instagram:"",
+    "التخصص الرئيسي":MN[m.major]||m.major||"","التخصص المساند":memSupport(m)||"","السنة":MEM_YEAR[m.year]||m.year||"",
+    "GPA":num(m.gpa),"MGPA":num(m.mgpa),
+    "اللجنة":MEM_COMMITTEE[m.committee]||m.committee||"","مهام اللجنة":(m.committeeTasks||[]).join("، "),"المهارات":m.skills||"",
+    "عضو سابق":m.previousMember?"نعم":"لا","عام العضوية السابقة":m.previousMemberYear||"",
+    "الدافع للانضمام":m.reason||"","يتمنى يتعلم":m.hopeToLearn||"","اقتراحات":m.suggestions||"",
+    "صورة الجدول":m.hasPhoto?"محفوظة":"—","صورة تأكيد المعدل":m.hasGpaProof?"محفوظة":"—",
+    "الحالة":(MEM_STATUS[m.status||"pending"]||MEM_STATUS.pending)[0].replace(/^\S+\s/,""),
+    "تاريخ التقديم":memXlsxDate(m.createdAt),"ملاحظات المراجعة":"","UID":m.id||m.uid||""
+  };
+}
+// يقرأ ورقة المتقدمين من ملف قديم → {head, rows:[{col:val}]}
+function memXlsxParseExisting(buf){
+  try{
+    const wb=XLSX.read(buf,{type:"array"});
+    const ws=wb.Sheets["المتقدمين"]||wb.Sheets[wb.SheetNames[0]];
+    if(!ws) return null;
+    const aoa=XLSX.utils.sheet_to_json(ws,{header:1,defval:""});
+    if(!aoa.length) return null;
+    const head=aoa[0].map(h=>String(h).trim());
+    const rows=aoa.slice(1).filter(r=>r.some(c=>c!=="")).map(r=>{const o={};head.forEach((h,i)=>{if(h)o[h]=r[i]??"";});return o;});
+    return {head,rows};
+  }catch(e){ console.warn("xlsx parse",e); return null; }
+}
+function memXlsxBuild(existing){
+  const all=_memCache;
+  const fresh=new Map(); all.forEach(m=>fresh.set(m.id||m.uid,memXlsxRow(m)));
+  const bySid=new Map(); all.forEach(m=>{ if(m.studentId) bySid.set(String(m.studentId),m.id||m.uid); });
+  // الأعمدة: القياسية + أي أعمدة إضافية أضافها المستخدم في الملف القديم
+  const extra=existing?existing.head.filter(h=>h&&!MEM_XLSX_HEAD.includes(h)):[];
+  const head=[...MEM_XLSX_HEAD.slice(0,-1),...extra,"UID"];
+  const out=[]; let added=0,updated=0,kept=0;
+  const seen=new Set();
+  if(existing){
+    for(const old of existing.rows){
+      const key=(old["UID"]&&fresh.has(old["UID"]))?old["UID"]:bySid.get(String(old["الرقم الجامعي"]||"")); // ملفات قديمة بدون UID تنربط بالرقم الجامعي
+      const f=key?fresh.get(key):null;
+      if(f&&!seen.has(key)){
+        const row={...f};
+        for(const h of head){ if(MEM_XLSX_KEEP.has(h)||extra.includes(h)) row[h]=old[h]??""; }
+        out.push(row); seen.add(key); updated++;
+      }else{ out.push({...old}); kept++; } // طلب انحذف من الموقع — نخليه بالملف مثل ما هو
+    }
+  }
+  const newOnes=all.filter(m=>!seen.has(m.id||m.uid));
+  // الأقدم أولاً عشان الترتيب الزمني يستمر
+  newOnes.sort((a,b)=>(memDate(a.createdAt)||0)-(memDate(b.createdAt)||0));
+  for(const m of newOnes){ out.push(fresh.get(m.id||m.uid)); added++; }
+  const aoa=[head,...out.map((r,i)=>head.map(h=>h==="#"?i+1:(r[h]??"")))];
+  const ws=XLSX.utils.aoa_to_sheet(aoa);
+  ws["!cols"]=head.map(h=>({wch:MEM_XLSX_WIDTHS[MEM_XLSX_HEAD.indexOf(h)]||18}));
+  ws["!rows"]=[{hpt:26}];
+  ws["!freeze"]={xSplit:0,ySplit:1};
+  ws["!views"]=[{RTL:true}];
+  ws["!autofilter"]={ref:XLSX.utils.encode_range({s:{c:0,r:0},e:{c:head.length-1,r:out.length}})};
+  for(const h of ["GPA","MGPA"]){
+    const c=head.indexOf(h);
+    for(let r=1;r<=out.length;r++){ const cell=ws[XLSX.utils.encode_cell({c,r})]; if(cell&&cell.v!==""&&!isNaN(+cell.v)){cell.t="n";cell.v=+cell.v;cell.z="0.00";} }
+  }
+  const wb=XLSX.utils.book_new();
+  wb.Workbook={Views:[{RTL:true}]};
+  XLSX.utils.book_append_sheet(wb,ws,"المتقدمين");
+
+  // ورقة الملخص (تُعاد كل مرة من بيانات الموقع)
+  const count=(fn)=>all.reduce((a,m)=>{const k=fn(m);a[k]=(a[k]||0)+1;return a;},{});
+  const byStatus=count(m=>(MEM_STATUS[m.status||"pending"]||MEM_STATUS.pending)[0]);
+  const byCom=count(m=>MEM_COMMITTEE[m.committee]||m.committee||"—");
+  const byMajor=count(m=>MN[m.major]||m.major||"—");
+  const byYear=count(m=>MEM_YEAR[m.year]||m.year||"—");
+  const gpas=all.map(m=>+m.gpa).filter(n=>!isNaN(n));
+  const avg=gpas.length?(gpas.reduce((a,b)=>a+b,0)/gpas.length):null;
+  const sum=[["ملخص طلبات العضوية",""],["آخر تحديث",new Date().toLocaleString("ar-KW",{timeZone:"Asia/Kuwait"})],["عدد الطلبات",all.length],["متوسط المعدل العام",avg==null?"—":+avg.toFixed(2)],[],
+    ["حسب الحالة","العدد"],...Object.entries(byStatus),[],
+    ["حسب اللجنة","العدد"],...Object.entries(byCom),[],
+    ["حسب التخصص","العدد"],...Object.entries(byMajor).sort((a,b)=>b[1]-a[1]),[],
+    ["حسب السنة","العدد"],...Object.entries(byYear)];
+  const ws2=XLSX.utils.aoa_to_sheet(sum);
+  ws2["!cols"]=[{wch:28},{wch:12}];
+  ws2["!views"]=[{RTL:true}];
+  XLSX.utils.book_append_sheet(wb,ws2,"ملخص");
+  return {wb,added,updated,kept,total:out.length};
+}
+function memXlsxSummary(r,name){
+  return `✅ تم تحديث ${name}\n\n• طلبات جديدة أُضيفت: ${r.added}\n• طلبات موجودة تحدّثت بياناتها: ${r.updated}${r.kept?`\n• صفوف قديمة بقيت كما هي: ${r.kept}`:""}\n• الإجمالي في الملف: ${r.total}\n\nملاحظاتك في عمود «ملاحظات المراجعة» محفوظة.`;
+}
+
+async function memXlsx(pickNew){
   const btn=document.getElementById("memExportXlsx");
-  const list=memFiltered();
-  if(!list.length){ alert("ما فيه طلبات مطابقة للتصدير"); return; }
-  if(btn){btn.disabled=true;btn.textContent="⏳ جاري التجهيز…";}
+  if(!_memCache.length){ alert("ما وصلت طلبات عضوية بعد."); return; }
+  if(btn){btn.disabled=true;btn.textContent="⏳ جاري التحديث…";}
   try{
     await loadXlsx();
-    const head=["#","الاسم","الرقم الجامعي","التلفون","الإيميل","إيميل موثّق","إنستقرام","التخصص الرئيسي","التخصص المساند","السنة","GPA","MGPA","اللجنة","مهام اللجنة","المهارات","عضو سابق","عام العضوية السابقة","الدافع للانضمام","يتمنى يتعلم","اقتراحات","صورة الجدول","صورة تأكيد المعدل","الحالة","تاريخ التقديم","ملاحظات المراجعة"];
-    const rows=list.map((m,i)=>[i+1,m.fullName||"",m.studentId||"",m.phone||"",m.email||"",m.verifiedEmail?"نعم":"لا",
-      m.instagram?"@"+m.instagram:"",MN[m.major]||m.major||"",memSupport(m)||"",MEM_YEAR[m.year]||m.year||"",
-      m.gpa??"",m.mgpa??"",MEM_COMMITTEE[m.committee]||m.committee||"",(m.committeeTasks||[]).join("، "),m.skills||"",
-      m.previousMember?"نعم":"لا",m.previousMemberYear||"",m.reason||"",m.hopeToLearn||"",m.suggestions||"",
-      m.hasPhoto?"محفوظة":"—",m.hasGpaProof?"محفوظة":"—",
-      (MEM_STATUS[m.status||"pending"]||MEM_STATUS.pending)[0].replace(/^\S+\s/,""),memXlsxDate(m.createdAt),""]);
-    const ws=XLSX.utils.aoa_to_sheet([head,...rows]);
-    const widths=[5,26,14,13,28,10,16,20,20,14,7,7,16,30,30,9,12,45,45,45,12,14,12,18,30];
-    ws["!cols"]=widths.map(w=>({wch:w}));
-    ws["!rows"]=[{hpt:26}];
-    ws["!freeze"]={xSplit:0,ySplit:1};
-    ws["!views"]=[{RTL:true}];
-    ws["!autofilter"]={ref:XLSX.utils.encode_range({s:{c:0,r:0},e:{c:head.length-1,r:rows.length}})};
-    // جعل الأرقام أرقاماً فعلية (GPA/MGPA) عشان الفرز والمتوسطات تشتغل بإكسل
-    for(let r=1;r<=rows.length;r++){
-      for(const c of [10,11]){ const cell=ws[XLSX.utils.encode_cell({c,r})]; if(cell&&cell.v!==""&&!isNaN(+cell.v)){cell.t="n";cell.v=+cell.v;cell.z="0.00";} }
+    if(xlsxSupported()){
+      let h=pickNew?null:await xlsxGetHandle();
+      let firstTime=!h;
+      if(!h) h=await xlsxPickHandle();
+      if(!(await xlsxEnsureWritable(h))) throw new Error("perm");
+      let existing=null;
+      if(!firstTime){
+        try{ const f=await h.getFile(); if(f.size>0) existing=memXlsxParseExisting(await f.arrayBuffer()); }
+        catch(e){
+          if(e.name!=="NotFoundError") throw e;
+          // الملف انحذف أو انتقل — نختار مكان جديد
+          await xlsxSetHandle(null); h=await xlsxPickHandle();
+          if(!(await xlsxEnsureWritable(h))) throw new Error("perm");
+        }
+      }
+      const r=memXlsxBuild(existing);
+      const buf=XLSX.write(r.wb,{type:"array",bookType:"xlsx"});
+      const w=await h.createWritable(); await w.write(buf); await w.close();
+      alert(memXlsxSummary(r,h.name));
+    }else{
+      // متصفح بدون File System Access: يختار الملف القديم (اختياري) ويرجع ينزّل نسخة محدّثة بنفس الاسم
+      const existing=await new Promise(res=>{
+        if(!confirm("متصفحك ما يقدر يعدّل الملف مباشرة.\n\nاضغط «موافق» لاختيار ملف الإكسل القديم عشان نضيف عليه، أو «إلغاء» لتنزيل ملف جديد.")) return res(null);
+        const inp=document.createElement("input"); inp.type="file"; inp.accept=".xlsx";
+        inp.onchange=async()=>{ const f=inp.files[0]; res(f?memXlsxParseExisting(await f.arrayBuffer()):null); };
+        inp.oncancel=()=>res(null);
+        inp.click();
+      });
+      const r=memXlsxBuild(existing);
+      XLSX.writeFile(r.wb,"bscku-memberships.xlsx");
+      alert(memXlsxSummary(r,"bscku-memberships.xlsx")+"\n\n(نزل كملف جديد — استبدل فيه النسخة القديمة)");
     }
-    const wb=XLSX.utils.book_new();
-    wb.Workbook={Views:[{RTL:true}]};
-    XLSX.utils.book_append_sheet(wb,ws,"المتقدمين");
-
-    // ورقة الملخص
-    const count=(fn)=>list.reduce((a,m)=>{const k=fn(m);a[k]=(a[k]||0)+1;return a;},{});
-    const byStatus=count(m=>(MEM_STATUS[m.status||"pending"]||MEM_STATUS.pending)[0]);
-    const byCom=count(m=>MEM_COMMITTEE[m.committee]||m.committee||"—");
-    const byMajor=count(m=>MN[m.major]||m.major||"—");
-    const byYear=count(m=>MEM_YEAR[m.year]||m.year||"—");
-    const gpas=list.map(m=>+m.gpa).filter(n=>!isNaN(n));
-    const avg=gpas.length?(gpas.reduce((a,b)=>a+b,0)/gpas.length):null;
-    const sum=[["ملخص طلبات العضوية",""],["تاريخ التصدير",new Date().toLocaleString("ar-KW",{timeZone:"Asia/Kuwait"})],["عدد الطلبات",list.length],["متوسط المعدل العام",avg==null?"—":+avg.toFixed(2)],[],
-      ["حسب الحالة","العدد"],...Object.entries(byStatus),[],
-      ["حسب اللجنة","العدد"],...Object.entries(byCom),[],
-      ["حسب التخصص","العدد"],...Object.entries(byMajor).sort((a,b)=>b[1]-a[1]),[],
-      ["حسب السنة","العدد"],...Object.entries(byYear)];
-    const ws2=XLSX.utils.aoa_to_sheet(sum);
-    ws2["!cols"]=[{wch:28},{wch:12}];
-    ws2["!views"]=[{RTL:true}];
-    XLSX.utils.book_append_sheet(wb,ws2,"ملخص");
-
-    XLSX.writeFile(wb,`bscku-memberships-${new Date().toISOString().slice(0,10)}.xlsx`);
   }catch(e){
+    if(e&&e.name==="AbortError") return; // المستخدم سكّر نافذة اختيار الملف
     console.error(e);
-    alert(e.message==="xlsx-load"?"تعذّر تحميل مكتبة Excel — تأكد من الإنترنت":"صار خطأ أثناء التصدير");
+    alert(e.message==="xlsx-load"?"تعذّر تحميل مكتبة Excel — تأكد من الإنترنت":e.message==="perm"?"ما انعطت صلاحية الكتابة على الملف.":"صار خطأ أثناء التحديث: "+(e.message||e));
   }finally{
-    if(btn){btn.disabled=false;btn.textContent="📊 تصدير Excel";}
+    if(btn){btn.disabled=false;btn.textContent="📊 تحديث ملف Excel";}
   }
 }
 
@@ -2050,7 +2184,8 @@ document.getElementById("memSaveMsg")?.addEventListener("click",async function()
 document.getElementById("memSearch")?.addEventListener("input",renderMemList);
 document.getElementById("memFilter")?.addEventListener("change",renderMemList);
 document.getElementById("memExport")?.addEventListener("click",memCsv);
-document.getElementById("memExportXlsx")?.addEventListener("click",memXlsx);
+document.getElementById("memExportXlsx")?.addEventListener("click",()=>memXlsx(false));
+document.getElementById("memExportXlsxPick")?.addEventListener("click",()=>memXlsx(true));
 document.getElementById("memRefresh")?.addEventListener("click",()=>loadAll());
 document.querySelectorAll('.nav-item[data-panel="members"]').forEach(b=>b.addEventListener("click",loadMemConfig));
 
