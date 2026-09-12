@@ -166,8 +166,24 @@ service cloud.firestore {
       allow get: if isAdmin() || (request.auth != null && request.auth.uid == uid);
       allow list: if isAdmin();
       // Applications are final once sent; an admin deletes to let a student
-      // re-apply.
+      // re-apply. Admin `create` exists only so a deleted application can be
+      // restored from membershipsDeleted with its original id.
       allow update, delete: if isAdmin();
+      allow create: if isAdmin();
+    }
+
+    // Deletion log. Every application an admin deletes from the panel is
+    // copied here first (data + who deleted it + when), together with its two
+    // photos in the sibling collections, so it can be inspected or restored.
+    // Nothing but an admin ever touches these.
+    match /membershipsDeleted/{id} {
+      allow read, write: if isAdmin();
+    }
+    match /membershipsDeletedPhotos/{id} {
+      allow read, write: if isAdmin();
+    }
+    match /membershipsDeletedGpaProof/{id} {
+      allow read, write: if isAdmin();
     }
 
     // The schedule photo, base64 in its own document so the admin list can load

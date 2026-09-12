@@ -627,6 +627,12 @@ a{color:inherit;text-decoration:none}
         </div>
 
         <div class="items-list" id="membersList"></div>
+
+        <details id="memTrash" style="margin-top:1.5rem">
+          <summary style="cursor:pointer;font-weight:800;color:var(--muted);padding:.5rem 0">🗑️ سجل الطلبات المحذوفة <span id="memTrashCount" style="font-size:.75rem;font-weight:700;background:rgba(239,68,68,.15);color:#fca5a5;padding:.1rem .5rem;border-radius:99px"></span></summary>
+          <p style="font-size:.8rem;color:var(--muted);margin:.4rem 0 .9rem">كل طلب ينحذف من لوحة التحكم ينحفظ هنا مع اسم الأدمن اللي حذفه والوقت — وتقدر ترجّعه بضغطة، أو تحذفه نهائياً.</p>
+          <div class="items-list" id="memTrashList"></div>
+        </details>
       </div>
 
       <!-- COURSE RATINGS -->
@@ -1881,10 +1887,90 @@ window.memReject_=async id=>{
 // الحذف هو الطريقة الوحيدة اللي تخلي الطالب يقدر يقدّم من جديد — معرّف المستند
 // هو الـ uid حقه، فوجوده يمنع أي طلب ثاني.
 window.memDelete_=async id=>{
-  if(!confirm("حذف الطلب نهائياً؟\n\nملاحظة: الحذف يسمح لنفس الطالب يقدّم طلب جديد."))return;
-  await deleteDoc(doc(db,"memberships",id));
-  await deleteDoc(doc(db,"membershipPhotos",id)).catch(()=>{});
-  await deleteDoc(doc(db,"membershipGpaProof",id)).catch(()=>{});
+  const m=_memCache.find(x=>x.id===id);
+  if(!confirm(`حذف طلب «${m?.fullName||"الطالب"}»؟\n\nينحفظ في سجل المحذوفات وتقدر ترجّعه.\nملاحظة: الحذف يسمح لنفس الطالب يقدّم طلب جديد.`))return;
+  try{
+    // نأرشف أولاً — لو الأرشفة فشلت ما نحذف شي
+    const archiveId=`${id}_${Date.now()}`;
+    const [snap,photo,proof]=await Promise.all([
+      getDoc(doc(db,"memberships",id)),
+      getDoc(doc(db,"membershipPhotos",id)).catch(()=>null),
+      getDoc(doc(db,"membershipGpaProof",id)).catch(()=>null)
+    ]);
+    if(!snap.exists()){ alert("الطلب مو موجود (يمكن انحذف من أدمن ثاني)."); loadAll(); return; }
+    const data=snap.data();
+    await setDoc(doc(db,"membershipsDeleted",archiveId),{
+      ...data, originalId:id,
+      deletedBy:auth.currentUser?.email||"", deletedAt:serverTimestamp(),
+      hadPhoto:!!(photo&&photo.exists()), hadGpaProof:!!(proof&&proof.exists())
+    });
+    if(photo&&photo.exists()) await setDoc(doc(db,"membershipsDeletedPhotos",archiveId),photo.data());
+    if(proof&&proof.exists()) await setDoc(doc(db,"membershipsDeletedGpaProof",archiveId),proof.data());
+    await deleteDoc(doc(db,"memberships",id));
+    await deleteDoc(doc(db,"membershipPhotos",id)).catch(()=>{});
+    await deleteDoc(doc(db,"membershipGpaProof",id)).catch(()=>{});
+  }catch(e){
+    console.error(e);
+    alert("ما انحذف الطلب — فشلت الأرشفة: "+(e.message||e));
+    return;
+  }
+  loadAll();
+};
+
+// ───────── سجل الطلبات المحذوفة ─────────
+let _memTrash=[];
+function renderMemTrash(items){
+  _memTrash=[...items].sort((a,b)=>(memDate(b.deletedAt)?.getTime()||0)-(memDate(a.deletedAt)?.getTime()||0));
+  const c=document.getElementById("memTrashCount"); if(c) c.textContent=_memTrash.length||"";
+  const el=document.getElementById("memTrashList"); if(!el) return;
+  if(!_memTrash.length){ el.innerHTML='<p style="color:var(--muted);padding:.5rem 1rem;font-size:.85rem">ما فيه طلبات محذوفة.</p>'; return; }
+  el.innerHTML=_memTrash.map(m=>{
+    const when=memDate(m.deletedAt), sub=memDate(m.createdAt);
+    const fmt=d=>d?d.toLocaleDateString("ar-KW",{year:"numeric",month:"short",day:"numeric"})+" · "+d.toLocaleTimeString("ar-KW",{hour:"2-digit",minute:"2-digit"}):"—";
+    const st=(MEM_STATUS[m.status||"pending"]||MEM_STATUS.pending)[0];
+    return `<div class="list-item" style="border-inline-start:3px solid #64748b;align-items:flex-start;opacity:.92">
+      <div class="list-item-body">
+        <h4>${escSub(m.fullName)||"طالب"} <span style="font-size:.72rem;font-weight:700;color:var(--muted)">${st} وقت الحذف</span></h4>
+        <p>🆔 ${escSub(m.studentId)||"—"} · ${escSub(MN[m.major]||m.major||"—")} · ${escSub(MEM_COMMITTEE[m.committee]||m.committee||"—")} · GPA ${escSub(m.gpa??"—")}</p>
+        <p style="margin-top:.2rem;direction:ltr;text-align:start">📞 ${escSub(m.phone)||"—"} · ✉️ ${escSub(m.email)||"—"}</p>
+        <p style="margin-top:.3rem;font-size:.76rem;color:#fca5a5">🗑️ حذفه: <b>${escSub(m.deletedBy)||"—"}</b> · ${fmt(when)}</p>
+        <p style="font-size:.74rem;color:var(--muted)">📝 قدّم في: ${fmt(sub)} · الصور: ${m.hadPhoto?"جدول ✓":"جدول ✗"} / ${m.hadGpaProof?"معدل ✓":"معدل ✗"}</p>
+      </div>
+      <div class="list-item-actions" style="flex-wrap:wrap">
+        <button class="btn btn-sm" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);color:#6ee7b7" onclick="memRestore_('${m.id}')">↩️ استرجاع</button>
+        <button class="btn btn-danger btn-sm" onclick="memPurge_('${m.id}')">حذف نهائي</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+window.memRestore_=async aid=>{
+  const a=_memTrash.find(x=>x.id===aid); if(!a) return;
+  const id=a.originalId;
+  if(!id){ alert("هالسجل ما فيه معرّف الطلب الأصلي."); return; }
+  if(!confirm(`استرجاع طلب «${a.fullName||"الطالب"}» إلى قائمة الطلبات؟`))return;
+  try{
+    const cur=await getDoc(doc(db,"memberships",id));
+    if(cur.exists()){ alert("ما ينفع الاسترجاع: نفس الطالب عنده طلب جديد حالياً في القائمة. احذف الجديد أولاً لو تبي ترجّع القديم."); return; }
+    const {originalId,deletedBy,deletedAt,hadPhoto,hadGpaProof,...data}=a; delete data.id;
+    await setDoc(doc(db,"memberships",id),{...data,restoredAt:serverTimestamp(),restoredBy:auth.currentUser?.email||""});
+    const [photo,proof]=await Promise.all([
+      getDoc(doc(db,"membershipsDeletedPhotos",aid)).catch(()=>null),
+      getDoc(doc(db,"membershipsDeletedGpaProof",aid)).catch(()=>null)
+    ]);
+    if(photo&&photo.exists()) await setDoc(doc(db,"membershipPhotos",id),photo.data());
+    if(proof&&proof.exists()) await setDoc(doc(db,"membershipGpaProof",id),proof.data());
+    await deleteDoc(doc(db,"membershipsDeleted",aid));
+    await deleteDoc(doc(db,"membershipsDeletedPhotos",aid)).catch(()=>{});
+    await deleteDoc(doc(db,"membershipsDeletedGpaProof",aid)).catch(()=>{});
+  }catch(e){ console.error(e); alert("فشل الاسترجاع: "+(e.message||e)); return; }
+  loadAll();
+};
+window.memPurge_=async aid=>{
+  const a=_memTrash.find(x=>x.id===aid);
+  if(!confirm(`حذف «${a?.fullName||"الطلب"}» من السجل نهائياً؟ ما راح تقدر ترجّعه بعدها.`))return;
+  await deleteDoc(doc(db,"membershipsDeleted",aid));
+  await deleteDoc(doc(db,"membershipsDeletedPhotos",aid)).catch(()=>{});
+  await deleteDoc(doc(db,"membershipsDeletedGpaProof",aid)).catch(()=>{});
   loadAll();
 };
 
@@ -3361,6 +3447,7 @@ async function loadAll(){
       getItems("schedules"),getItems("noteSubmissions"),getItems("courseRatings"),getItems("courseVideos"),getItems("videoComments"),
       getItems("memberships"),getItems("faculty"),getItems("humanQuestions")
     ]);
+    getItems("membershipsDeleted").then(renderMemTrash).catch(()=>{});
     // stats
     document.getElementById("ds-notes").textContent=notes.length;
     document.getElementById("ds-events").textContent=events.length;
