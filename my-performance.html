@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="favicon.png" sizes="512x512">
+<title>تقييمي | BSC KU</title>
+<meta name="description" content="اعرض تقييمك وحضورك وإنذاراتك داخل نادي العلوم البيولوجية — برابطك الخاص فقط.">
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080c14;--surface:rgba(255,255,255,.05);--border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.18);--text:#f1f5f9;--muted:#94a3b8;--ink:#6366f1;--ink2:#8b5cf6;--green:#10b981;--gold:#f59e0b;--red:#ef4444;--radius:18px}
+body{font-family:'Tajawal',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.7;padding:2rem 1rem}
+a{color:inherit}
+.wrap{max-width:520px;margin:0 auto}
+.brand{display:flex;align-items:center;justify-content:center;gap:.6rem;margin-bottom:2rem}
+.brand strong{font-size:1.1rem;font-weight:800;background:linear-gradient(90deg,#a5b4fc,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent}
+.card{background:rgba(15,23,42,.75);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius);padding:1.6rem;margin-bottom:1.25rem}
+h1{font-size:1.3rem;font-weight:800;margin-bottom:.3rem}
+.muted{color:var(--muted);font-size:.85rem}
+.gate input{width:100%;padding:.9rem 1.1rem;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:inherit;font-size:1rem;outline:none;text-align:center;letter-spacing:.15em;direction:ltr}
+.gate input:focus{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.06)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.85rem 1.3rem;border-radius:999px;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;width:100%;margin-top:.9rem;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;transition:transform .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn:disabled{opacity:.6;cursor:default;transform:none}
+#status{min-height:1.2em;font-size:.85rem;margin-top:.8rem;text-align:center;color:#fca5a5}
+.hidden{display:none!important}
+.hero{text-align:center;padding:1rem 0 .5rem}
+.hero .name{font-size:1.5rem;font-weight:900;margin-bottom:.2rem}
+.hero .sub{color:var(--muted);font-size:.85rem}
+.badge{display:inline-block;font-size:.78rem;font-weight:800;border-radius:999px;padding:.3rem .9rem;margin-top:.7rem}
+.badge-green{color:#6ee7b7;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.25)}
+.badge-gold{color:#fcd34d;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.25)}
+.badge-red{color:#fca5a5;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.25)}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin:1.2rem 0}
+.stat{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:1rem;text-align:center}
+.stat strong{display:block;font-size:1.6rem;font-weight:900;font-family:'Plus Jakarta Sans',system-ui}
+.stat span{font-size:.75rem;color:var(--muted)}
+h3{font-size:.95rem;font-weight:800;margin-bottom:.8rem;color:#c7d2fe}
+.hist-item{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:.8rem 1rem;margin-bottom:.6rem}
+.hist-item .top{display:flex;justify-content:space-between;gap:.6rem;font-size:.88rem;font-weight:700}
+.hist-item .note{font-size:.78rem;color:var(--muted);margin-top:.3rem}
+.empty{color:var(--muted);text-align:center;padding:1.2rem;font-size:.85rem}
+footer{text-align:center;color:var(--muted);font-size:.75rem;margin-top:1.5rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span style="font-size:1.6rem">🧬</span><strong>BSC KU</strong></div>
+
+  <div class="card gate" id="gateCard">
+    <h1>تقييمي بالنادي</h1>
+    <p class="muted" style="margin-bottom:1rem">اكتب الرمز الخاص اللي وصلك من إدارة النادي عشان تشوف تقييمك وحضورك.</p>
+    <input id="codeInput" placeholder="XXXXXXX" maxlength="12" autocomplete="off" autocapitalize="characters">
+    <button class="btn" id="viewBtn">عرض تقييمي</button>
+    <div id="status"></div>
+  </div>
+
+  <div id="resultArea" class="hidden">
+    <div class="card">
+      <div class="hero">
+        <div class="name" id="rName">—</div>
+        <div class="sub" id="rCommittee">—</div>
+        <span class="badge" id="rBadge">—</span>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><strong id="rPoints">0</strong><span>نقاط الإنذار</span></div>
+        <div class="stat"><strong id="rEvalScore">—</strong><span>متوسط تقييم الفعاليات</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📋 آخر سجل حضور</h3>
+      <div id="attList"></div>
+    </div>
+
+    <div class="card">
+      <h3>⭐ آخر تقييمات الفعاليات</h3>
+      <div id="evalList"></div>
+    </div>
+
+    <button class="btn" id="backBtn" style="background:rgba(255,255,255,.08)">🔒 خروج</button>
+  </div>
+
+  <footer>BSC KU · نادي العلوم البيولوجية — جامعة الكويت</footer>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const FB = {apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDomain:"bsc-ku.firebaseapp.com",projectId:"bsc-ku",storageBucket:"bsc-ku.firebasestorage.app",messagingSenderId:"326699795389",appId:"1:326699795389:web:94dcd1cb40be153987c8d4"};
+const app=initializeApp(FB);
+const db=getFirestore(app);
+
+const STATUS_LABEL={
+  normal:{t:"✅ طبيعي — ما فيه إنذارات",cls:"badge-green"},
+  warning1:{t:"⚠️ إنذار أول",cls:"badge-gold"},
+  warning2:{t:"⚠️ إنذار ثاني",cls:"badge-red"},
+  recommend_kick:{t:"🚨 توصية بالطرد — راجع الإدارة",cls:"badge-red"},
+  pending_removal:{t:"⏳ قرار الطرد قيد المراجعة",cls:"badge-red"},
+  removed:{t:"❌ غير نشط بالنادي",cls:"badge-red"}
+};
+const esc=s=>(s==null?"":String(s)).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+async function loadCode(codeRaw){
+  const code=codeRaw.trim().toUpperCase();
+  const statusEl=document.getElementById("status");
+  if(!code){statusEl.textContent="اكتب الرمز أولاً.";return;}
+  const btn=document.getElementById("viewBtn");
+  btn.disabled=true;btn.textContent="⏳ جاري التحميل…";statusEl.textContent="";
+  try{
+    const snap=await getDoc(doc(db,"memberAccess",code));
+    if(!snap.exists()){statusEl.textContent="الرمز غير صحيح. تأكد منه مع إدارة النادي.";return;}
+    render(snap.data());
+    document.getElementById("gateCard").classList.add("hidden");
+    document.getElementById("resultArea").classList.remove("hidden");
+    history.replaceState(null,"","?code="+encodeURIComponent(code));
+  }catch(error){
+    statusEl.textContent="تعذّر التحميل: "+error.message;
+  }finally{
+    btn.disabled=false;btn.textContent="عرض تقييمي";
+  }
+}
+
+function render(d){
+  document.getElementById("rName").textContent=d.name||"—";
+  document.getElementById("rCommittee").textContent=(d.committee||"عام")+" · "+(d.role||"عضو");
+  const info=STATUS_LABEL[d.disciplineStatus]||STATUS_LABEL.normal;
+  const badge=document.getElementById("rBadge");
+  badge.textContent=info.t;badge.className="badge "+info.cls;
+  document.getElementById("rPoints").textContent=d.disciplinePoints||0;
+  document.getElementById("rEvalScore").textContent=d.evalScore==null?"—":d.evalScore+"%";
+
+  const attList=document.getElementById("attList");
+  const att=d.attendanceRecent||[];
+  attList.innerHTML=att.length?att.map(r=>`
+    <div class="hist-item">
+      <div class="top"><span>${esc(r.eventTitle)}</span><span>${esc(r.label)}</span></div>
+      ${r.note?`<div class="note">${esc(r.note)}</div>`:""}
+    </div>`).join(""):'<div class="empty">ما فيه سجل حضور مسجّل بعد.</div>';
+
+  const evalList=document.getElementById("evalList");
+  const evs=d.evalRecent||[];
+  evalList.innerHTML=evs.length?evs.map(x=>`
+    <div class="hist-item">
+      <div class="top"><span>${esc(x.eventTitle)}</span><span>${x.score||0}%</span></div>
+      ${x.note?`<div class="note">${esc(x.note)}</div>`:""}
+    </div>`).join(""):'<div class="empty">ما فيه تقييمات فعاليات بعد.</div>';
+}
+
+document.getElementById("viewBtn").addEventListener("click",()=>loadCode(document.getElementById("codeInput").value));
+document.getElementById("codeInput").addEventListener("keydown",e=>{if(e.key==="Enter")loadCode(e.target.value);});
+document.getElementById("backBtn").addEventListener("click",()=>{
+  document.getElementById("resultArea").classList.add("hidden");
+  document.getElementById("gateCard").classList.remove("hidden");
+  document.getElementById("codeInput").value="";
+  history.replaceState(null,"",location.pathname);
+});
+
+const urlCode=new URLSearchParams(location.search).get("code");
+if(urlCode){document.getElementById("codeInput").value=urlCode;loadCode(urlCode);}
+</script>
+</body>
+</html>

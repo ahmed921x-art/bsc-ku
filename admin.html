@@ -499,6 +499,7 @@ a{color:inherit;text-decoration:none}
       <div class="sidebar-label">مركز القيادة DNA</div>
       <button class="nav-item" data-panel="clubmembers"><span class="ni">👤</span>أعضاء النادي</button>
       <button class="nav-item" data-panel="eventevals"><span class="ni">⭐</span>تقييم الفعاليات</button>
+      <button class="nav-item" data-panel="attendance"><span class="ni">⚠️</span>الحضور والإنذارات</button>
       <button class="nav-item" data-panel="dnacenter"><span class="ni">🧬</span>مساعد DNA</button>
       <div class="sidebar-label">الذكاء الاصطناعي</div>
       <button class="nav-item" data-panel="aiknowledge"><span class="ni">🤖</span>معرفة المساعد</button>
@@ -1364,7 +1365,7 @@ a{color:inherit;text-decoration:none}
 
       <!-- DNA COMMAND CENTER: CLUB MEMBERS -->
       <div class="panel" id="panel-clubmembers">
-        <div class="panel-header"><h2>👤 أعضاء النادي</h2><p>سجل داخلي خاص بالأدمن — الأسماء والتقييمات ما تظهر لزوار الموقع.</p></div>
+        <div class="panel-header"><h2>👤 أعضاء النادي</h2><p>سجل داخلي خاص بالأدمن — الأسماء والتقييمات ما تظهر لزوار الموقع. اضغط «🔗 رابط الأداء» بجدول الأعضاء عشان تبعث لأي عضو رابطه الخاص ليشوف تقييمه وإنذاراته.</p></div>
         <div class="cc-hero">
           <h3>🧬 مركز القيادة DNA</h3>
           <p>أضف أعضاء النادي، رتّبهم حسب اللجنة والدور، وتابع متوسط أدائهم المبني على تقييمات الفعاليات.</p>
@@ -1441,6 +1442,73 @@ a{color:inherit;text-decoration:none}
             <table class="cc-table">
               <thead><tr><th>العضو</th><th>الفعالية</th><th>التنفيذ</th><th>الفريق</th><th>الالتزام</th><th>المبادرة</th><th>النتيجة</th><th>إدارة</th></tr></thead>
               <tbody id="ccEvaluationsList"><tr><td colspan="8" class="cc-empty">⏳ جاري التحميل…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- DNA COMMAND CENTER: ATTENDANCE & WARNINGS -->
+      <div class="panel" id="panel-attendance">
+        <div class="panel-header"><h2>⚠️ الحضور والإنذارات</h2><p>سجّل حضور أعضاء لجنتك في كل فعالية — النظام يحسب الإنذارات ويقترح الطرد تلقائياً حسب النقاط.</p></div>
+        <div class="stats-row" id="atStats"></div>
+
+        <div class="card" style="border-color:rgba(99,102,241,.25)">
+          <h3>ℹ️ آلية النقاط</h3>
+          <p style="font-size:.82rem;color:var(--muted);line-height:2">
+            غياب بدون عذر = <b style="color:#fca5a5">نقطتان</b> · اعتذار متأخر = <b style="color:#fcd34d">1.5 نقطة</b> · اعتذار مسبق مقبول = <b style="color:#6ee7b7">0.5 نقطة</b> · حضور = 0<br>
+            عند <b>نقطتين</b> → إنذار أول · عند <b>4 نقاط</b> → إنذار ثاني · عند <b>6 نقاط</b> → توصية بالطرد.<br>
+            «🚩 طرد مباشر» يفتح طلباً معلّقاً يحتاج تأكيد <b>أدمن ثاني غيرك</b> — عشان القرار يكون سريع وعادل بنفس الوقت.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>➕ إضافة فعالية جديدة للحضور</h3>
+          <div class="form-grid">
+            <div class="form-group"><label>اسم الفعالية</label><input id="atEventTitle" placeholder="اجتماع لجنة الإعلام الأسبوعي"></div>
+            <div class="form-group"><label>التاريخ</label><input id="atEventDate" placeholder="20 May 2026"></div>
+            <div class="form-group"><label>اللجنة</label>
+              <select id="atEventCommittee">
+                <option value="عام">عام</option><option value="اللجنة العلمية">اللجنة العلمية</option><option value="لجنة الأنشطة">لجنة الأنشطة</option>
+                <option value="لجنة الإعلام">لجنة الإعلام</option><option value="لجنة التصميم">لجنة التصميم</option><option value="لجنة العلاقات العامة">لجنة العلاقات العامة</option>
+                <option value="لجنة التنظيم">لجنة التنظيم</option><option value="لجنة التطوع">لجنة التطوع</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" id="atAddEvent">+ إضافة الفعالية</button></div>
+          <div class="cc-status" id="atEventStatus"></div>
+        </div>
+
+        <div class="card">
+          <h3>📋 تسجيل الحضور</h3>
+          <div class="cc-toolbar">
+            <select id="atTakeEvent"><option value="">— اختر فعالية —</option></select>
+            <button class="btn btn-sm" id="atRefreshRoster">🔄 تحديث القائمة</button>
+          </div>
+          <div id="atRosterWrap"><p class="cc-empty">اختر فعالية عشان تظهر قائمة أعضاء لجنتها.</p></div>
+          <div class="btn-row"><button class="btn btn-primary" id="atSaveAttendance">💾 حفظ الحضور</button></div>
+          <div class="cc-status" id="atAttendanceStatus"></div>
+        </div>
+
+        <div class="card">
+          <div class="cc-toolbar">
+            <input id="atMemberSearch" placeholder="🔍 ابحث بالاسم…" autocomplete="off">
+            <select id="atCommitteeFilter"><option value="">كل اللجان</option></select>
+            <select id="atStatusFilter">
+              <option value="">كل الحالات</option>
+              <option value="normal">طبيعي</option>
+              <option value="warning1">⚠️ إنذار أول</option>
+              <option value="warning2">⚠️ إنذار ثاني</option>
+              <option value="recommend_kick">🚨 توصية بالطرد</option>
+              <option value="pending_removal">⏳ بانتظار تأكيد الطرد</option>
+              <option value="removed">❌ مطرود</option>
+            </select>
+            <button class="btn btn-sm" id="atExport">⬇️ تصدير CSV</button>
+            <button class="btn btn-sm" id="atRefresh">🔄 تحديث</button>
+          </div>
+          <div class="cc-table-wrap">
+            <table class="cc-table">
+              <thead><tr><th>العضو</th><th>اللجنة</th><th>النقاط</th><th>الحالة</th><th>إدارة</th></tr></thead>
+              <tbody id="atMembersList"><tr><td colspan="5" class="cc-empty">⏳ جاري التحميل…</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -1628,6 +1696,7 @@ onAuthStateChanged(auth,user=>{
   document.getElementById("userEmail").textContent=em;
   loadAll();
   ccLoadAll();
+  atLoadAll();
   loadMemConfig();
   loadNoteCourses(document.getElementById("noteMajor").value);
 });
@@ -3615,7 +3684,7 @@ function ccRenderMembers(){
     return `<tr>
       <td><strong>${ccEsc(m.name)}</strong></td><td>${ccEsc(m.committee||"عام")}</td><td>${ccEsc(m.role||"عضو")}</td>
       <td>${avg.count}</td><td>${ccScoreBadge(avg.score)}</td>
-      <td style="white-space:nowrap"><button class="btn btn-sm" data-cc-edit-member="${ccEsc(m.id)}">تعديل</button> <button class="btn btn-danger btn-sm" data-cc-delete-member="${ccEsc(m.id)}">حذف</button></td>
+      <td style="white-space:nowrap"><button class="btn btn-sm" data-cc-edit-member="${ccEsc(m.id)}">تعديل</button> <button class="btn btn-gold btn-sm" data-cc-link-member="${ccEsc(m.id)}">🔗 رابط الأداء</button> <button class="btn btn-danger btn-sm" data-cc-delete-member="${ccEsc(m.id)}">حذف</button></td>
     </tr>`;
   }).join(""):'<tr><td colspan="6" class="cc-empty">لا توجد أسماء مطابقة.</td></tr>';
 }
@@ -3647,6 +3716,12 @@ async function ccLoadAll(){
 }
 window.ccLoadAll=ccLoadAll;
 
+function ccGenCode(len=7){
+  const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // بدون أحرف/أرقام ملتبسة (0/O، 1/I)
+  let out="";for(let i=0;i<len;i++)out+=chars[Math.floor(Math.random()*chars.length)];
+  return out;
+}
+
 async function ccAddMemberRows(rows,successMessage){
   const existing=new Set(ccMembers.map(m=>ccNorm(m.name)));
   const unique=[];
@@ -3660,7 +3735,9 @@ async function ccAddMemberRows(rows,successMessage){
   const batch=writeBatch(db);
   unique.forEach(row=>{
     const ref=doc(collection(db,"clubMembers"));
-    batch.set(ref,{name:row.name,normalizedName:row.normalizedName,committee:row.committee||"عام",role:row.role||"عضو",status:"active",source:row.source||"manual",createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+    const accessCode=ccGenCode();
+    batch.set(ref,{name:row.name,normalizedName:row.normalizedName,committee:row.committee||"عام",role:row.role||"عضو",status:"active",source:row.source||"manual",accessCode,disciplinePoints:0,disciplineStatus:"normal",createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+    batch.set(doc(db,"memberAccess",accessCode),{memberId:ref.id,name:row.name,committee:row.committee||"عام",role:row.role||"عضو",disciplinePoints:0,disciplineStatus:"normal",evalCount:0,evalScore:null,evalRecent:[],attendanceRecent:[],updatedAt:serverTimestamp()});
   });
   await batch.commit();
   ccSetStatus("ccMemberStatus",`${successMessage} (${unique.length})`);
@@ -3700,8 +3777,18 @@ ccEl("ccMembersList")?.addEventListener("click",async event=>{
     const committee=prompt("اللجنة",member.committee||"عام");if(committee===null)return;
     const role=prompt("الدور",member.role||"عضو");if(role===null)return;
     if(!name.trim()){alert("اسم العضو مطلوب");return;}
-    try{await updateDoc(doc(db,"clubMembers",member.id),{name:name.trim(),normalizedName:ccNorm(name),committee:committee.trim()||"عام",role:role.trim()||"عضو",updatedAt:serverTimestamp()});await ccLoadAll();}
+    try{
+      await updateDoc(doc(db,"clubMembers",member.id),{name:name.trim(),normalizedName:ccNorm(name),committee:committee.trim()||"عام",role:role.trim()||"عضو",updatedAt:serverTimestamp()});
+      await ccLoadAll();
+      await atSyncMemberSnapshot(member.id);
+    }
     catch(error){alert("تعذّر التعديل: "+error.message);}
+    return;
+  }
+  const link=event.target.closest("[data-cc-link-member]");
+  if(link){
+    const member=ccMembers.find(x=>x.id===link.dataset.ccLinkMember);if(!member)return;
+    try{await ccShowMemberLink(member.id);}catch(error){alert("تعذّر إنشاء الرابط: "+error.message);}
     return;
   }
   const remove=event.target.closest("[data-cc-delete-member]");
@@ -3710,7 +3797,9 @@ ccEl("ccMembersList")?.addEventListener("click",async event=>{
     const related=ccEvaluations.filter(x=>x.memberId===member.id);
     if(!confirm(`حذف ${member.name} وكل تقييماته (${related.length})؟`))return;
     try{
-      const batch=writeBatch(db);batch.delete(doc(db,"clubMembers",member.id));related.forEach(x=>batch.delete(doc(db,"eventEvaluations",x.id)));await batch.commit();await ccLoadAll();
+      const batch=writeBatch(db);batch.delete(doc(db,"clubMembers",member.id));related.forEach(x=>batch.delete(doc(db,"eventEvaluations",x.id)));
+      if(member.accessCode)batch.delete(doc(db,"memberAccess",member.accessCode));
+      await batch.commit();await ccLoadAll();
     }catch(error){alert("تعذّر الحذف: "+error.message);}
   }
 });
@@ -3743,6 +3832,7 @@ ccEl("ccSaveEval")?.addEventListener("click",async()=>{
   try{
     await setDoc(doc(db,"eventEvaluations",id),{eventId,eventTitle:clubEvent.title||clubEvent.name||"فعالية",memberId,memberName:member.name,...values,score,note:ccEl("ccEvalNote").value.trim(),evaluatorEmail:auth.currentUser?.email||"",createdAt:old?.createdAt||serverTimestamp(),updatedAt:serverTimestamp()},{merge:true});
     ccSetStatus("ccEvalStatus",`تم حفظ تقييم ${member.name}: ${score}%`);await ccLoadAll();
+    await atSyncMemberSnapshot(memberId);
   }catch(error){ccSetStatus("ccEvalStatus","تعذّر حفظ التقييم: "+error.message,false);}
   finally{btn.disabled=false;btn.textContent="💾 حفظ التقييم";}
 });
@@ -3760,6 +3850,7 @@ ccEl("ccEvalFilter")?.addEventListener("change",ccRenderEvaluations);
 ccEl("ccMembersRefresh")?.addEventListener("click",ccLoadAll);
 ccEl("ccEvalsRefresh")?.addEventListener("click",ccLoadAll);
 document.querySelectorAll('.nav-item[data-panel="clubmembers"],.nav-item[data-panel="eventevals"],.nav-item[data-panel="dnacenter"]').forEach(button=>button.addEventListener("click",ccLoadAll));
+document.querySelectorAll('.nav-item[data-panel="attendance"]').forEach(button=>button.addEventListener("click",atLoadAll));
 
 ccEl("ccMembersExport")?.addEventListener("click",()=>{
   const rows=[["الاسم","اللجنة","الدور","عدد التقييمات","متوسط الأداء"]];
@@ -3796,6 +3887,287 @@ ccEl("ccAskDna")?.addEventListener("click",()=>ccDnaAnswer(ccEl("ccDnaInput").va
 ccEl("ccDnaInput")?.addEventListener("keydown",event=>{if(event.key==="Enter")ccDnaAnswer(ccEl("ccDnaInput").value);});
 document.querySelectorAll("[data-dna-question]").forEach(button=>button.addEventListener("click",()=>{ccEl("ccDnaInput").value=button.dataset.dnaQuestion;ccDnaAnswer(button.dataset.dnaQuestion);}));
 ccUpdateScorePreview();
+
+// ══════════════════════════════════════════════════════════════════════
+// ATTENDANCE & WARNINGS — لجنتين (أو أكثر) · نقاط تلقائية · إنذارات · طرد مباشر بتأكيد أدمن ثاني
+// ══════════════════════════════════════════════════════════════════════
+const AT_STATUS={
+  present:{label:"✅ حضر",points:0},
+  excused_prior:{label:"🟢 اعتذار مسبق مقبول",points:0.5},
+  excused_late:{label:"🟡 اعتذار متأخر",points:1.5},
+  absent:{label:"🔴 غياب بدون عذر",points:2}
+};
+const AT_THRESH={warn1:2,warn2:4,kick:6};
+const AT_DISC_LABEL={
+  normal:{t:"طبيعي",cls:"badge-green"},
+  warning1:{t:"⚠️ إنذار أول",cls:"badge-gold"},
+  warning2:{t:"⚠️ إنذار ثاني",cls:"badge-red"},
+  recommend_kick:{t:"🚨 توصية بالطرد",cls:"badge-red"},
+  pending_removal:{t:"⏳ بانتظار تأكيد الطرد",cls:"badge-red"},
+  removed:{t:"❌ مطرود",cls:"badge-red"}
+};
+let atEvents=[];
+let atAttendance=[];
+
+function atComputeStatus(points){
+  if(points>=AT_THRESH.kick)return"recommend_kick";
+  if(points>=AT_THRESH.warn2)return"warning2";
+  if(points>=AT_THRESH.warn1)return"warning1";
+  return"normal";
+}
+function atMemberPoints(memberId){
+  return atAttendance.filter(x=>x.memberId===memberId).reduce((s,x)=>s+(Number(x.points)||0),0);
+}
+function atSyncFilters(){
+  const committees=[...new Set(ccMembers.map(m=>m.committee||"عام"))].sort((a,b)=>a.localeCompare(b,"ar"));
+  const cur=ccEl("atCommitteeFilter").value;
+  ccEl("atCommitteeFilter").innerHTML='<option value="">كل اللجان</option>'+committees.map(x=>`<option value="${ccEsc(x)}">${ccEsc(x)}</option>`).join("");
+  if(committees.includes(cur))ccEl("atCommitteeFilter").value=cur;
+
+  const curEvt=ccEl("atTakeEvent").value;
+  const sortedEvents=[...atEvents].sort((a,b)=>ccWhen(b.createdAt)-ccWhen(a.createdAt));
+  ccEl("atTakeEvent").innerHTML='<option value="">— اختر فعالية —</option>'+sortedEvents.map(e=>`<option value="${ccEsc(e.id)}">${ccEsc(e.title)} · ${ccEsc(e.committee||"عام")}${e.date?" · "+ccEsc(e.date):""}</option>`).join("");
+  if(atEvents.some(e=>e.id===curEvt))ccEl("atTakeEvent").value=curEvt;
+}
+function atRenderStats(){
+  const committeeFilter=ccEl("atCommitteeFilter").value;
+  const members=ccMembers.filter(m=>m.disciplineStatus!=="removed"&&(!committeeFilter||(m.committee||"عام")===committeeFilter));
+  const warned=members.filter(m=>["warning1","warning2"].includes(m.disciplineStatus)).length;
+  const kickRec=members.filter(m=>m.disciplineStatus==="recommend_kick").length;
+  const pending=ccMembers.filter(m=>m.disciplineStatus==="pending_removal"&&(!committeeFilter||(m.committee||"عام")===committeeFilter)).length;
+  const removed=ccMembers.filter(m=>m.disciplineStatus==="removed"&&(!committeeFilter||(m.committee||"عام")===committeeFilter)).length;
+  ccEl("atStats").innerHTML=`
+    <div class="stat-card"><strong>${members.length}</strong><span>👤 عضو نشط</span></div>
+    <div class="stat-card"><strong>${warned}</strong><span>⚠️ عليهم إنذار</span></div>
+    <div class="stat-card"><strong>${kickRec}</strong><span>🚨 توصية بالطرد</span></div>
+    <div class="stat-card"><strong>${pending}</strong><span>⏳ بانتظار تأكيد</span></div>
+    <div class="stat-card"><strong>${removed}</strong><span>❌ مطرودون</span></div>`;
+}
+function atRenderMembers(){
+  const q=ccNorm(ccEl("atMemberSearch").value);
+  const committee=ccEl("atCommitteeFilter").value;
+  const statusFilter=ccEl("atStatusFilter").value;
+  const rows=ccMembers.filter(m=>{
+    const status=m.disciplineStatus||"normal";
+    if(committee&&(m.committee||"عام")!==committee)return false;
+    if(statusFilter&&status!==statusFilter)return false;
+    if(q&&!ccNorm(`${m.name} ${m.committee}`).includes(q))return false;
+    return true;
+  });
+  ccEl("atMembersList").innerHTML=rows.length?rows.map(m=>{
+    const status=m.disciplineStatus||"normal";
+    const points=m.disciplinePoints||0;
+    const info=AT_DISC_LABEL[status]||AT_DISC_LABEL.normal;
+    let actions=`<button class="btn btn-sm" data-at-history="${ccEsc(m.id)}">📜 تفاصيل</button>`;
+    if(status==="pending_removal"){
+      actions+=` <button class="btn btn-green btn-sm" data-at-confirm="${ccEsc(m.id)}">✅ تأكيد الطرد</button> <button class="btn btn-ghost btn-sm" data-at-cancel="${ccEsc(m.id)}">❌ إلغاء</button>`;
+    }else if(status==="removed"){
+      actions+=` <button class="btn btn-ghost btn-sm" data-at-restore="${ccEsc(m.id)}">↩️ استرجاع</button>`;
+    }else{
+      actions+=` <button class="btn btn-danger btn-sm" data-at-kick="${ccEsc(m.id)}">🚩 طرد مباشر</button>`;
+    }
+    return `<tr>
+      <td><strong>${ccEsc(m.name)}</strong></td><td>${ccEsc(m.committee||"عام")}</td>
+      <td style="direction:ltr;text-align:center">${points}</td>
+      <td><span class="badge ${info.cls}">${info.t}</span></td>
+      <td style="white-space:nowrap">${actions}</td>
+    </tr>`;
+  }).join(""):'<tr><td colspan="5" class="cc-empty">لا يوجد أعضاء مطابقون.</td></tr>';
+}
+function atRenderAll(){atSyncFilters();atRenderStats();atRenderMembers();}
+
+async function atLoadAll(){
+  if(!ccEl("atMembersList"))return;
+  try{
+    const[,events,attendance]=await Promise.all([ccLoadAll(),getItems("committeeEvents"),getItems("committeeAttendance")]);
+    atEvents=events;atAttendance=attendance;
+    atRenderAll();
+  }catch(error){
+    ccSetStatus("atEventStatus","تعذّر تحميل بيانات الحضور: "+error.message,false);
+  }
+}
+window.atLoadAll=atLoadAll;
+
+// عرض خاص للعضو بدون تسجيل دخول: نسخة مختصرة من بياناته فقط، مربوطة برمز سري
+// عشوائي (memberAccess/{code})، بمعزل تام عن بيانات بقية الأعضاء.
+async function atSyncMemberSnapshot(memberId){
+  const member=ccMembers.find(x=>x.id===memberId);
+  if(!member)return;
+  let accessCode=member.accessCode;
+  if(!accessCode){
+    accessCode=ccGenCode();
+    await updateDoc(doc(db,"clubMembers",memberId),{accessCode,updatedAt:serverTimestamp()});
+    member.accessCode=accessCode;
+  }
+  const avg=ccAverage(memberId);
+  const evalRecent=ccEvaluations.filter(x=>x.memberId===memberId).slice(0,5)
+    .map(x=>({eventTitle:x.eventTitle||"فعالية",score:x.score||0,note:x.note||""}));
+  const attendanceRecent=atAttendance.filter(x=>x.memberId===memberId)
+    .sort((a,b)=>ccWhen(b.createdAt)-ccWhen(a.createdAt)).slice(0,10)
+    .map(x=>({eventTitle:x.eventTitle||"فعالية",status:x.status,label:AT_STATUS[x.status]?.label||x.status,points:x.points||0,note:x.note||""}));
+  await setDoc(doc(db,"memberAccess",accessCode),{
+    memberId,name:member.name,committee:member.committee||"عام",role:member.role||"عضو",
+    disciplinePoints:member.disciplinePoints||0,disciplineStatus:member.disciplineStatus||"normal",
+    evalCount:avg.count,evalScore:avg.score,evalRecent,attendanceRecent,updatedAt:serverTimestamp()
+  },{merge:true});
+}
+
+async function ccShowMemberLink(memberId){
+  await atSyncMemberSnapshot(memberId);
+  const member=ccMembers.find(x=>x.id===memberId);
+  const url=`${location.origin}${location.pathname.replace(/admin\.html$/,"")}my-performance.html?code=${member.accessCode}`;
+  try{await navigator.clipboard.writeText(url);alert(`تم نسخ رابط ${member.name}:\n${url}\n\nابعثه للعضو — يشوف تقييمه وإنذاراته بدون تسجيل دخول.`);}
+  catch{prompt(`رابط ${member.name} (انسخه يدوياً):`,url);}
+}
+
+ccEl("atAddEvent")?.addEventListener("click",async()=>{
+  const title=ccEl("atEventTitle").value.trim();
+  const date=ccEl("atEventDate").value.trim();
+  const committee=ccEl("atEventCommittee").value;
+  if(!title){ccSetStatus("atEventStatus","اكتب اسم الفعالية.",false);return;}
+  const btn=ccEl("atAddEvent");btn.disabled=true;btn.textContent="⏳ جاري الإضافة…";
+  try{
+    await addDoc(collection(db,"committeeEvents"),{title,date,committee,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+    ccEl("atEventTitle").value="";ccEl("atEventDate").value="";
+    ccSetStatus("atEventStatus","تمت إضافة الفعالية ✅");
+    await atLoadAll();
+  }catch(error){ccSetStatus("atEventStatus","تعذّر الإضافة: "+error.message,false);}
+  finally{btn.disabled=false;btn.textContent="+ إضافة الفعالية";}
+});
+
+function atRenderRoster(){
+  const eventId=ccEl("atTakeEvent").value;
+  const wrap=ccEl("atRosterWrap");
+  if(!eventId){wrap.innerHTML='<p class="cc-empty">اختر فعالية عشان تظهر قائمة أعضاء لجنتها.</p>';return;}
+  const clubEvent=atEvents.find(x=>x.id===eventId);
+  if(!clubEvent){wrap.innerHTML='<p class="cc-empty">الفعالية غير موجودة.</p>';return;}
+  const roster=ccMembers.filter(m=>(m.committee||"عام")===(clubEvent.committee||"عام")&&m.disciplineStatus!=="removed");
+  if(!roster.length){wrap.innerHTML='<p class="cc-empty">ما فيه أعضاء مسجّلين بهذي اللجنة. أضفهم من «أعضاء النادي».</p>';return;}
+  const optsHtml=Object.entries(AT_STATUS).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join("");
+  wrap.innerHTML=`<div class="cc-table-wrap"><table class="cc-table"><thead><tr><th>العضو</th><th>الحالة</th><th>ملاحظة</th></tr></thead><tbody>`+
+    roster.map(m=>{
+      const existing=atAttendance.find(x=>x.eventId===eventId&&x.memberId===m.id);
+      const sel=existing?.status||"present";
+      return `<tr data-at-roster-row="${ccEsc(m.id)}">
+        <td><strong>${ccEsc(m.name)}</strong></td>
+        <td><select data-at-status="${ccEsc(m.id)}">${optsHtml.replace(`value="${sel}"`,`value="${sel}" selected`)}</select></td>
+        <td><input data-at-note="${ccEsc(m.id)}" placeholder="اختياري" value="${ccEsc(existing?.note||"")}" style="width:100%;padding:.45rem .6rem;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:.82rem"></td>
+      </tr>`;
+    }).join("")+`</tbody></table></div>`;
+}
+ccEl("atTakeEvent")?.addEventListener("change",atRenderRoster);
+ccEl("atRefreshRoster")?.addEventListener("click",atRenderRoster);
+
+ccEl("atSaveAttendance")?.addEventListener("click",async()=>{
+  const eventId=ccEl("atTakeEvent").value;
+  const clubEvent=atEvents.find(x=>x.id===eventId);
+  if(!clubEvent){ccSetStatus("atAttendanceStatus","اختر فعالية أولاً.",false);return;}
+  const rows=[...document.querySelectorAll("[data-at-roster-row]")];
+  if(!rows.length){ccSetStatus("atAttendanceStatus","ما فيه أعضاء لتسجيل حضورهم.",false);return;}
+  const btn=ccEl("atSaveAttendance");btn.disabled=true;btn.textContent="⏳ جاري الحفظ…";
+  try{
+    const batch=writeBatch(db);
+    const touchedMembers=new Set();
+    rows.forEach(row=>{
+      const memberId=row.dataset.atRosterRow;
+      const member=ccMembers.find(x=>x.id===memberId);if(!member)return;
+      const statusSel=row.querySelector(`[data-at-status="${memberId}"]`);
+      const noteInput=row.querySelector(`[data-at-note="${memberId}"]`);
+      const status=statusSel.value;
+      const points=AT_STATUS[status]?.points??0;
+      const ref=doc(db,"committeeAttendance",`${eventId}__${memberId}`);
+      batch.set(ref,{eventId,eventTitle:clubEvent.title,committee:clubEvent.committee||"عام",memberId,memberName:member.name,status,points,note:noteInput.value.trim(),recordedBy:auth.currentUser?.email||"",createdAt:serverTimestamp(),updatedAt:serverTimestamp()},{merge:true});
+      touchedMembers.add(memberId);
+    });
+    await batch.commit();
+    // إعادة تحميل سجلات الحضور المحدثة قبل حساب النقاط
+    atAttendance=await getItems("committeeAttendance");
+    const pointsBatch=writeBatch(db);
+    touchedMembers.forEach(memberId=>{
+      const member=ccMembers.find(x=>x.id===memberId);if(!member)return;
+      const points=atMemberPoints(memberId);
+      const newStatus=(member.disciplineStatus==="pending_removal"||member.disciplineStatus==="removed")?member.disciplineStatus:atComputeStatus(points);
+      pointsBatch.update(doc(db,"clubMembers",memberId),{disciplinePoints:points,disciplineStatus:newStatus,updatedAt:serverTimestamp()});
+    });
+    await pointsBatch.commit();
+    await ccLoadAll();
+    for(const memberId of touchedMembers)await atSyncMemberSnapshot(memberId);
+    ccSetStatus("atAttendanceStatus","تم حفظ الحضور وتحديث النقاط ✅");
+    await atLoadAll();atRenderRoster();
+  }catch(error){ccSetStatus("atAttendanceStatus","تعذّر الحفظ: "+error.message,false);}
+  finally{btn.disabled=false;btn.textContent="💾 حفظ الحضور";}
+});
+
+ccEl("atMembersList")?.addEventListener("click",async event=>{
+  const history=event.target.closest("[data-at-history]");
+  if(history){
+    const memberId=history.dataset.atHistory;
+    const member=ccMembers.find(x=>x.id===memberId);if(!member)return;
+    const records=atAttendance.filter(x=>x.memberId===memberId).sort((a,b)=>ccWhen(b.createdAt)-ccWhen(a.createdAt));
+    const text=records.length?records.map(r=>`• ${r.eventTitle||"فعالية"} — ${AT_STATUS[r.status]?.label||r.status} (${r.points} نقطة)${r.note?" — "+r.note:""}`).join("\n"):"ما فيه سجل حضور لهذا العضو بعد.";
+    alert(`سجل ${member.name} (${member.disciplinePoints||0} نقطة):\n\n${text}`);
+    return;
+  }
+  const kick=event.target.closest("[data-at-kick]");
+  if(kick){
+    const memberId=kick.dataset.atKick;
+    const member=ccMembers.find(x=>x.id===memberId);if(!member)return;
+    const reason=prompt(`سبب الطرد المباشر لـ ${member.name}؟ (لازم أدمن ثاني يأكده)`);
+    if(!reason||!reason.trim())return;
+    try{
+      await updateDoc(doc(db,"clubMembers",memberId),{disciplineStatus:"pending_removal",pendingRemoval:{reason:reason.trim(),by:auth.currentUser?.email||"",at:new Date().toISOString()},updatedAt:serverTimestamp()});
+      await ccLoadAll();await atSyncMemberSnapshot(memberId);await atLoadAll();
+    }catch(error){alert("تعذّر إرسال طلب الطرد: "+error.message);}
+    return;
+  }
+  const confirmKick=event.target.closest("[data-at-confirm]");
+  if(confirmKick){
+    const memberId=confirmKick.dataset.atConfirm;
+    const member=ccMembers.find(x=>x.id===memberId);if(!member)return;
+    if(member.pendingRemoval?.by&&member.pendingRemoval.by===(auth.currentUser?.email||"")){
+      alert("هذا طلبك أنت — لازم أدمن ثاني غيرك يأكد الطرد.");return;
+    }
+    if(!confirm(`تأكيد طرد ${member.name}؟ السبب: ${member.pendingRemoval?.reason||"—"}`))return;
+    try{
+      await updateDoc(doc(db,"clubMembers",memberId),{disciplineStatus:"removed",status:"inactive",removedAt:serverTimestamp(),removedBy:auth.currentUser?.email||"",updatedAt:serverTimestamp()});
+      await ccLoadAll();await atSyncMemberSnapshot(memberId);await atLoadAll();
+    }catch(error){alert("تعذّر التأكيد: "+error.message);}
+    return;
+  }
+  const cancelKick=event.target.closest("[data-at-cancel]");
+  if(cancelKick){
+    const memberId=cancelKick.dataset.atCancel;
+    const member=ccMembers.find(x=>x.id===memberId);if(!member)return;
+    if(!confirm(`إلغاء طلب طرد ${member.name}؟`))return;
+    try{
+      const points=atMemberPoints(memberId);
+      await updateDoc(doc(db,"clubMembers",memberId),{disciplineStatus:atComputeStatus(points),pendingRemoval:null,updatedAt:serverTimestamp()});
+      await ccLoadAll();await atSyncMemberSnapshot(memberId);await atLoadAll();
+    }catch(error){alert("تعذّر الإلغاء: "+error.message);}
+    return;
+  }
+  const restore=event.target.closest("[data-at-restore]");
+  if(restore){
+    const memberId=restore.dataset.atRestore;
+    const member=ccMembers.find(x=>x.id===memberId);if(!member)return;
+    if(!confirm(`استرجاع ${member.name} كعضو نشط؟`))return;
+    try{
+      const points=atMemberPoints(memberId);
+      await updateDoc(doc(db,"clubMembers",memberId),{disciplineStatus:atComputeStatus(points),status:"active",pendingRemoval:null,updatedAt:serverTimestamp()});
+      await ccLoadAll();await atSyncMemberSnapshot(memberId);await atLoadAll();
+    }catch(error){alert("تعذّر الاسترجاع: "+error.message);}
+  }
+});
+
+ccEl("atMemberSearch")?.addEventListener("input",atRenderMembers);
+ccEl("atCommitteeFilter")?.addEventListener("change",()=>{atRenderStats();atRenderMembers();});
+ccEl("atStatusFilter")?.addEventListener("change",atRenderMembers);
+ccEl("atRefresh")?.addEventListener("click",atLoadAll);
+ccEl("atExport")?.addEventListener("click",()=>{
+  const rows=[["الاسم","اللجنة","النقاط","الحالة"]];
+  ccMembers.forEach(m=>rows.push([m.name,m.committee||"عام",m.disciplinePoints||0,(AT_DISC_LABEL[m.disciplineStatus||"normal"]||AT_DISC_LABEL.normal).t]));
+  ccDownloadCsv(rows,"bsc-attendance-warnings");
+});
 
 // ── UNIVERSAL EDIT MODAL ──
 const _MO=[
