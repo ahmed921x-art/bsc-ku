@@ -1377,9 +1377,7 @@ a{color:inherit;text-decoration:none}
             <div class="form-group form-full"><label>أسماء الأعضاء</label><textarea id="ccMemberNames" rows="4" placeholder="اكتب كل اسم في سطر مستقل&#10;أحمد محمد&#10;فاطمة عبدالله"></textarea></div>
             <div class="form-group"><label>اللجنة</label>
               <select id="ccMemberCommittee">
-                <option value="عام">عام</option><option value="اللجنة العلمية">اللجنة العلمية</option><option value="لجنة الأنشطة">لجنة الأنشطة</option>
-                <option value="لجنة الإعلام">لجنة الإعلام</option><option value="لجنة التصميم">لجنة التصميم</option><option value="لجنة العلاقات العامة">لجنة العلاقات العامة</option>
-                <option value="لجنة التنظيم">لجنة التنظيم</option><option value="لجنة التطوع">لجنة التطوع</option>
+                <option value="اللجنة الإعلامية">اللجنة الإعلامية</option><option value="اللجنة الثقافية">اللجنة الثقافية</option>
               </select>
             </div>
             <div class="form-group"><label>الدور</label>
@@ -1389,6 +1387,7 @@ a{color:inherit;text-decoration:none}
           <div class="btn-row">
             <button class="btn btn-primary" id="ccAddMembers">حفظ الأعضاء</button>
             <button class="btn btn-green" id="ccImportApproved">استيراد المقبولين من طلبات العضوية</button>
+            <button class="btn btn-gold" id="ccImportAll">استيراد كل المتقدمين (بدون فلترة القبول)</button>
           </div>
           <div class="cc-status" id="ccMemberStatus"></div>
         </div>
@@ -1468,9 +1467,7 @@ a{color:inherit;text-decoration:none}
             <div class="form-group"><label>التاريخ</label><input id="atEventDate" placeholder="20 May 2026"></div>
             <div class="form-group"><label>اللجنة</label>
               <select id="atEventCommittee">
-                <option value="عام">عام</option><option value="اللجنة العلمية">اللجنة العلمية</option><option value="لجنة الأنشطة">لجنة الأنشطة</option>
-                <option value="لجنة الإعلام">لجنة الإعلام</option><option value="لجنة التصميم">لجنة التصميم</option><option value="لجنة العلاقات العامة">لجنة العلاقات العامة</option>
-                <option value="لجنة التنظيم">لجنة التنظيم</option><option value="لجنة التطوع">لجنة التطوع</option>
+                <option value="اللجنة الإعلامية">اللجنة الإعلامية</option><option value="اللجنة الثقافية">اللجنة الثقافية</option>
               </select>
             </div>
           </div>
@@ -3762,11 +3759,25 @@ ccEl("ccImportApproved")?.addEventListener("click",async()=>{
   const btn=ccEl("ccImportApproved");btn.disabled=true;btn.textContent="⏳ جاري الاستيراد…";
   try{
     const applications=await getItems("memberships");
-    const approved=applications.filter(x=>x.status==="approved"&&x.fullName).map(x=>({name:x.fullName,committee:x.committee||"عام",role:"عضو",source:"approved-membership"}));
+    const approved=applications.filter(x=>x.status==="approved"&&x.fullName).map(x=>({name:x.fullName,committee:MEM_COMMITTEE[x.committee]||x.committee||"اللجنة الإعلامية",role:"عضو",source:"approved-membership"}));
     if(!approved.length)ccSetStatus("ccMemberStatus","لا توجد طلبات عضوية مقبولة لاستيرادها حالياً.",false);
     else await ccAddMemberRows(approved,"تم استيراد المقبولين");
   }catch(error){ccSetStatus("ccMemberStatus","تعذّر الاستيراد: "+error.message,false);}
   finally{btn.disabled=false;btn.textContent="استيراد المقبولين من طلبات العضوية";}
+});
+
+ccEl("ccImportAll")?.addEventListener("click",async()=>{
+  const btn=ccEl("ccImportAll");btn.disabled=true;btn.textContent="⏳ جاري الاستيراد…";
+  try{
+    const applications=await getItems("memberships");
+    const all=applications.filter(x=>x.fullName).map(x=>({name:x.fullName,committee:MEM_COMMITTEE[x.committee]||x.committee||"اللجنة الإعلامية",role:"عضو",source:"membership-application-"+(x.status||"pending")}));
+    if(!all.length)ccSetStatus("ccMemberStatus","ما فيه طلبات عضوية أصلاً لاستيرادها.",false);
+    else{
+      const count=await ccAddMemberRows(all,"تم استيراد كل المتقدمين");
+      ccSetStatus("ccMemberStatus",`تم استيراد ${count} — شامل كل الحالات (مقبول/قيد المراجعة/مرفوض)، مو بس المقبولين.`);
+    }
+  }catch(error){ccSetStatus("ccMemberStatus","تعذّر الاستيراد: "+error.message,false);}
+  finally{btn.disabled=false;btn.textContent="استيراد كل المتقدمين (بدون فلترة القبول)";}
 });
 
 ccEl("ccMembersList")?.addEventListener("click",async event=>{
