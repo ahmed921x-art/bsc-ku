@@ -1131,11 +1131,10 @@ a{color:inherit;text-decoration:none}
   <div class="service-panel" id="panel-files">
     <div class="section-label" data-ar="الملفات الجامعية" data-en="University Files">الملفات الجامعية</div>
     <div class="section-h2" data-ar="ملفات وروابط جامعية مهمة" data-en="Important university files and links">ملفات وروابط جامعية مهمة</div>
-    <div class="uni-files-card reveal">
-      <div class="uni-files-icon">📁</div>
-      <h3 data-ar="هني بنجمع الملفات الجامعية" data-en="University files will live here">هني بنجمع الملفات الجامعية</h3>
-      <p data-ar="هذا السكشن مخصص للملفات المهمة مثل النماذج، الأدلة، والروابط الجامعية اللي يحتاجها الطالب خلال الدراسة." data-en="This section is for important files such as forms, guides, and university links students need during their studies.">هذا السكشن مخصص للملفات المهمة مثل النماذج، الأدلة، والروابط الجامعية اللي يحتاجها الطالب خلال الدراسة.</p>
+    <div class="sched-filter" id="uniFilesFilter">
+      <button class="sf-btn active" onclick="filterUniFiles('all',this)">🗂️ الكل</button>
     </div>
+    <div class="sched-grid" id="uniFilesGrid"></div>
   </div>
 
   <!-- ===== COURSE RATINGS ===== -->
@@ -1265,6 +1264,18 @@ function itemLink(params){
     if(typeof buildGuideFilters==="function")buildGuideFilters();
     if(typeof renderGuide==="function")renderGuide("all");
   }catch(e){console.warn("guide load:",e);}
+})();
+
+// Load university files from Firestore
+(async()=>{
+  try{
+    const snap=await getDocs(collection(db,"universityFiles"));
+    const items=snap.docs.map(d=>({id:d.id,...d.data()}));
+    items.sort((a,b)=>(+a.order||99)-(+b.order||99));
+    window._uniFilesData=items;
+    if(typeof buildUniFilesFilters==="function")buildUniFilesFilters();
+    if(typeof renderUniFiles==="function")renderUniFiles("all");
+  }catch(e){console.warn("university files load:",e);}
 })();
 
 // ===== COURSE RATINGS =====
@@ -1447,6 +1458,7 @@ function setServiceUrl(tab){
   if(tab!=="news")url.searchParams.delete("news");
   if(tab!=="sched")url.searchParams.delete("schedule");
   if(tab!=="guide")url.searchParams.delete("guide");
+  if(tab!=="files")url.searchParams.delete("file");
   if(tab!=="ratings")url.searchParams.delete("rating");
   history.pushState(null,"",url.pathname+url.search+url.hash);
 }
@@ -1489,6 +1501,7 @@ function focusLinkedCard(tab,param,selector){
 }
 window.focusLinkedSchedule=()=>focusLinkedCard("sched","schedule","#schedGrid .sched-card");
 window.focusLinkedGuide=()=>focusLinkedCard("guide","guide","#guideGrid .sched-card");
+window.focusLinkedUniFile=()=>focusLinkedCard("files","file","#uniFilesGrid .sched-card");
 window.focusLinkedRating=()=>focusLinkedCard("ratings","rating","#ratingsBrowseList .rating-card");
 
 /* ===== GPA V2 ===== */
@@ -1963,6 +1976,82 @@ function filterGuide(sec,btn){
 buildGuideFilters();
 renderGuide("all");
 
+/* ===== UNIVERSITY FILES ===== */
+window._uniFilesData=window._uniFilesData||[];
+
+const UNI_FILE_SECTIONS={forms:"النماذج",guides:"الأدلة",links:"روابط مهمة",calendar:"التقويم الجامعي",other:"أخرى"};
+
+function buildUniFilesFilters(){
+  const bar=document.getElementById("uniFilesFilter");
+  if(!bar)return;
+  while(bar.children.length>1)bar.removeChild(bar.lastChild);
+  const secs=[...new Set((window._uniFilesData||[]).map(s=>s.section).filter(Boolean))];
+  secs.forEach(c=>{
+    const b=document.createElement("button");
+    b.className="sf-btn";
+    b.textContent=UNI_FILE_SECTIONS[c]||c;
+    b.onclick=function(){filterUniFiles(c,this);};
+    bar.appendChild(b);
+  });
+}
+
+function renderUniFiles(filter){
+  const grid=document.getElementById("uniFilesGrid");
+  if(!grid)return;
+  const data=window._uniFilesData||[];
+  const list=(!filter||filter==="all")?data:data.filter(s=>s.section===filter);
+  if(!list.length){
+    grid.innerHTML=`<div class="sched-empty"><span>📁</span><p>لا توجد ملفات جامعية بعد — ستُضاف قريباً</p></div>`;
+    return;
+  }
+  grid.innerHTML=list.map((s,i)=>{
+    const itemId=String(s.id||i);
+    const imgs=(s.images&&s.images.length)?s.images:(s.imageUrl?[s.imageUrl]:[]);
+    const hasImgs=imgs.length>0&&imgs[0];
+    const imgUrl=hasImgs?imgs[0].replace(/"/g,"&quot;"):"";
+    const imgsJson=JSON.stringify(imgs).replace(/"/g,"&quot;");
+    const title=(s.title||"").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+    const tag=(s.section?UNI_FILE_SECTIONS[s.section]||s.section:"ملف جامعي").replace(/</g,"&lt;");
+    const desc=(s.desc||"").replace(/</g,"&lt;");
+    const extUrl=s.url||"";
+    const linkLabel=extUrl.includes("drive.google")?"📂 فتح Google Drive":extUrl.includes("ku.edu")?"🏛️ فتح رابط الجامعة":"📄 فتح الرابط";
+    const itemLink=makeServiceLink("files","file",itemId).replace(/"/g,"&quot;");
+    const imgSection=hasImgs
+      ?`<div class="sched-img-wrap" style="position:relative"><img class="sched-img" src="${imgUrl}" alt="${title}" loading="lazy">${imgs.length>1?`<span style="position:absolute;bottom:.4rem;left:.5rem;background:rgba(0,0,0,.65);color:#fff;font-size:.7rem;font-weight:700;padding:.18rem .55rem;border-radius:999px">🖼 ${imgs.length}</span>`:""}</div>`
+      :`<div class="sched-img-wrap" style="background:rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;font-size:3rem;min-height:130px">📁</div>`;
+    return`<div class="sched-card reveal" style="animation-delay:${i*.07}s" data-item-id="${itemId.replace(/"/g,"&quot;")}" data-url="${imgUrl}" data-imgs="${imgsJson}" data-title="${title}" data-exturl="${extUrl.replace(/"/g,"&quot;")}">
+      ${imgSection}
+      <div class="sched-info">
+        <div class="sched-tag">${tag}</div>
+        <h3>${title}</h3>
+        ${desc?`<p>${desc}</p>`:""}
+        <div class="card-link-row">
+          ${extUrl?`<a href="${extUrl.replace(/"/g,"&quot;")}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:.4rem;padding:.4rem .9rem;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.35);border-radius:999px;color:#a5b4fc;font-size:.78rem;font-weight:700;text-decoration:none">${linkLabel}</a>`:""}
+          <button class="item-link-btn" type="button" onclick="event.stopPropagation();window.copyDeepLink('${itemLink}',this)">🔗 نسخ رابط الملف</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+  document.querySelectorAll("#uniFilesGrid .sched-card").forEach(card=>{
+    card.onclick=()=>{
+      const imgs=card.dataset.imgs?JSON.parse(card.dataset.imgs):[];
+      if(imgs.length&&imgs[0])openLightbox(imgs,card.dataset.title);
+      else if(card.dataset.exturl)window.open(card.dataset.exturl,"_blank");
+    };
+  });
+  trigReveal();
+  if(window.focusLinkedUniFile)window.focusLinkedUniFile();
+}
+
+function filterUniFiles(sec,btn){
+  document.querySelectorAll("#uniFilesFilter .sf-btn").forEach(b=>b.classList.remove("active"));
+  if(btn)btn.classList.add("active");
+  renderUniFiles(sec);
+}
+
+buildUniFilesFilters();
+renderUniFiles("all");
+
 /* ===== GRADUATION PROGRESS ===== */
 const GRAD_MAJORS={molecular:{ar:"البيولوجيا الجزيئية",icon:"🧬"},micro:{ar:"مايكروبيولوجي",icon:"🦠"},plant:{ar:"بيولوجيا النبات",icon:"🌱"},animal:{ar:"بيولوجيا الحيوان",icon:"🐾"},biochem:{ar:"الكيمياء الحيوية",icon:"⚗️"}};
 const GRAD_TYPE_COLORS={required:{bg:"rgba(16,185,129,.12)",border:"rgba(16,185,129,.35)",text:"#6ee7b7",label:"إلزامي"},dept:{bg:"rgba(59,130,246,.12)",border:"rgba(59,130,246,.35)",text:"#93c5fd",label:"قسم"},major:{bg:"rgba(245,158,11,.12)",border:"rgba(245,158,11,.35)",text:"#fcd34d",label:"تخصص"},support:{bg:"rgba(239,68,68,.08)",border:"rgba(239,68,68,.25)",text:"#fca5a5",label:"مساند"},elective:{bg:"rgba(139,92,246,.12)",border:"rgba(139,92,246,.35)",text:"#c4b5fd",label:"اختياري"}};
@@ -2240,6 +2329,7 @@ loadPref();trigReveal();
   if(getDeepParam("news"))setTimeout(()=>window.focusLinkedNews&&window.focusLinkedNews(),120);
   if(getDeepParam("schedule"))setTimeout(()=>window.focusLinkedSchedule&&window.focusLinkedSchedule(),120);
   if(getDeepParam("guide"))setTimeout(()=>window.focusLinkedGuide&&window.focusLinkedGuide(),120);
+  if(getDeepParam("file"))setTimeout(()=>window.focusLinkedUniFile&&window.focusLinkedUniFile(),120);
   if(getDeepParam("rating"))setTimeout(()=>window.focusLinkedRating&&window.focusLinkedRating(),120);
 }
 
