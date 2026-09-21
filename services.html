@@ -135,6 +135,7 @@ a{color:inherit;text-decoration:none}
 .star-picker span.on{color:#fbbf24}
 .star-picker span:hover{transform:scale(1.15)}
 .rating-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:1.25rem 1.4rem}
+.rating-card.linked-target{border-color:rgba(99,102,241,.75);box-shadow:0 0 0 3px rgba(99,102,241,.18),0 18px 52px rgba(0,0,0,.35)}
 .rating-card-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.5rem}
 .rating-card-title{font-weight:800;font-size:.95rem}
 .rating-card-code{color:#a5b4fc;font-weight:800;margin-inline-end:.4rem}
@@ -151,11 +152,15 @@ a{color:inherit;text-decoration:none}
 .news-card::after{content:'';position:absolute;top:0;right:0;bottom:0;width:3px;background:linear-gradient(180deg,#6366f1,#8b5cf6);transform:scaleY(0);transform-origin:bottom;transition:transform .4s}
 .news-card:hover{transform:translateX(-6px);border-color:rgba(99,102,241,.3);box-shadow:0 12px 40px rgba(0,0,0,.35)}
 .news-card:hover::after{transform:scaleY(1)}
+.news-card.linked-target{border-color:rgba(99,102,241,.75);box-shadow:0 0 0 3px rgba(99,102,241,.18),0 18px 52px rgba(0,0,0,.45)}
 .news-date-box{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);border-radius:12px;padding:.75rem;text-align:center;flex-shrink:0;min-width:54px}
 .news-date-box .nd{display:block;font-size:1.3rem;font-weight:900;color:#a5b4fc;line-height:1;font-family:'Plus Jakarta Sans',sans-serif}
 .news-date-box .nm{display:block;font-size:.7rem;color:#818cf8;font-weight:700;margin-top:2px}
 .news-body h3{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:.35rem;line-height:1.4}
 .news-body p{font-size:.875rem;color:var(--muted);line-height:1.6}
+.news-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.7rem}
+.news-share-btn{display:inline-flex;align-items:center;gap:.35rem;padding:.38rem .9rem;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:999px;font-size:.78rem;font-weight:700;color:var(--muted);cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s}
+.news-share-btn:hover{color:#fff;background:rgba(99,102,241,.16);border-color:rgba(99,102,241,.35)}
 .news-tag{display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;font-weight:700;border-radius:999px;padding:.22rem .75rem;margin-bottom:.6rem}
 .news-tag.info{color:#a5b4fc;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25)}
 .news-tag.event{color:#6ee7b7;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25)}
@@ -189,6 +194,7 @@ a{color:inherit;text-decoration:none}
 .sched-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.25rem}
 .sched-card{background:rgba(22,22,22,.75);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .35s var(--ease);animation:fu .5s ease both}
 .sched-card:hover{transform:translateY(-6px);border-color:rgba(99,102,241,.4);box-shadow:0 16px 48px rgba(0,0,0,.45)}
+.sched-card.linked-target{border-color:rgba(99,102,241,.75);box-shadow:0 0 0 3px rgba(99,102,241,.18),0 18px 52px rgba(0,0,0,.45)}
 .sched-img-wrap{overflow:hidden;aspect-ratio:4/3;background:rgba(99,102,241,.06);display:flex;align-items:center;justify-content:center}
 .sched-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .45s var(--ease)}
 .sched-card:hover .sched-img{transform:scale(1.06)}
@@ -196,9 +202,16 @@ a{color:inherit;text-decoration:none}
 .sched-tag{display:inline-flex;align-items:center;font-size:.7rem;font-weight:700;padding:.2rem .65rem;border-radius:999px;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);color:#a5b4fc;margin-bottom:.5rem}
 .sched-info h3{font-size:.95rem;font-weight:700;color:#f1f5f9;margin-bottom:.25rem;line-height:1.4}
 .sched-info p{font-size:.8rem;color:var(--muted);line-height:1.5}
+.card-link-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.7rem}
+.item-link-btn{display:inline-flex;align-items:center;gap:.35rem;padding:.36rem .85rem;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:999px;font-size:.76rem;font-weight:700;color:var(--muted);cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s}
+.item-link-btn:hover{color:#fff;background:rgba(99,102,241,.16);border-color:rgba(99,102,241,.35)}
 .sched-empty{grid-column:1/-1;text-align:center;padding:5rem 2rem;color:var(--muted)}
 .sched-empty span{font-size:3.5rem;display:block;margin-bottom:1rem}
 .sched-empty p{font-size:.9rem}
+.uni-files-card{background:rgba(22,22,22,.75);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;max-width:760px;margin:0 auto;text-align:center}
+.uni-files-icon{width:62px;height:62px;margin:0 auto 1rem;border-radius:18px;background:linear-gradient(135deg,rgba(99,102,241,.22),rgba(16,185,129,.14));border:1px solid rgba(99,102,241,.28);display:flex;align-items:center;justify-content:center;font-size:2rem}
+.uni-files-card h3{font-size:1.15rem;font-weight:800;color:var(--text);margin-bottom:.45rem}
+.uni-files-card p{max-width:520px;margin:0 auto;color:var(--muted);font-size:.9rem;line-height:1.8}
 /* Lightbox */
 .lb-overlay{position:fixed;inset:0;z-index:9500;background:rgba(4,5,10,.93);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(6px)}
 .lb-overlay.open{opacity:1;pointer-events:all}
@@ -710,6 +723,7 @@ a{color:inherit;text-decoration:none}
     <button class="stab" onclick="switchTab('news')" data-ar="📰 الأخبار" data-en="📰 News">📰 الأخبار</button>
     <button class="stab" onclick="switchTab('sched')" data-ar="📅 الجداول المقترحة" data-en="📅 Suggested Schedules">📅 الجداول المقترحة</button>
     <button class="stab" onclick="switchTab('guide')" data-ar="📖 دليل الطالب" data-en="📖 Student Guide">📖 دليل الطالب</button>
+    <button class="stab" onclick="switchTab('files')" data-ar="📁 الملفات الجامعية" data-en="📁 University Files">📁 الملفات الجامعية</button>
     <button class="stab" onclick="switchTab('grad')" data-ar="🎓 إنجاز التخرج" data-en="🎓 Graduation Progress">🎓 إنجاز التخرج</button>
     <button class="stab" onclick="switchTab('ratings')" data-ar="⭐ تقييم المواد" data-en="⭐ Rate Courses">⭐ تقييم المواد</button>
   </div>
@@ -1113,6 +1127,17 @@ a{color:inherit;text-decoration:none}
     <div class="sched-grid" id="guideGrid"></div>
   </div>
 
+  <!-- ===== UNIVERSITY FILES ===== -->
+  <div class="service-panel" id="panel-files">
+    <div class="section-label" data-ar="الملفات الجامعية" data-en="University Files">الملفات الجامعية</div>
+    <div class="section-h2" data-ar="ملفات وروابط جامعية مهمة" data-en="Important university files and links">ملفات وروابط جامعية مهمة</div>
+    <div class="uni-files-card reveal">
+      <div class="uni-files-icon">📁</div>
+      <h3 data-ar="هني بنجمع الملفات الجامعية" data-en="University files will live here">هني بنجمع الملفات الجامعية</h3>
+      <p data-ar="هذا السكشن مخصص للملفات المهمة مثل النماذج، الأدلة، والروابط الجامعية اللي يحتاجها الطالب خلال الدراسة." data-en="This section is for important files such as forms, guides, and university links students need during their studies.">هذا السكشن مخصص للملفات المهمة مثل النماذج، الأدلة، والروابط الجامعية اللي يحتاجها الطالب خلال الدراسة.</p>
+    </div>
+  </div>
+
   <!-- ===== COURSE RATINGS ===== -->
   <div class="service-panel" id="panel-ratings">
     <div class="section-label" data-ar="تقييم المواد" data-en="Rate Courses">تقييم المواد</div>
@@ -1180,6 +1205,13 @@ const app=initializeApp({apiKey:"AIzaSyDGSTBOgSu4skvrEWUr2LcFLL_DDhTTZBE",authDo
 const db=getFirestore(app);
 const months=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
 function fmtDate(ts){if(!ts)return{d:"—",m:""};const dt=ts.toDate?ts.toDate():new Date(ts);return{d:dt.getDate(),m:months[dt.getMonth()]}}
+function escHtml(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
+function itemLink(params){
+  const url=new URL(location.href);
+  Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,v));
+  url.hash="";
+  return url.href;
+}
 
 // Load news from "news" collection
 (async()=>{
@@ -1191,16 +1223,23 @@ function fmtDate(ts){if(!ts)return{d:"—",m:""};const dt=ts.toDate?ts.toDate():
     el.innerHTML=list.map((n,i)=>{
       const dt=fmtDate(n.createdAt);
       const type=n.type||"info";
-      return`<div class="news-card reveal" style="animation-delay:${i*.08}s">
+      const link=itemLink({tab:"news",news:n.id});
+      const title=escHtml(n.title||"خبر");
+      const body=escHtml(n.content||n.description||"");
+      return`<div class="news-card reveal" id="news-${escHtml(n.id)}" data-news-id="${escHtml(n.id)}" style="animation-delay:${i*.08}s">
         <div class="news-date-box"><span class="nd">${dt.d}</span><span class="nm">${dt.m}</span></div>
         <div class="news-body">
           <div class="news-tag ${type}">${type==="urgent"?"🚨 عاجل":type==="event"?"🎤 نشاط":"📌 خبر"}</div>
-          <h3>${n.title||"خبر"}</h3>
-          <p>${n.content||n.description||""}</p>
-          ${n.driveUrl?`<a href="${n.driveUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:.35rem;margin-top:.6rem;padding:.38rem .9rem;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.28);border-radius:999px;font-size:.78rem;font-weight:700;color:#a5b4fc;text-decoration:none">📁 فتح الملف</a>`:""}
+          <h3>${title}</h3>
+          <p>${body}</p>
+          <div class="news-actions">
+            ${n.driveUrl?`<a href="${escHtml(n.driveUrl)}" target="_blank" style="display:inline-flex;align-items:center;gap:.35rem;padding:.38rem .9rem;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.28);border-radius:999px;font-size:.78rem;font-weight:700;color:#a5b4fc;text-decoration:none">📁 فتح الملف</a>`:""}
+            <button class="news-share-btn" type="button" onclick="window.copyDeepLink('${escHtml(link)}',this)">🔗 نسخ رابط الخبر</button>
+          </div>
         </div>
       </div>`}).join("");
     trigReveal();
+    if(window.focusLinkedNews)window.focusLinkedNews();
   }catch(e){document.getElementById("newsGrid").innerHTML='<div class="news-empty"><span>📰</span>لا توجد أخبار حالياً.</div>'}
 })();
 
@@ -1348,20 +1387,23 @@ function fmtDate(ts){if(!ts)return{d:"—",m:""};const dt=ts.toDate?ts.toDate():
     list.sort((a,b)=>b.ratings.length-a.ratings.length);
     if(!list.length){el.innerHTML='<div class="ratings-empty">لا توجد تقييمات منشورة بعد.</div>';return}
     el.innerHTML=list.map(g=>{
+      const link=itemLink({tab:"ratings",rating:g.code});
       const avg=g.ratings.reduce((s,r)=>s+(+r.rating||0),0)/g.ratings.length;
       const full=Math.round(avg);
       const stars="★".repeat(full)+"☆".repeat(5-full);
       const comments=g.ratings.filter(r=>r.comment).slice(0,5).map(r=>
         `<div class="rating-comment"><span class="rc-stars">${"★".repeat(+r.rating||0)}</span>${escR(r.comment)}</div>`
       ).join("");
-      return `<div class="rating-card">
+      return `<div class="rating-card" data-item-id="${escR(g.code)}" data-rating-id="${escR(g.code)}">
         <div class="rating-card-head">
           <div class="rating-card-title"><span class="rating-card-code">${escR(g.code)}</span>${escR(g.nameAr)}</div>
           <div><span class="rating-stars">${stars}</span> <span class="rating-count">${avg.toFixed(1)} · ${g.ratings.length} تقييم</span></div>
         </div>
         ${comments?`<div class="rating-comments">${comments}</div>`:""}
+        <div class="news-actions"><button class="news-share-btn" type="button" onclick="window.copyDeepLink('${escR(link)}',this)">🔗 نسخ رابط التقييم</button></div>
       </div>`;
     }).join("");
+    if(window.focusLinkedRating)window.focusLinkedRating();
   }
 
   async function loadRatingsBrowse(){
@@ -1383,12 +1425,71 @@ function fmtDate(ts){if(!ts)return{d:"—",m:""};const dt=ts.toDate?ts.toDate():
 
 <script>
 /* ===== TABS ===== */
-function switchTab(id){
-  document.querySelectorAll(".stab").forEach((t,i)=>{t.classList.toggle("active",["gpa","planner","news","sched","guide","grad","ratings"][i]===id)});
+const SERVICE_TABS=["gpa","planner","news","sched","guide","files","grad","ratings"];
+function getDeepParam(key){
+  const search=new URLSearchParams(location.search);
+  if(search.has(key))return search.get(key);
+  const hash=(location.hash||"").replace(/^#/,"");
+  if(!hash)return null;
+  const hashParams=new URLSearchParams(hash);
+  return hashParams.get(key);
+}
+function makeServiceLink(tab,key,value){
+  const url=new URL(location.href);
+  url.searchParams.set("tab",tab);
+  if(key&&value)url.searchParams.set(key,value);
+  url.hash="";
+  return url.href;
+}
+function setServiceUrl(tab){
+  const url=new URL(location.href);
+  url.searchParams.set("tab",tab);
+  if(tab!=="news")url.searchParams.delete("news");
+  if(tab!=="sched")url.searchParams.delete("schedule");
+  if(tab!=="guide")url.searchParams.delete("guide");
+  if(tab!=="ratings")url.searchParams.delete("rating");
+  history.pushState(null,"",url.pathname+url.search+url.hash);
+}
+function switchTab(id,opts={}){
+  document.querySelectorAll(".stab").forEach((t,i)=>{t.classList.toggle("active",["gpa","planner","news","sched","guide","files","grad","ratings"][i]===id)});
   document.querySelectorAll(".service-panel").forEach(p=>p.classList.remove("active"));
   document.getElementById("panel-"+id).classList.add("active");
+  if(opts.updateUrl!==false)setServiceUrl(id);
   trigReveal();
 }
+window.copyDeepLink=async function(url,btn){
+  try{
+    await navigator.clipboard.writeText(url);
+    if(btn){const old=btn.textContent;btn.textContent="✅ تم النسخ";setTimeout(()=>btn.textContent=old,1600);}
+  }catch{
+    prompt("انسخ الرابط:",url);
+  }
+};
+window.focusLinkedNews=function(){
+  const newsId=getDeepParam("news");
+  if(!newsId)return false;
+  switchTab("news",{updateUrl:false});
+  const card=[...document.querySelectorAll("[data-news-id]")].find(el=>el.dataset.newsId===newsId);
+  if(!card)return false;
+  document.querySelectorAll(".news-card.linked-target").forEach(el=>el.classList.remove("linked-target"));
+  card.classList.add("linked-target");
+  setTimeout(()=>card.scrollIntoView({behavior:"smooth",block:"center"}),80);
+  return true;
+};
+function focusLinkedCard(tab,param,selector){
+  const itemId=getDeepParam(param);
+  if(!itemId)return false;
+  switchTab(tab,{updateUrl:false});
+  const card=[...document.querySelectorAll(selector)].find(el=>el.dataset.itemId===itemId);
+  if(!card)return false;
+  document.querySelectorAll(".linked-target").forEach(el=>el.classList.remove("linked-target"));
+  card.classList.add("linked-target");
+  setTimeout(()=>card.scrollIntoView({behavior:"smooth",block:"center"}),80);
+  return true;
+}
+window.focusLinkedSchedule=()=>focusLinkedCard("sched","schedule","#schedGrid .sched-card");
+window.focusLinkedGuide=()=>focusLinkedCard("guide","guide","#guideGrid .sched-card");
+window.focusLinkedRating=()=>focusLinkedCard("ratings","rating","#ratingsBrowseList .rating-card");
 
 /* ===== GPA V2 ===== */
 const GRADES={A:4.0,"A-":3.67,"B+":3.33,B:3.0,"B-":2.67,"C+":2.33,C:2.0,"C-":1.67,"D+":1.33,D:1.0,F:0,"غير معادة":null};
@@ -1718,18 +1819,21 @@ function renderScheds(filter){
     return;
   }
   grid.innerHTML=list.map((s,i)=>{
+    const itemId=String(s.id||i);
     const imgs=s.images&&s.images.length?s.images:[s.imageUrl||""];
     const url=imgs[0].replace(/"/g,"&quot;");
     const imgsJson=JSON.stringify(imgs).replace(/"/g,"&quot;");
     const title=(s.title||"جدول").replace(/</g,"&lt;").replace(/"/g,"&quot;");
     const tag=(s.tag||"جدول").replace(/</g,"&lt;");
     const desc=(s.desc||"").replace(/</g,"&lt;");
-    return`<div class="sched-card reveal" style="animation-delay:${i*.07}s" data-url="${url}" data-imgs="${imgsJson}" data-title="${title}">
+    const link=makeServiceLink("sched","schedule",itemId).replace(/"/g,"&quot;");
+    return`<div class="sched-card reveal" style="animation-delay:${i*.07}s" data-item-id="${itemId.replace(/"/g,"&quot;")}" data-url="${url}" data-imgs="${imgsJson}" data-title="${title}">
       <div class="sched-img-wrap" style="position:relative"><img class="sched-img" src="${url}" alt="${title}" loading="lazy">${imgs.length>1?`<span style="position:absolute;bottom:.4rem;left:.5rem;background:rgba(0,0,0,.65);color:#fff;font-size:.7rem;font-weight:700;padding:.18rem .55rem;border-radius:999px">🖼 ${imgs.length}</span>`:""}</div>
       <div class="sched-info">
         <div class="sched-tag">${tag}</div>
         <h3>${title}</h3>
         ${desc?`<p>${desc}</p>`:""}
+        <div class="card-link-row"><button class="item-link-btn" type="button" onclick="event.stopPropagation();window.copyDeepLink('${link}',this)">🔗 نسخ رابط الجدول</button></div>
       </div>
     </div>`;
   }).join("");
@@ -1738,6 +1842,7 @@ function renderScheds(filter){
     card.onclick=()=>openLightbox(imgs,card.dataset.title);
   });
   trigReveal();
+  if(window.focusLinkedSchedule)window.focusLinkedSchedule();
 }
 
 function filterSched(cat,btn){
@@ -1811,6 +1916,7 @@ function renderGuide(filter){
     return;
   }
   grid.innerHTML=list.map((s,i)=>{
+    const itemId=String(s.id||i);
     const imgs=(s.images&&s.images.length)?s.images:(s.imageUrl?[s.imageUrl]:[]);
     const hasImgs=imgs.length>0&&imgs[0];
     const imgUrl=hasImgs?imgs[0].replace(/"/g,"&quot;"):"";
@@ -1820,16 +1926,20 @@ function renderGuide(filter){
     const desc=(s.desc||"").replace(/</g,"&lt;");
     const extUrl=s.url||"";
     const linkLabel=extUrl.includes("drive.google")?"📂 فتح Google Drive":extUrl.includes("adobe")?"📄 فتح Adobe":"📄 فتح الرابط";
+    const itemLink=makeServiceLink("guide","guide",itemId).replace(/"/g,"&quot;");
     const imgSection=hasImgs
       ?`<div class="sched-img-wrap" style="position:relative"><img class="sched-img" src="${imgUrl}" alt="${title}" loading="lazy">${imgs.length>1?`<span style="position:absolute;bottom:.4rem;left:.5rem;background:rgba(0,0,0,.65);color:#fff;font-size:.7rem;font-weight:700;padding:.18rem .55rem;border-radius:999px">🖼 ${imgs.length}</span>`:""}</div>`
       :`<div class="sched-img-wrap" style="background:rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;font-size:3rem;min-height:130px">📄</div>`;
-    return`<div class="sched-card reveal" style="animation-delay:${i*.07}s" data-url="${imgUrl}" data-imgs="${imgsJson}" data-title="${title}" data-exturl="${extUrl.replace(/"/g,"&quot;")}">
+    return`<div class="sched-card reveal" style="animation-delay:${i*.07}s" data-item-id="${String(itemId).replace(/"/g,"&quot;")}" data-url="${imgUrl}" data-imgs="${imgsJson}" data-title="${title}" data-exturl="${extUrl.replace(/"/g,"&quot;")}">
       ${imgSection}
       <div class="sched-info">
         <div class="sched-tag">${tag}</div>
         <h3>${title}</h3>
         ${desc?`<p>${desc}</p>`:""}
-        ${extUrl?`<a href="${extUrl.replace(/"/g,"&quot;")}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:.6rem;padding:.4rem .9rem;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.35);border-radius:8px;color:#a5b4fc;font-size:.8rem;font-weight:700;text-decoration:none">${linkLabel}</a>`:""}
+        <div class="card-link-row">
+          ${extUrl?`<a href="${extUrl.replace(/"/g,"&quot;")}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:.4rem;padding:.4rem .9rem;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.35);border-radius:999px;color:#a5b4fc;font-size:.78rem;font-weight:700;text-decoration:none">${linkLabel}</a>`:""}
+          <button class="item-link-btn" type="button" onclick="event.stopPropagation();window.copyDeepLink('${itemLink}',this)">🔗 نسخ رابط الملف</button>
+        </div>
       </div>
     </div>`;
   }).join("");
@@ -1841,6 +1951,7 @@ function renderGuide(filter){
     };
   });
   trigReveal();
+  if(window.focusLinkedGuide)window.focusLinkedGuide();
 }
 
 function filterGuide(sec,btn){
@@ -2123,6 +2234,14 @@ function trigReveal(){
 /* ===== INIT ===== */
 // GPA v2 initializes via loadSemUI above
 loadPref();trigReveal();
+{
+  const linkedTab=getDeepParam("tab");
+  if(linkedTab&&SERVICE_TABS.includes(linkedTab))switchTab(linkedTab,{updateUrl:false});
+  if(getDeepParam("news"))setTimeout(()=>window.focusLinkedNews&&window.focusLinkedNews(),120);
+  if(getDeepParam("schedule"))setTimeout(()=>window.focusLinkedSchedule&&window.focusLinkedSchedule(),120);
+  if(getDeepParam("guide"))setTimeout(()=>window.focusLinkedGuide&&window.focusLinkedGuide(),120);
+  if(getDeepParam("rating"))setTimeout(()=>window.focusLinkedRating&&window.focusLinkedRating(),120);
+}
 
 /* ===== SCHEDULE PLANNER ===== */
 (function(){

@@ -234,6 +234,7 @@
     '📰 الأخبار': '📰 News',
     '📢 الإعلانات': '📢 Announcements',
     '⭐ الوضع المفضل': '⭐ Favorites',
+    '📁 الملفات الجامعية': '📁 University Files',
     'حاسبة المعدل': 'GPA Calculator',
     'حساب المعدل التراكمي': 'Calculate Cumulative GPA',
     'الوحدات المسجّلة السابقة': 'Previous Registered Credits',
@@ -255,6 +256,11 @@
     '+ فصل جديد': '+ New Semester',
     'سلم الدرجات — جامعة الكويت': 'Grade Scale — Kuwait University',
     'تقييم المواد': 'Rate Courses',
+    'الملفات الجامعية': 'University Files',
+    'ملفات وروابط جامعية مهمة': 'Important university files and links',
+    'هني بنجمع الملفات الجامعية': 'University files will live here',
+    'هذا السكشن مخصص للملفات المهمة مثل النماذج، الأدلة، والروابط الجامعية اللي يحتاجها الطالب خلال الدراسة.':
+      'This section is for important files such as forms, guides, and university links students need during their studies.',
     'قيّم المواد وشوف تقييمات زملائك': 'Rate courses & see your peers\' ratings',
     'التقييم على المادة نفسها فقط (بدون ذكر أسماء الدكاترة) — يمر على مراجعة النادي قبل ما يُنشر.':
       'Ratings are about the course itself only (no instructor names) — reviewed by the club before publishing.',
