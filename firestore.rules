@@ -20,7 +20,7 @@ service cloud.firestore {
     // Public content: readable by everyone, writable by admins only.
     // events, notes, advisors, announcements, news, studentGuide,
     // majorSheets, supportSheets, gradCourses, teamMembers, majorResources,
-    // aiKnowledge, schedules
+    // aiKnowledge, schedules, universityFiles
     match /events/{id} {
       allow read: if true;
       allow write: if isAdmin();
@@ -51,6 +51,10 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     match /studentGuide/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /universityFiles/{id} {
       allow read: if true;
       allow write: if isAdmin();
     }
