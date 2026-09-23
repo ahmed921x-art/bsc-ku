@@ -625,6 +625,7 @@ a{color:inherit;text-decoration:none}
           <button class="btn btn-sm" id="memExportXlsx" title="يضيف الطلبات الجديدة على نفس ملف الإكسل ويحافظ على ملاحظاتك">📊 تحديث ملف Excel</button>
           <button class="btn btn-sm" id="memExportXlsxPick" title="اختيار/إنشاء ملف إكسل آخر">📁</button>
           <button class="btn btn-sm" id="memExport">⬇️ CSV</button>
+          <button class="btn btn-green btn-sm" id="memImportApprovedTeam">👥 إضافة المقبولين لعائلة النادي</button>
           <button class="btn btn-sm" id="memRefresh">🔄 تحديث</button>
         </div>
 
@@ -1698,7 +1699,7 @@ a{color:inherit;text-decoration:none}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, query, orderBy, serverTimestamp, getDoc, updateDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, query, orderBy, where, limit, serverTimestamp, getDoc, updateDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import { MAJOR_SHEETS_SEED } from "./majorsheets-seed.js";
 import { CATALOG_SEED, SUPPORT_CATALOG_SEED } from "./catalog-seed.js";
@@ -1988,12 +1989,136 @@ function renderMemList(){
   }).join("");
 }
 
+async function memPrepareClubMemberWrite(batch,m){
+  const name=String(m.fullName||"").trim().replace(/\s+/g," ");
+  if(!name) return {added:false, memberId:"", reason:"missing-name"};
+  const normalizedName=ccNorm(name);
+  const existing=await getDocs(query(collection(db,"clubMembers"),where("normalizedName","==",normalizedName),limit(1)));
+  if(!existing.empty) return {added:false, memberId:existing.docs[0].id, reason:"already-exists"};
+
+  const ref=doc(collection(db,"clubMembers"));
+  const committee=MEM_COMMITTEE[m.committee]||m.committee||"اللجنة الإعلامية";
+  const accessCode=ccGenCode();
+  const role="عضو";
+  batch.set(ref,{
+    name,
+    normalizedName,
+    committee,
+    role,
+    status:"active",
+    source:"approved-membership",
+    membershipId:m.id,
+    studentId:m.studentId||"",
+    accessCode,
+    disciplinePoints:0,
+    disciplineStatus:"normal",
+    createdAt:serverTimestamp(),
+    updatedAt:serverTimestamp()
+  });
+  batch.set(doc(db,"memberAccess",accessCode),{
+    memberId:ref.id,
+    name,
+    committee,
+    role,
+    disciplinePoints:0,
+    disciplineStatus:"normal",
+    evalCount:0,
+    evalScore:null,
+    evalRecent:[],
+    attendanceRecent:[],
+    updatedAt:serverTimestamp()
+  });
+  return {added:true, memberId:ref.id, reason:"created"};
+}
+
+async function memPrepareTeamMemberWrite(batch,m){
+  const name=String(m.fullName||"").trim().replace(/\s+/g," ");
+  if(!name) return {added:false, memberId:"", reason:"missing-name"};
+
+  if(m.studentId){
+    const byStudent=await getDocs(query(collection(db,"teamMembers"),where("studentId","==",String(m.studentId).trim()),limit(1)));
+    if(!byStudent.empty) return {added:false, memberId:byStudent.docs[0].id, reason:"already-exists"};
+  }
+  const byName=await getDocs(query(collection(db,"teamMembers"),where("name","==",name),limit(1)));
+  if(!byName.empty) return {added:false, memberId:byName.docs[0].id, reason:"already-exists"};
+
+  const committee=MEM_COMMITTEE[m.committee]||m.committee||"اللجنة الإعلامية";
+  const category=m.committee==="academic"?"academic":(m.committee==="media"?"media":"other");
+  const ref=doc(collection(db,"teamMembers"));
+  batch.set(ref,{
+    name,
+    nameEn:"",
+    role:`عضو ${committee}`,
+    roleEn:"Club Member",
+    studentId:m.studentId||"",
+    major:MN[m.major]||m.major||"",
+    email:m.email||"",
+    photo:"",
+    bio:"",
+    order:99,
+    category,
+    source:"approved-membership",
+    membershipId:m.id,
+    createdAt:serverTimestamp(),
+    updatedAt:serverTimestamp()
+  });
+  return {added:true, memberId:ref.id, reason:"created"};
+}
+
 window.memApprove_=async id=>{
   const m=_memCache.find(x=>x.id===id); if(!m) return;
-  if(!confirm(`قبول «${m.fullName||"الطالب"}» كعضو في النادي؟\n\nبيشوف نتيجة القبول في صفحة الانضمام.`))return;
-  await setDoc(doc(db,"memberships",id),{status:"approved",reviewedAt:serverTimestamp()},{merge:true});
-  loadAll();
+  if(!confirm(`قبول «${m.fullName||"الطالب"}» كعضو في النادي؟\n\nبينضاف تلقائياً إلى عائلة النادي، وبيشوف نتيجة القبول في صفحة الانضمام.`))return;
+  try{
+    const batch=writeBatch(db);
+    const clubMember=await memPrepareClubMemberWrite(batch,m);
+    const teamMember=await memPrepareTeamMemberWrite(batch,m);
+    batch.set(doc(db,"memberships",id),{
+      status:"approved",
+      reviewedAt:serverTimestamp(),
+      clubMemberId:clubMember.memberId||null,
+      teamMemberId:teamMember.memberId||null,
+      clubMemberLinkedAt:serverTimestamp(),
+      teamMemberLinkedAt:serverTimestamp()
+    },{merge:true});
+    await batch.commit();
+    await Promise.all([loadAll(),ccLoadAll()]);
+  }catch(e){
+    console.error(e);
+    alert("تعذّر قبول الطلب أو إضافته لعائلة النادي: "+(e.message||e));
+  }
 };
+
+document.getElementById("memImportApprovedTeam")?.addEventListener("click",async()=>{
+  const approved=_memCache.filter(m=>(m.status||"pending")==="approved"&&m.fullName);
+  if(!approved.length){alert("ما فيه طلبات مقبولة حالياً لإضافتها لعائلة النادي.");return;}
+  if(!confirm(`إضافة ${approved.length} من المقبولين إلى عائلة النادي؟\n\nالأسماء الموجودة مسبقاً ما تنضاف مرتين.`))return;
+  const btn=document.getElementById("memImportApprovedTeam");
+  btn.disabled=true;btn.textContent="⏳ جاري الإضافة…";
+  try{
+    const batch=writeBatch(db);
+    const summary={teamAdded:0,clubAdded:0};
+    for(const m of approved){
+      const clubMember=await memPrepareClubMemberWrite(batch,m);
+      const teamMember=await memPrepareTeamMemberWrite(batch,m);
+      if(clubMember.added) summary.clubAdded++;
+      if(teamMember.added) summary.teamAdded++;
+      batch.set(doc(db,"memberships",m.id),{
+        clubMemberId:clubMember.memberId||null,
+        teamMemberId:teamMember.memberId||null,
+        clubMemberLinkedAt:serverTimestamp(),
+        teamMemberLinkedAt:serverTimestamp()
+      },{merge:true});
+    }
+    await batch.commit();
+    await Promise.all([loadAll(),ccLoadAll()]);
+    alert(`تمت الإضافة لعائلة النادي: ${summary.teamAdded}\nوتم تجهيز سجل الأداء الداخلي: ${summary.clubAdded}`);
+  }catch(e){
+    console.error(e);
+    alert("تعذّر إضافة المقبولين لعائلة النادي: "+(e.message||e));
+  }finally{
+    btn.disabled=false;btn.textContent="👥 إضافة المقبولين لعائلة النادي";
+  }
+});
 window.memReject_=async id=>{
   if(!confirm("رفض هذا الطلب؟ (يظل محفوظاً ويمكن حذفه لاحقاً)"))return;
   await setDoc(doc(db,"memberships",id),{status:"rejected",reviewedAt:serverTimestamp()},{merge:true});

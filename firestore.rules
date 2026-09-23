@@ -92,6 +92,11 @@ service cloud.firestore {
     match /clubMembers/{id} {
       allow read, write: if isAdmin();
     }
+    match /memberAccess/{code} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow write: if isAdmin();
+    }
     match /eventEvaluations/{id} {
       allow read, write: if isAdmin();
     }
