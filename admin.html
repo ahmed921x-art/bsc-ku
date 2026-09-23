@@ -4846,7 +4846,7 @@ window.gcSave=async function(){
     members.sort((a,b)=>(+a.order||99)-(+b.order||99));
     const catNames = {supervisor:'مشرفة النادي',board:'الهيئة الإدارية',academic:'اللجنة الثقافية',media:'اللجنة الإعلامية',events:'فريق الفعاليات',other:'أخرى'};
     list.innerHTML = members.map(m=>`
-      <div class="list-item" id="mi-${m.id}">
+      <div class="list-item" id="mi-${m.id}" style="align-items:flex-start;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:.85rem;flex:1;min-width:0">
           ${m.photo?`<img src="${m.photo}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border)" onerror="this.style.display='none'">`:'<div style="width:44px;height:44px;border-radius:50%;background:rgba(99,102,241,.2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">👤</div>'}
           <div class="list-item-body" style="min-width:0">
@@ -4870,6 +4870,7 @@ window.gcSave=async function(){
           <button class="btn btn-sm" style="background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);color:#a5b4fc" onclick="editMember('${m.id}')">تعديل</button>
           <button class="btn btn-danger btn-sm" onclick="deleteMember('${m.id}')">حذف</button>
         </div>
+        <div id="member-inline-editor-${m.id}" style="display:none;flex-basis:100%;margin-top:.9rem"></div>
       </div>`).join('');
   }
 
@@ -4901,39 +4902,101 @@ window.gcSave=async function(){
     }
   };
 
+  const teamMajorOptions=[
+    ["","— اختر التخصص —"],["molecular","البيولوجيا الجزيئية"],["micro","علم الميكروبيولوجي"],
+    ["plant","بيولوجيا النبات"],["animal","بيولوجيا الحيوان"],["biochem","الكيمياء الحيوية"],
+    ["forensic","علم الأدلة الجنائية"],["agri","النبات الزراعي"],["biotech","التقنية الحيوية"]
+  ];
+  const teamCategoryOptions=[
+    ["supervisor","مشرفة النادي — Club Supervisor"],["board","الهيئة الإدارية — Board of Directors"],
+    ["academic","اللجنة الثقافية — Scientific Affairs Unit"],["media","اللجنة الإعلامية — Media Affairs Unit"],
+    ["events","فريق الفعاليات — Events Team"],["other","أخرى — Other"]
+  ];
+
+  function optionHtml(options,value){
+    return options.map(([v,label])=>`<option value="${ccEsc(v)}"${String(value||"")===v?" selected":""}>${ccEsc(label)}</option>`).join("");
+  }
+
+  function inlineMemberEditor(m){
+    return `
+      <div style="background:rgba(15,23,42,.82);border:1px solid rgba(99,102,241,.28);border-radius:14px;padding:1rem">
+        <div style="display:flex;justify-content:space-between;gap:.8rem;align-items:center;flex-wrap:wrap;margin-bottom:.85rem">
+          <strong style="font-size:.92rem;color:#c7d2fe">تعديل ${ccEsc(m.name||"العضو")}</strong>
+          <span id="member-inline-status-${m.id}" style="font-size:.78rem;color:var(--muted);min-height:1em"></span>
+        </div>
+        <div class="form-grid">
+          <div class="form-group"><label>الاسم الكامل *</label><input id="inline-name-${m.id}" value="${ccEsc(m.name||"")}" placeholder="اسم العضو"></div>
+          <div class="form-group"><label>Full Name (EN)</label><input id="inline-nameEn-${m.id}" value="${ccEsc(m.nameEn||"")}" placeholder="e.g. Abdullah Al-Ahmad"></div>
+          <div class="form-group"><label>المنصب / الدور *</label><input id="inline-role-${m.id}" value="${ccEsc(m.role||"")}" placeholder="مثال: عضو اللجنة الثقافية"></div>
+          <div class="form-group"><label>Role (EN)</label><input id="inline-roleEn-${m.id}" value="${ccEsc(m.roleEn||"")}" placeholder="e.g. Club Member"></div>
+          <div class="form-group"><label>الرقم الجامعي</label><input id="inline-studentId-${m.id}" value="${ccEsc(m.studentId||"")}" placeholder="2XXXXXXXX"></div>
+          <div class="form-group"><label>التخصص</label><select id="inline-major-${m.id}">${optionHtml(teamMajorOptions,m.major)}</select></div>
+          <div class="form-group"><label>إيميل التواصل</label><input id="inline-email-${m.id}" value="${ccEsc(m.email||"")}" placeholder="name@ku.edu.kw"></div>
+          <div class="form-group"><label>رابط الصورة</label><input id="inline-photo-${m.id}" value="${ccEsc(m.photo||"")}" placeholder="https://... أو data:image/..."></div>
+          <div class="form-group"><label>ترتيب الظهور</label><input id="inline-order-${m.id}" type="number" min="1" value="${ccEsc(m.order||99)}"></div>
+          <div class="form-group"><label>الفئة</label><select id="inline-category-${m.id}">${optionHtml(teamCategoryOptions,m.category||"board")}</select></div>
+          <div class="form-group form-full"><label>نبذة مختصرة</label><textarea id="inline-bio-${m.id}" rows="3" placeholder="نبذة قصيرة عن العضو...">${ccEsc(m.bio||"")}</textarea></div>
+        </div>
+        <div class="btn-row" style="margin-top:.85rem">
+          <button class="btn btn-primary btn-sm" id="inline-save-${m.id}" onclick="saveInlineMember('${m.id}')">💾 حفظ التعديلات</button>
+          <button class="btn btn-sm" onclick="cancelInlineMemberEdit('${m.id}')" style="background:rgba(255,255,255,.06);border:1px solid var(--border)">إلغاء</button>
+        </div>
+      </div>`;
+  }
+
   window.editMember = function(id){
     getItems('teamMembers').then(members=>{
       const m = members.find(x=>x.id===id);
       if(!m) return;
-      // مسح حالة الصورة أولاً
-      if(typeof clearMemberPhoto==='function') clearMemberPhoto();
-      document.getElementById('memberName').value = m.name||'';
-      document.getElementById('memberNameEn').value = m.nameEn||'';
-      document.getElementById('memberRole').value = m.role||'';
-      document.getElementById('memberRoleEn').value = m.roleEn||'';
-      document.getElementById('memberStudentId').value = m.studentId||'';
-      document.getElementById('memberMajor').value = m.major||'';
-      document.getElementById('memberEmail').value = m.email||'';
-      document.getElementById('memberPhoto').value = m.photo||'';
-      // Show photo preview if exists
-      if(m.photo){
-        const preview = document.getElementById('memberPhotoPreview');
-        const img = document.getElementById('memberPhotoImg');
-        img.src = m.photo;
-        preview.style.display = 'flex';
-        preview.style.alignItems = 'center';
-        document.getElementById('memberPhotoName').textContent = 'صورة محفوظة';
-        document.getElementById('memberPhoto').style.display = 'none';
-      }
-      document.getElementById('memberBio').value = m.bio||'';
-      document.getElementById('memberOrder').value = m.order||99;
-      document.getElementById('memberCategory').value = m.category||'board';
-      // Store id for update
-      document.getElementById('addMemberBtn').dataset.editId = id;
-      document.getElementById('addMemberBtn').textContent = '💾 حفظ التعديلات';
-      document.getElementById('memberFormStatus').textContent = 'وضع التعديل — عدّل البيانات واضغط حفظ';
-      (document.querySelector('.admin-main')||document.documentElement).scrollTo({top:0,behavior:'smooth'});
+      document.querySelectorAll('[id^="member-inline-editor-"]').forEach(el=>{
+        if(el.id!=='member-inline-editor-'+id){el.style.display='none';el.innerHTML='';}
+      });
+      const box=document.getElementById('member-inline-editor-'+id);
+      if(!box) return;
+      if(box.style.display==='block'){box.style.display='none';box.innerHTML='';return;}
+      box.innerHTML=inlineMemberEditor(m);
+      box.style.display='block';
+      box.querySelector('input')?.focus();
     });
+  };
+
+  window.cancelInlineMemberEdit = function(id){
+    const box=document.getElementById('member-inline-editor-'+id);
+    if(box){box.style.display='none';box.innerHTML='';}
+  };
+
+  window.saveInlineMember = async function(id){
+    const get=v=>document.getElementById(`inline-${v}-${id}`);
+    const name=get('name')?.value.trim()||'';
+    const role=get('role')?.value.trim()||'';
+    if(!name||!role){alert('الاسم والمنصب مطلوبان.');return;}
+    const status=document.getElementById('member-inline-status-'+id);
+    const saveBtn=document.getElementById('inline-save-'+id);
+    if(status){status.textContent='جاري الحفظ...';status.style.color='#a5b4fc';}
+    if(saveBtn)saveBtn.disabled=true;
+    try{
+      await setDoc(doc(db,'teamMembers',id),{
+        name,
+        nameEn:get('nameEn')?.value.trim()||'',
+        role,
+        roleEn:get('roleEn')?.value.trim()||'',
+        studentId:get('studentId')?.value.trim()||'',
+        major:get('major')?.value||'',
+        email:get('email')?.value.trim()||'',
+        photo:get('photo')?.value.trim()||'',
+        bio:get('bio')?.value.trim()||'',
+        order:+(get('order')?.value)||99,
+        category:get('category')?.value||'board',
+        updatedAt:serverTimestamp()
+      },{merge:true});
+      if(status){status.textContent='✅ تم الحفظ';status.style.color='#6ee7b7';}
+      await loadMembers();
+    }catch(e){
+      if(status){status.textContent='❌ '+e.message;status.style.color='#f87171';}
+      else alert('حدث خطأ: '+e.message);
+    }finally{
+      if(saveBtn)saveBtn.disabled=false;
+    }
   };
 
   window.deleteMember = function(id){
