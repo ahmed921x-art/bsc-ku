@@ -1436,6 +1436,7 @@ a{color:inherit;text-decoration:none}
           </div>
           <div class="btn-row">
             <button class="btn btn-primary" id="ccAddMembers">حفظ الأعضاء</button>
+            <button class="btn btn-green" id="ccImportTeamFamily">استيراد كل أعضاء عائلة النادي</button>
             <button class="btn btn-green" id="ccImportApproved">استيراد المقبولين من طلبات العضوية</button>
             <button class="btn btn-gold" id="ccImportAll">استيراد كل المتقدمين (بدون فلترة القبول)</button>
           </div>
@@ -4005,15 +4006,16 @@ async function ccAddMemberRows(rows,successMessage){
     if(name&&key&&!existing.has(key)){existing.add(key);unique.push({...row,name,normalizedName:key});}
   });
   if(!unique.length){ccSetStatus("ccMemberStatus","ما فيه أسماء جديدة لإضافتها.",false);return 0;}
-  if(unique.length>400){ccSetStatus("ccMemberStatus","أضف 400 اسم أو أقل في كل مرة.",false);return 0;}
-  const batch=writeBatch(db);
-  unique.forEach(row=>{
-    const ref=doc(collection(db,"clubMembers"));
-    const accessCode=ccGenCode();
-    batch.set(ref,{name:row.name,normalizedName:row.normalizedName,committee:row.committee||"عام",role:row.role||"عضو",status:"active",source:row.source||"manual",accessCode,disciplinePoints:0,disciplineStatus:"normal",createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
-    batch.set(doc(db,"memberAccess",accessCode),{memberId:ref.id,name:row.name,committee:row.committee||"عام",role:row.role||"عضو",disciplinePoints:0,disciplineStatus:"normal",evalCount:0,evalScore:null,evalRecent:[],attendanceRecent:[],updatedAt:serverTimestamp()});
-  });
-  await batch.commit();
+  for(let offset=0;offset<unique.length;offset+=200){
+    const batch=writeBatch(db);
+    unique.slice(offset,offset+200).forEach(row=>{
+      const ref=doc(collection(db,"clubMembers"));
+      const accessCode=ccGenCode();
+      batch.set(ref,{name:row.name,normalizedName:row.normalizedName,committee:row.committee||"عام",role:row.role||"عضو",status:"active",source:row.source||"manual",teamMemberId:row.teamMemberId||"",studentId:row.studentId||"",accessCode,disciplinePoints:0,disciplineStatus:"normal",createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+      batch.set(doc(db,"memberAccess",accessCode),{memberId:ref.id,name:row.name,committee:row.committee||"عام",role:row.role||"عضو",disciplinePoints:0,disciplineStatus:"normal",evalCount:0,evalScore:null,evalRecent:[],attendanceRecent:[],updatedAt:serverTimestamp()});
+    });
+    await batch.commit();
+  }
   ccSetStatus("ccMemberStatus",`${successMessage} (${unique.length})`);
   await ccLoadAll();
   return unique.length;
@@ -4030,6 +4032,28 @@ ccEl("ccAddMembers")?.addEventListener("click",async()=>{
     if(count)ccEl("ccMemberNames").value="";
   }catch(error){ccSetStatus("ccMemberStatus","تعذّر الحفظ: "+error.message,false);}
   finally{btn.disabled=false;btn.textContent="حفظ الأعضاء";}
+});
+
+function ccTeamCommittee(member){
+  const role=String(member.role||"");
+  if(role.includes("الإعلامية"))return "اللجنة الإعلامية";
+  if(role.includes("الثقافية"))return "اللجنة الثقافية";
+  return ({supervisor:"الإشراف",board:"الهيئة الإدارية",academic:"اللجنة الثقافية",media:"اللجنة الإعلامية",events:"فريق الفعاليات"})[member.category]||"عام";
+}
+
+ccEl("ccImportTeamFamily")?.addEventListener("click",async()=>{
+  const btn=ccEl("ccImportTeamFamily");btn.disabled=true;btn.textContent="⏳ جاري الاستيراد…";
+  try{
+    const [family,registered]=await Promise.all([getItems("teamMembers"),getItems("clubMembers")]);
+    ccMembers=registered;
+    const rows=family.filter(m=>String(m.name||"").trim()).map(m=>({
+      name:m.name,committee:ccTeamCommittee(m),role:m.role||"عضو",
+      source:"team-family",teamMemberId:m.id,studentId:m.studentId||""
+    }));
+    if(!rows.length)ccSetStatus("ccMemberStatus","لا يوجد أعضاء في عائلة النادي لاستيرادهم.",false);
+    else await ccAddMemberRows(rows,"تمت إضافة أعضاء عائلة النادي إلى مركز القيادة");
+  }catch(error){ccSetStatus("ccMemberStatus","تعذّر استيراد عائلة النادي: "+error.message,false);}
+  finally{btn.disabled=false;btn.textContent="استيراد كل أعضاء عائلة النادي";}
 });
 
 ccEl("ccImportApproved")?.addEventListener("click",async()=>{
