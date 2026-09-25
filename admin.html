@@ -1519,6 +1519,7 @@ a{color:inherit;text-decoration:none}
             <div class="form-group"><label>اللجنة</label>
               <select id="atEventCommittee">
                 <option value="اللجنة الإعلامية">اللجنة الإعلامية</option><option value="اللجنة الثقافية">اللجنة الثقافية</option>
+                <option value="جميع أعضاء النادي">جميع أعضاء النادي</option>
               </select>
             </div>
           </div>
@@ -4353,8 +4354,9 @@ function atRenderRoster(){
   if(!eventId){wrap.innerHTML='<p class="cc-empty">اختر فعالية عشان تظهر قائمة أعضاء لجنتها.</p>';return;}
   const clubEvent=atEvents.find(x=>x.id===eventId);
   if(!clubEvent){wrap.innerHTML='<p class="cc-empty">الفعالية غير موجودة.</p>';return;}
-  const roster=ccMembers.filter(m=>(m.committee||"عام")===(clubEvent.committee||"عام")&&m.disciplineStatus!=="removed");
-  if(!roster.length){wrap.innerHTML='<p class="cc-empty">ما فيه أعضاء مسجّلين بهذي اللجنة. أضفهم من «أعضاء النادي».</p>';return;}
+  const allMembers=clubEvent.committee==="جميع أعضاء النادي";
+  const roster=ccMembers.filter(m=>(allMembers||(m.committee||"عام")===(clubEvent.committee||"عام"))&&m.disciplineStatus!=="removed");
+  if(!roster.length){wrap.innerHTML=`<p class="cc-empty">ما فيه أعضاء مسجّلين ${allMembers?'في النادي':'بهذي اللجنة'}. أضفهم من «أعضاء النادي».</p>`;return;}
   const optsHtml=Object.entries(AT_STATUS).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join("");
   wrap.innerHTML=`<div class="cc-table-wrap"><table class="cc-table"><thead><tr><th>العضو</th><th>الحالة</th><th>ملاحظة</th></tr></thead><tbody>`+
     roster.map(m=>{
