@@ -100,6 +100,12 @@ service cloud.firestore {
     match /eventEvaluations/{id} {
       allow read, write: if isAdmin();
     }
+    match /committeeEvents/{id} {
+      allow read, write: if isAdmin();
+    }
+    match /committeeAttendance/{id} {
+      allow read, write: if isAdmin();
+    }
 
     // User-generated content (no login required to create).
 
