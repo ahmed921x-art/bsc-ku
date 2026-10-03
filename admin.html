@@ -1716,6 +1716,52 @@ const ALLOWED=["ahmed921x@gmail.com","abdullaalshewaya66@gmail.com","kmaldebs@gm
 const MN={molecular:"البيولوجيا الجزيئية",micro:"مايكروبيولوجي",plant:"بيولوجيا النبات",animal:"بيولوجيا الحيوان",biochem:"الكيمياء الحيوية",forensic:"الأدلة الجنائية",agri:"النبات الزراعي",biotech:"التقنية الحيوية"};
 
 // AUTH
+// ── الأدوار: مشرف عام (قائمة ALLOWED) أو عضو فريق (مستند staff/{email}) ──
+async function resolveRole(user,em){
+  if(ALLOWED.includes(em)) return {type:"super",perms:{publish:true,content:true,members:true}};
+  if(!user.emailVerified) return null;
+  try{
+    const s=await getDoc(doc(db,"staff",em));
+    if(s.exists()){
+      const d=s.data()||{};
+      if(d.active===true) return {type:"staff",name:d.name||"",perms:{publish:!!d.publish,content:!!d.content,members:!!d.members}};
+    }
+  }catch(e){}
+  return null;
+}
+const PANEL_PERM={
+  news:"publish",announcements:"publish",events:"publish",
+  notes:"content",noteSubs:"content",ratings:"content",videos:"content",vcomments:"content",
+  schedules:"content",guide:"content",unifiles:"content",majorsheet:"content",supportsheet:"content",
+  gradcalc:"content",advisors:"content",committee:"content",faculty:"content",resources:"content",
+  team:"members",clubmembers:"members",eventevals:"members",attendance:"members",dnacenter:"members"
+};
+function canPanel(id){
+  const r=window.BSC_ROLE; if(!r) return false;
+  if(r.type==="super") return true;
+  const p=PANEL_PERM[id]; return !!(p&&r.perms[p]);
+}
+function applyRole(){
+  const r=window.BSC_ROLE;
+  document.querySelectorAll(".nav-item[data-panel]").forEach(b=>{b.style.display=canPanel(b.dataset.panel)?"":"none";});
+  let label=null,any=false;
+  const flush=()=>{if(label) label.style.display=any?"":"none";};
+  [...document.querySelector(".sidebar").children].forEach(el=>{
+    if(el.classList.contains("sidebar-label")){flush();label=el;any=false;}
+    else if(el.style.display!=="none") any=true;
+  });
+  flush();
+  document.querySelectorAll('#panel-dashboard button[onclick^="goPanel("]').forEach(b=>{
+    const m=b.getAttribute("onclick").match(/goPanel\('(\w+)'\)/);
+    if(m&&!canPanel(m[1])) b.style.display="none";
+  });
+  if(r.type!=="super"){
+    const first=[...document.querySelectorAll(".nav-item[data-panel]")].find(b=>b.style.display!=="none");
+    if(first) first.click();
+  }
+}
+window.bscUploadImg=uploadImgMin;
+
 document.getElementById("loginBtn").onclick=()=>signInWithPopup(auth,new GoogleAuthProvider());
 document.getElementById("emailLoginBtn").onclick=async()=>{
   const em=document.getElementById("emailInput").value.trim().toLowerCase();
@@ -1729,7 +1775,7 @@ document.getElementById("emailLoginBtn").onclick=async()=>{
   }
 };
 document.getElementById("logoutBtn").onclick=()=>signOut(auth);
-onAuthStateChanged(auth,user=>{
+onAuthStateChanged(auth,async user=>{
   // account.js يسجّل كل زائر دخولاً مجهولاً، وجلسة Firebase مشتركة على
   // مستوى الموقع كله — فأي أدمن تصفّح الموقع قبل ما يفتح هالصفحة بيوصل
   // هنا وهو «مسجّل دخول» بدون إيميل. نعامل المجهول كأنه مو مسجّل.
@@ -1739,10 +1785,13 @@ onAuthStateChanged(auth,user=>{
     return;
   }
   const em=user.email.toLowerCase().trim();
-  if(!ALLOWED.includes(em)){document.getElementById("statusMsg").textContent="هذا الإيميل غير مصرح له: "+em;return}
+  window.BSC_ROLE=await resolveRole(user,em);
+  if(!window.BSC_ROLE){document.getElementById("statusMsg").textContent="هذا الإيميل غير مصرح له: "+em;return}
   document.getElementById("loginArea").classList.add("hidden");
   document.getElementById("adminApp").classList.remove("hidden");
-  document.getElementById("userEmail").textContent=em;
+  document.getElementById("userEmail").textContent=em+(window.BSC_ROLE.type==="staff"?" · عضو فريق":"");
+  applyRole();
+  window.dispatchEvent(new Event("bsc-role"));
   loadAll();
   ccLoadAll();
   atLoadAll();
@@ -5876,5 +5925,6 @@ function applyLang(lang){
 })();
 </script>
 
+<script type="module" src="admin-extras.js"></script>
 </body>
 </html>

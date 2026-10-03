@@ -442,6 +442,23 @@
     }
     .dl-btn:hover { background: rgba(99,102,241,.28); transform: scale(1.05); }
 
+    /* ===== CREATORS (home) ===== */
+    .cr-home-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.25rem; }
+    .cr-home-grid a {
+      display: block; border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--border);
+      transition: transform .4s var(--ease), border-color .35s, box-shadow .35s;
+    }
+    .cr-home-grid a:hover {
+      transform: translateY(-8px);
+      border-color: rgba(99,102,241,.28);
+      box-shadow: 0 24px 60px rgba(0,0,0,.45);
+    }
+    .cr-home-grid img {
+      display: block; width: 100%; aspect-ratio: 4/3; object-fit: cover;
+      background: rgba(255,255,255,.04);
+    }
+
     /* ===== MAJORS ===== */
     .majors-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 1.25rem; }
     .major-card {
@@ -553,6 +570,7 @@
       .hero { padding:3rem 5% 2rem; }
       .stats { grid-template-columns:1fr; }
       .grid-3, .majors-grid { grid-template-columns:1fr; }
+      .cr-home-grid { grid-template-columns:repeat(2,1fr); gap:.75rem; }
       .footer { flex-direction:column; align-items:center; text-align:center; }
     }
   
@@ -686,6 +704,7 @@
     <a href="explain.html" data-ar="شرح المواد" data-en="Course Explainers">شرح المواد</a>
     <a href="advisors.html" data-ar="المرشدون" data-en="Advisors">المرشدون</a>
     <a href="events.html" data-ar="الأنشطة" data-en="Activities">الأنشطة</a>
+    <a href="creators.html" data-ar="المبدعين" data-en="Creators">المبدعين</a>
     <a href="about.html" data-ar="عن النادي" data-en="About">عن النادي</a>
     <a href="join.html" class="join-link" data-ar="انضم للنادي" data-en="Join Us">انضم للنادي</a>
     <a href="ask.html" data-ar="اسأل النادي" data-en="Ask Us">اسأل النادي</a>
@@ -741,6 +760,7 @@
     <a href="explain.html" data-ar="🎬 شرح المواد" data-en="🎬 Course Explainers">🎬 شرح المواد</a>
     <a href="advisors.html" data-ar="🎓 المرشدون" data-en="🎓 Advisors">🎓 المرشدون</a>
     <a href="events.html" data-ar="🎉 الأنشطة" data-en="🎉 Activities">🎉 الأنشطة</a>
+    <a href="creators.html" data-ar="📸 المبدعين" data-en="📸 Creators">📸 المبدعين</a>
     <a href="about.html" data-ar="ℹ️ عن النادي" data-en="ℹ️ About">ℹ️ عن النادي</a>
     <a href="join.html" data-ar="✍️ انضم للنادي" data-en="✍️ Join Us">✍️ انضم للنادي</a>
     <a href="ask.html" data-ar="💬 اسأل النادي" data-en="💬 Ask Us">💬 اسأل النادي</a>
@@ -841,6 +861,18 @@
   </div>
 </section>
 
+<!-- ====== CREATORS (يظهر فقط إذا فيه صور) ====== -->
+<div class="divider" id="crDivider" hidden></div>
+<section class="section" id="crSection" hidden>
+  <div class="section-head reveal">
+    <div>
+      <div class="section-label" data-ar="المبدعين" data-en="Creators">المبدعين</div>
+      <h2 data-ar="مشاركات المبدعين" data-en="Creators' Gallery">مشاركات المبدعين</h2>
+    </div>
+    <a class="see-all" href="creators.html" data-ar="عرض الكل ←" data-en="View All →">عرض الكل ←</a>
+  </div>
+  <div class="cr-home-grid" id="crHomeGrid"></div>
+</section>
 
 <div class="divider"></div>
 
@@ -998,6 +1030,24 @@ function renderAnnouncements(list) {
   triggerReveal();
 }
 
+/* مشاركات المبدعين: آخر 6 صور من أحدث الفعاليات. القسم يظل مخفي لو ما فيه صور */
+async function loadCreators() {
+  try {
+    const s = await getDocs(query(collection(db,"creatorEvents"), orderBy("createdAt","desc"), limit(3)));
+    const photos = s.docs.flatMap(d => {
+      const e = d.data();
+      return (e.photos||[]).map(p => ({ u:p.url, t:e.title||"" }));
+    }).slice(0,6);
+    if (!photos.length) return;
+    document.getElementById("crHomeGrid").innerHTML = photos.map(p =>
+      `<a class="reveal" href="creators.html"><img src="${p.u}" alt="${p.t.replace(/"/g,"&quot;")}" loading="lazy" decoding="async"></a>`
+    ).join("");
+    document.getElementById("crSection").hidden = false;
+    document.getElementById("crDivider").hidden = false;
+    triggerReveal();
+  } catch (e) { /* يظل القسم مخفي */ }
+}
+
 function animateCount(el, target) {
   if (!target) { el.textContent="—"; return; }
   let c=0; const step=Math.max(1,Math.ceil(target/45));
@@ -1005,6 +1055,7 @@ function animateCount(el, target) {
 }
 
 (async()=>{
+  loadCreators();
   const [evts, nc, ec] = await Promise.all([
     getLatest("events",3),
     getCount("notes"), getCount("events")
