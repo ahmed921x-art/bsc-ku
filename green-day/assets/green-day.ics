@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//BSC KU//Green Day//AR
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:greenday-20261028@biosci-ku.com
+DTSTAMP:20261025T191148Z
+DTSTART:20261028T080000Z
+DTEND:20261028T110000Z
+SUMMARY:Green Day | نادي العلوم البيولوجية
+LOCATION:الساحة الخارجية لكلية العلوم - جامعة
+  الكويت
+DESCRIPTION:فعالية Green Day من نادي العلوم البيول
+ وجية بجامعة الكويت.
+URL:https://biosci-ku.com/green-day
+END:VEVENT
+END:VCALENDAR
