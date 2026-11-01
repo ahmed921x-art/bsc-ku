@@ -1,0 +1,16 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//BSC KU//Science Expo 2026//AR
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:science-expo-2026@biosci-ku.com
+DTSTAMP:20261101T000000Z
+DTSTART:20261103T070000Z
+DTEND:20261103T110000Z
+RRULE:FREQ=DAILY;COUNT=2
+SUMMARY:Science Expo — الأحياء والعلوم البيئية
+DESCRIPTION:نادي العلوم البيولوجية × مكتب التوجيه والإرشاد بكلية العلوم. تعرّفوا على تخصصات البايو والفرص الوظيفية بعد التخرج.\nhttps://biosci-ku.com/expo/
+LOCATION:كلية العلوم · الجنوبي — جامعة الكويت
+END:VEVENT
+END:VCALENDAR
