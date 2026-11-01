@@ -12,5 +12,6 @@ RRULE:FREQ=DAILY;COUNT=2
 SUMMARY:Science Expo — الأحياء والعلوم البيئية
 DESCRIPTION:نادي العلوم البيولوجية × مكتب التوجيه والإرشاد بكلية العلوم. تعرّفوا على تخصصات البايو والفرص الوظيفية بعد التخرج.\nhttps://biosci-ku.com/expo/
 LOCATION:كلية العلوم · الجنوبي — جامعة الكويت
+URL:https://biosci-ku.com/expo/
 END:VEVENT
 END:VCALENDAR
