@@ -640,3 +640,6 @@ export function programMatches(p) {
   const c = P.cycler;
   return p.init.t === c.init.t && p.init.s === c.init.s && p.cycles === c.cycles && p.den.t === c.den.t && p.den.s === c.den.s && p.ann.t === c.ann.t && p.ann.s === c.ann.s && p.ext.t === c.ext.t && p.ext.s === c.ext.s && p.final.t === c.final.t && p.final.s === c.final.s && p.hold === c.hold;
 }
+
+// Checklist helpers shared with the quick (10-step) version.
+export { transferTasks, spinTasks, evIs, held, loc, amt, tolFor };

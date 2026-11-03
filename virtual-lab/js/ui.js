@@ -109,7 +109,7 @@ export class UI {
     const cards = [];
     const B = L.V('B');
     const dnaNg = (B.sol.gdna || 0) + (B.sol.gppt || 0) + (B.pel.gdna || 0);
-    if (['te', 'carry', 'calc'].includes(st.id) && (B.liq.te || 0) > 5) {
+    if (['te', 'carry', 'calc', 'q-dissolve', 'q-pcrsetup'].includes(st.id) && (B.liq.te || 0) > 5) {
       const v = L.vol('B');
       cards.push(`<div class="card"><div class="card-h">Your extracted DNA · Tube B</div>
         <div class="kv"><span>Concentration</span><b>${(dnaNg / v).toFixed(1)} ng/µL</b></div>
@@ -117,10 +117,10 @@ export class UI {
         <div class="kv"><span>Still in pellet</span><b>${((B.pel.gdna || 0) / Math.max(1, dnaNg) * 100).toFixed(0)}%</b></div>
         <div class="note">Model: ${P.model.dnaPer100mg} ng DNA released per 100 mg fully lysed tissue; losses come from your actual transfers, spins and pellet handling.</div></div>`);
     }
-    if (['calc', 'mastermix', 'mixmm', 'aliquot', 'template', 'seal'].includes(st.id)) {
+    if (['calc', 'mastermix', 'mixmm', 'aliquot', 'template', 'seal', 'q-pcrsetup'].includes(st.id)) {
       const mm = masterMix();
       const MM = L.V('MM');
-      const aliq = ['aliquot', 'template', 'seal'].includes(st.id);
+      const aliq = ['aliquot', 'template', 'seal', 'q-pcrsetup'].includes(st.id);
       cards.push(`<div class="card"><div class="card-h">Master mix · ${mm.n} reactions <button class="btn ghost xs" data-act="calc">Calculator</button></div>
         <table class="rx"><tr><th>Component</th><th>Need</th><th>Added</th><th></th></tr>
         ${mm.rows.map(r => { const a = aliq ? null : (MM.liq[r.id] || 0); const ok = a == null ? null : Math.abs(a - r.total) <= Math.max(0.05, r.total * 0.04); const over = a != null && a > r.total * 1.06 + 0.05; return `<tr><td>${esc(r.label)}</td><td>${r.total}</td><td>${a == null ? '—' : fmtV(a)}</td><td class="${ok ? 'ok' : over ? 'bad' : a > 0 ? 'part' : 'miss'}">${a == null ? '' : ok ? '✓' : over ? 'excess' : a > 0 ? 'partial' : 'missing'}</td></tr>`; }).join('')}
@@ -128,8 +128,8 @@ export class UI {
         ${aliq ? `<div class="pcrtubes">${[1, 2, 3].map(i => `<div><b>Tube ${i}</b><span>${fmtV(L.vol('pcr' + i))} / ${P.pcr.rxnVol} µL</span><em>${['sample', '+ control', 'NTC'][i - 1]}</em></div>`).join('')}</div>` : ''}
         ${st.id === 'seal' ? '<button class="btn primary sm" data-act="verify">Verify reactions</button>' : ''}</div>`);
     }
-    if (['program', 'run', 'unload'].includes(st.id)) cards.push(`<div class="card"><div class="card-h">Thermocycler</div><div class="row"><button class="btn ghost sm" data-act="tc">Open controls</button><button class="btn ghost sm" data-act="chart">Amplification graph</button></div></div>`);
-    if (['image', 'results'].includes(st.id)) cards.push(`<div class="card"><div class="card-h">Gel documentation</div><button class="btn primary sm" data-act="analyse">Analyse gel</button></div>`);
+    if (['program', 'run', 'unload', 'q-cycle'].includes(st.id)) cards.push(`<div class="card"><div class="card-h">Thermocycler</div><div class="row"><button class="btn ghost sm" data-act="tc">Open controls</button><button class="btn ghost sm" data-act="chart">Amplification graph</button></div></div>`);
+    if (['image', 'results', 'q-run'].includes(st.id)) cards.push(`<div class="card"><div class="card-h">Gel documentation</div><button class="btn primary sm" data-act="analyse">Analyse gel</button></div>`);
     $('#cards').innerHTML = cards.join('');
     $('#cards').onclick = (e) => { const b = e.target.closest('[data-act]'); if (!b) return; const a = b.dataset.act; if (a === 'calc') this.showCalc(); if (a === 'verify') this.showVerify(); if (a === 'tc') this.openPanel('tc'); if (a === 'chart') this.showChart(); if (a === 'analyse') this.showAnalysis(); };
   }
@@ -414,6 +414,7 @@ export class UI {
       <button class="btn" data-m="help">How to operate</button>
       <button class="btn danger" data-m="restart">Restart experiment</button>
       <a class="btn" href="../index.html" style="display:grid;place-items:center;text-decoration:none">← BSC KU website</a>
+      ${this.app.mode === 'simple' ? '<a class="btn" href="index.html" style="display:grid;place-items:center;text-decoration:none">Full version (33 steps)</a>' : ''}
       </div><div class="row end"><button class="btn primary" data-close>Close</button></div>`);
     m.querySelectorAll('[data-m]').forEach(b => b.onclick = () => {
       const k = b.dataset.m;

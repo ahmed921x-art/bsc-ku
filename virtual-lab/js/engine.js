@@ -1,20 +1,22 @@
 // Workflow engine: tracks the current step, evaluates checklists from lab
 // events/state, and turns rule violations into explained mistakes.
 import { buildSteps, programMatches } from './protocol.js';
+import { buildSimpleSteps } from './protocol-simple.js';
 import { PROTOCOL as P, REAGENTS } from './data.js';
 
 const tolFor = (v) => Math.max(0.05, v * 0.04);
 
 export class Engine {
-  constructor(lab, bus) {
-    this.lab = lab; this.bus = bus;
-    this.steps = buildSteps();
+  constructor(lab, bus, mode = 'full') {
+    this.lab = lab; this.bus = bus; this.mode = mode;
+    this.steps = this.build();
     this.idx = 0;
     this.sticky = this.steps.map(() => new Set());
     this.completed = new Set();
     this.mistakes = [];
     bus.on('lab', (ev) => this.onEvent(ev));
   }
+  build() { return this.mode === 'simple' ? buildSimpleSteps() : buildSteps(); }
   get step() { return this.steps[this.idx]; }
   tasks(i = this.idx) {
     const st = this.steps[i];
@@ -68,7 +70,7 @@ export class Engine {
   next() { this.goto(this.idx + 1); }
   prev() { this.goto(this.idx - 1); }
   refresh() { // protocol edited: rebuild step text/expectations, keep progress
-    const idx = this.idx; this.steps = buildSteps();
+    const idx = this.idx; this.steps = this.build();
     while (this.sticky.length < this.steps.length) this.sticky.push(new Set());
     this.idx = idx; this.bus.emit('stepChange', { idx, step: this.step });
   }

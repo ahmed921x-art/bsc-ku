@@ -24,10 +24,11 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 const camera = new THREE.PerspectiveCamera(38, 1, 0.01, 30);
+const MODE = window.LAB_MODE === 'simple' ? 'simple' : 'full';
 const bus = new Bus();
 const world = new World(renderer);
-const lab = new Lab(world, bus);
-const engine = new Engine(lab, bus);
+const lab = new Lab(world, bus, MODE);
+const engine = new Engine(lab, bus, MODE);
 lab.engine = engine;
 const rig = new CameraRig(camera);
 const input = new Input(canvas, camera, world, lab, rig, bus);
@@ -37,6 +38,7 @@ const app = {
   autoCam: true,
   quality: (window.devicePixelRatio || 1) >= 2 ? 'Balanced' : 'High',
   molKey: null,
+  mode: MODE,
   station: 'overview',
   goStation(key, instant = false) {
     if (!STATIONS[key]) return;
@@ -53,7 +55,7 @@ const app = {
   onStep(step) {
     this.molKey = step.mol;
     document.querySelectorAll('#stations [data-st]').forEach(b => b.classList.toggle('hint', b.dataset.st === step.station && b.dataset.st !== this.station));
-    const manual = ['carry', 'tcload', 'unload'].includes(step.id);
+    const manual = ['carry', 'tcload', 'unload', 'q-pcrsetup', 'q-cycle', 'q-load'].includes(step.id);
     if (!manual && step.station !== this.station && this.entered) this.goStation(step.station);
     this.ui?.renderMol();
   },
@@ -70,6 +72,7 @@ const app = {
 };
 const ui = new UI({ lab, engine, bus, world, mol, app });
 app.ui = ui;
+if (MODE === 'simple') ui.assisted = true;
 
 function applyQuality() {
   const q = QUALITY[app.quality];

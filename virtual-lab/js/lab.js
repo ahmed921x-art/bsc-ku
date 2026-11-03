@@ -6,6 +6,7 @@ import { REAGENTS, PROTOCOL, PIPETTES, TIPS, LADDER_100, capacity, fmtTime } fro
 import { tipMesh } from './models.js';
 import { sumLiq, simulatePCR, mobility, STANDARD_RUN } from './sim.js';
 import { STATIONS } from './scene.js';
+import { applySimplePresets } from './protocol-simple.js';
 import { sfx } from './audio.js';
 
 const UP = new THREE.Vector3(0, 1, 0);
@@ -14,8 +15,8 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 const isMicro = (id) => ['A', 'B', 'BAL', 'MM', 'DYE', 'LAD'].includes(id);
 
 export class Lab {
-  constructor(world, bus) {
-    this.w = world; this.bus = bus;
+  constructor(world, bus, mode = 'full') {
+    this.w = world; this.bus = bus; this.mode = mode;
     this.anchorToSlot = new Map();
     for (const s of Object.values(world.slots)) this.anchorToSlot.set(s.anchor, s.id);
     this.S = this.initialState();
@@ -60,6 +61,7 @@ export class Lab {
       S.vessels[v.id] = { liq: { ...(v.init || {}) }, sol: {}, pel: {}, cap: v.capped ? true : null, mixed: true, tissue: null, contam: false };
     }
     S.vessels.LAD.sol = {};
+    if (this.mode === 'simple') applySimplePresets(S);
     return S;
   }
 

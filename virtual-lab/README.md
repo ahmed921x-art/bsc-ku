@@ -41,6 +41,16 @@ Then open `http://localhost:8080`. (Opening `index.html` directly from disk does
 
 ---
 
+## Two versions
+
+| Page | Steps | What is prepared in advance |
+|---|---|---|
+| `index.html` — full lab | 33 | nothing: every reagent, the master mix and the gel are made by the user |
+| `simple.html` — quick lab | 10 | master mix with loading dye, cast gel in the tank with buffer, PCR program; one-tap pipetting on |
+
+Both run the same simulation, so results still depend on what the user actually does.
+Self-test for the quick version: `await (await import('./tools/selftest-simple.js')).run()` from `simple.html`.
+
 ## 2. Operating the laboratory
 
 | Gesture | Effect |
