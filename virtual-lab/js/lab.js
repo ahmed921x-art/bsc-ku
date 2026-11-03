@@ -356,8 +356,8 @@ export class Lab {
         if (level === 2 && vid.startsWith('well')) this.toast('Avoid the second stop when loading wells — the air bubble can push the sample out of the well.', 'warn');
         p.dispensedHere = true;
       } else {
-        if (inLiquid && !p.dispensedHere) { p.bubbled = true; sfx.bubble(); this.toast('Air bubbles! Press the plunger to the first stop BEFORE the tip enters the liquid.', 'warn'); }
-        if (!inLiquid || p.dispensedHere) p.primed = level;
+        if (inLiquid && !p.dispensedHere) { p.bubbled = true; sfx.bubble(); this.toast('Air bubbles blown into the liquid — next time press to the first stop BEFORE the tip goes in. Now slide the plunger back up to aspirate.', 'warn'); }
+        p.primed = level;
       }
       p.plunger = level; sfx.click(0.35);
     } else {
@@ -389,7 +389,7 @@ export class Lab {
   aspirate(vid, factor, primed) {
     const id = this.S.held.id, p = this.S.pip[id], vs = this.V(vid);
     if (factor === 0) { this.toast('Press the plunger to the first stop before immersing the tip, then release to aspirate.', 'warn'); return; }
-    const want = p.vol * factor * (p.bubbled ? 0.85 : 1);
+    const want = p.vol * factor;
     const avail = this.vol(vid);
     const reagent = this.mainReagent(vs.liq);
     const m = this.check('aspirate', { vid, pip: id, ptype: p.type, vol: p.vol, reagent, primed });

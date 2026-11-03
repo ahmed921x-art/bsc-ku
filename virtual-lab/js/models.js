@@ -131,8 +131,8 @@ export function conicalTube({ label, color = '#1f6feb', capColor = 0x2a62c9, sub
   const p = PROFILES.conical;
   const outer = [[0.0004, 0], ...p.map(([y, r]) => [r + 0.0008, y]), [0.0086, 0.118]];
   const body = lathe(outer, 28, MAT.clear); body.renderOrder = 3; g.add(body);
-  const lab = mesh(new THREE.CylinderGeometry(0.0087, 0.0087, 0.045, 28, 1, true, -1.3, 2.6),
-    new THREE.MeshStandardMaterial({ map: labelTexture({ title: label, sub, lines, color, w: 512, h: 220 }), roughness: 0.6 }), 0, 0.06, 0);
+  const lab = mesh(new THREE.CylinderGeometry(0.0087, 0.0087, 0.026, 28, 1, true, -1.3, 2.6),
+    new THREE.MeshStandardMaterial({ map: labelTexture({ title: label, sub, lines, color, w: 512, h: 220 }), roughness: 0.6 }), 0, 0.04, 0);
   g.add(lab);
   const liquid = new Liquid('conical'); g.add(liquid.mesh);
   const cap = mesh(new THREE.CylinderGeometry(0.0095, 0.0095, 0.012, 24), new THREE.MeshStandardMaterial({ color: capColor, roughness: 0.4 }), 0.016, 0.006, 0.012);
