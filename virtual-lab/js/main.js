@@ -55,7 +55,7 @@ const app = {
   onStep(step) {
     this.molKey = step.mol;
     document.querySelectorAll('#stations [data-st]').forEach(b => b.classList.toggle('hint', b.dataset.st === step.station && b.dataset.st !== this.station));
-    const manual = ['carry', 'tcload', 'unload', 'q-pcrsetup', 'q-cycle', 'q-load'].includes(step.id);
+    const manual = ['carry', 'tcload', 'unload', 'x-pcr', 'x-gel'].includes(step.id);
     if (!manual && step.station !== this.station && this.entered) this.goStation(step.station);
     this.ui?.renderMol();
   },

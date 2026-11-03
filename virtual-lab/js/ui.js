@@ -109,7 +109,7 @@ export class UI {
     const cards = [];
     const B = L.V('B');
     const dnaNg = (B.sol.gdna || 0) + (B.sol.gppt || 0) + (B.pel.gdna || 0);
-    if (['te', 'carry', 'calc', 'q-dissolve', 'q-pcrsetup'].includes(st.id) && (B.liq.te || 0) > 5) {
+    if (['te', 'carry', 'calc', 'x-dna', 'x-pcr'].includes(st.id) && (B.liq.te || 0) > 5) {
       const v = L.vol('B');
       cards.push(`<div class="card"><div class="card-h">Your extracted DNA · Tube B</div>
         <div class="kv"><span>Concentration</span><b>${(dnaNg / v).toFixed(1)} ng/µL</b></div>
@@ -117,10 +117,10 @@ export class UI {
         <div class="kv"><span>Still in pellet</span><b>${((B.pel.gdna || 0) / Math.max(1, dnaNg) * 100).toFixed(0)}%</b></div>
         <div class="note">Model: ${P.model.dnaPer100mg} ng DNA released per 100 mg fully lysed tissue; losses come from your actual transfers, spins and pellet handling.</div></div>`);
     }
-    if (['calc', 'mastermix', 'mixmm', 'aliquot', 'template', 'seal', 'q-pcrsetup'].includes(st.id)) {
+    if (['calc', 'mastermix', 'mixmm', 'aliquot', 'template', 'seal'].includes(st.id)) {
       const mm = masterMix();
       const MM = L.V('MM');
-      const aliq = ['aliquot', 'template', 'seal', 'q-pcrsetup'].includes(st.id);
+      const aliq = ['aliquot', 'template', 'seal'].includes(st.id);
       cards.push(`<div class="card"><div class="card-h">Master mix · ${mm.n} reactions <button class="btn ghost xs" data-act="calc">Calculator</button></div>
         <table class="rx"><tr><th>Component</th><th>Need</th><th>Added</th><th></th></tr>
         ${mm.rows.map(r => { const a = aliq ? null : (MM.liq[r.id] || 0); const ok = a == null ? null : Math.abs(a - r.total) <= Math.max(0.05, r.total * 0.04); const over = a != null && a > r.total * 1.06 + 0.05; return `<tr><td>${esc(r.label)}</td><td>${r.total}</td><td>${a == null ? '—' : fmtV(a)}</td><td class="${ok ? 'ok' : over ? 'bad' : a > 0 ? 'part' : 'miss'}">${a == null ? '' : ok ? '✓' : over ? 'excess' : a > 0 ? 'partial' : 'missing'}</td></tr>`; }).join('')}
@@ -128,8 +128,8 @@ export class UI {
         ${aliq ? `<div class="pcrtubes">${[1, 2, 3].map(i => `<div><b>Tube ${i}</b><span>${fmtV(L.vol('pcr' + i))} / ${P.pcr.rxnVol} µL</span><em>${['sample', '+ control', 'NTC'][i - 1]}</em></div>`).join('')}</div>` : ''}
         ${st.id === 'seal' ? '<button class="btn primary sm" data-act="verify">Verify reactions</button>' : ''}</div>`);
     }
-    if (['program', 'run', 'unload', 'q-cycle'].includes(st.id)) cards.push(`<div class="card"><div class="card-h">Thermocycler</div><div class="row"><button class="btn ghost sm" data-act="tc">Open controls</button><button class="btn ghost sm" data-act="chart">Amplification graph</button></div></div>`);
-    if (['image', 'results', 'q-run'].includes(st.id)) cards.push(`<div class="card"><div class="card-h">Gel documentation</div><button class="btn primary sm" data-act="analyse">Analyse gel</button></div>`);
+    if (['program', 'run', 'unload', 'x-pcr'].includes(st.id)) cards.push(`<div class="card"><div class="card-h">Thermocycler</div><div class="row"><button class="btn ghost sm" data-act="tc">Open controls</button><button class="btn ghost sm" data-act="chart">Amplification graph</button></div></div>`);
+    if (['image', 'results', 'x-gel'].includes(st.id)) cards.push(`<div class="card"><div class="card-h">Gel documentation</div><button class="btn primary sm" data-act="analyse">Analyse gel</button></div>`);
     $('#cards').innerHTML = cards.join('');
     $('#cards').onclick = (e) => { const b = e.target.closest('[data-act]'); if (!b) return; const a = b.dataset.act; if (a === 'calc') this.showCalc(); if (a === 'verify') this.showVerify(); if (a === 'tc') this.openPanel('tc'); if (a === 'chart') this.showChart(); if (a === 'analyse') this.showAnalysis(); };
   }
@@ -179,6 +179,8 @@ export class UI {
       const id = held.id, type = this.world.objects[id].itemType;
       label = `Holding: ${L.labelOf(id)}`;
       if (type === 'micro' || type === 'strip') { capBtn(id); acts.push({ t: 'Flick', f: () => L.flick(id) }); if (type === 'micro') acts.push({ t: 'Invert', f: () => L.invert(id) }); }
+      if (L.express && id === 'B' && this.engine.step.id === 'x-precip') acts.unshift({ t: 'Invert ×10', primary: true, f: () => L.invertMany('B', P.extraction.inversions) });
+      if (L.express && id === 'B' && this.engine.step.id === 'x-dna') acts.unshift({ t: 'Add TE & dissolve', primary: true, f: () => L.addTE('B') });
       if (id === 'tray') acts.push({ t: 'Rotate 180°', f: () => L.rotateTray() });
       if (id === 'tissue') acts.push({ t: `Trim (${S.tissueMg} mg)`, f: () => L.trimSample() });
       if ((id === 'flask' || id === 'taebottle') && L.pourDock) {
@@ -204,7 +206,11 @@ export class UI {
         }
         acts.push({ t: 'Pick up', primary: true, f: () => L.pickItem(sel) });
         if (sel === 'strip' || L.V(sel)?.cap !== undefined) capBtn(sel);
-        if (sel === 'B' || sel === 'A') acts.push({ t: `Air-dry ${P.extraction.dryMin} min`, f: () => L.startDrying(sel, P.extraction.dryMin) });
+        if (L.express && sel === 'B') {
+          if (this.engine.step.id === 'x-precip') acts.unshift({ t: 'Invert ×10', primary: true, f: () => L.invertMany('B', P.extraction.inversions) });
+          if (this.engine.step.id === 'x-dna') acts.unshift({ t: 'Add TE & dissolve', primary: true, f: () => L.addTE('B') });
+        }
+        if (!L.express && (sel === 'B' || sel === 'A')) acts.push({ t: `Air-dry ${P.extraction.dryMin} min`, f: () => L.startDrying(sel, P.extraction.dryMin) });
         if (sel === 'tissue') acts.push({ t: `Trim (${S.tissueMg} mg)`, f: () => L.trimSample() });
       }
     }
@@ -305,7 +311,7 @@ export class UI {
       html = `<div class="pgrid"><div class="rotor">${rotor}<div class="hub"></div></div><div class="pcol">
         ${stepper('Speed', `${c.g.toLocaleString()} × g`, 'cfg-g')}
         ${stepper('Time', fmtTime(c.running ? c.remain : c.sec), 'cfg-s')}
-        <div class="row"><button class="btn" data-a="lid" ${c.running ? 'disabled' : ''}>${c.lid ? 'Close lid' : 'Open lid'}</button><button class="btn primary" data-a="start" ${c.running ? 'disabled' : ''}>${c.running ? 'Running…' : 'Start'}</button></div>
+        <div class="row">${L.express ? `<button class="btn primary" data-a="qspin" ${c.running ? 'disabled' : ''}>${c.running ? 'Spinning…' : 'Quick spin'}</button>` : ''}<button class="btn" data-a="lid" ${c.running ? 'disabled' : ''}>${c.lid ? 'Close lid' : 'Open lid'}</button><button class="btn ${L.express ? '' : 'primary'}" data-a="start" ${c.running ? 'disabled' : ''}>${c.running ? 'Running…' : 'Start'}</button></div>
         <div class="note">${c.lid ? (heldTube ? `Tap a rotor position to place ${esc(L.vesselLabel(heldTube))}.` : 'Tap a tube on the rotor map, then an empty position, to move it.') : 'Open the lid to load or move tubes.'} Every tube needs a tube of equal mass (±0.1 g) directly opposite.</div></div></div>`;
     } else if (key === 'vortex') {
       const id = L.occupant('vortex-cup');
@@ -340,7 +346,7 @@ export class UI {
           <button class="btn ${ps.leads === 'correct' ? 'on' : ''}" data-lead="correct">Black → black (−) · Red → red (+)</button>
           <button class="btn ${ps.leads === 'reversed' ? 'on' : ''}" data-lead="reversed">Black → red (+) · Red → black (−)</button></div></div>
         <div class="pcol">${stepper('Voltage', `${ps.v} V`, 'ps-v')}${stepper('Time', `${ps.min} min`, 'ps-m')}
-        <div class="row"><button class="btn primary" data-a="psrun" ${ps.on ? 'disabled' : ''}>Start</button><button class="btn" data-a="psstop" ${ps.on ? '' : 'disabled'}>Stop</button></div>
+        <div class="row">${L.express ? `<button class="btn primary" data-a="qrun" ${ps.on ? 'disabled' : ''}>Run gel</button>` : ''}<button class="btn ${L.express ? '' : 'primary'}" data-a="psrun" ${ps.on ? 'disabled' : ''}>Start</button><button class="btn" data-a="psstop" ${ps.on ? '' : 'disabled'}>Stop</button></div>
         <div class="dim">${ps.on ? `Running · ${fmtTime((ps.min - ps.elapsed) * 60)} left · ${Math.round(ps.v * 0.85)} mA` : ''}</div></div></div>`;
     } else if (key === 'trans') {
       const tr = I.trans;
@@ -375,6 +381,7 @@ export class UI {
   panelAct(a) {
     const L = this.lab;
     ({ lid: () => L.cfgToggleLid(), start: () => L.cfgStart(), slid: () => L.spinnerToggleLid(), spin: () => L.spinnerStart(),
+      qspin: () => L.quickSpin(), qrun: () => L.quickRunGel(),
       tlid: () => L.tcToggleLid(), prog: () => this.showProgram(), tstart: () => L.tcStart(), chart: () => this.showChart(),
       chlid: () => L.chamberToggleLid(), psrun: () => L.psStart(), psstop: () => L.psStop(),
       shield: () => L.transToggle('shield'), light: () => L.transToggle('on'), analyse: () => this.showAnalysis() })[a]?.();

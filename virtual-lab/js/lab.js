@@ -183,6 +183,8 @@ export class Lab {
     }
     this.snapshot('pick pipette');
     this.S.pip[id].loc = 'held'; this.S.held = { kind: 'pip', id };
+    const auto = this.express && this.engine?.step.autoVol?.[id];
+    if (auto) this.S.pip[id].vol = auto;
     this.selected = null;
     this.holdPoint.set(STATIONS[this.station]?.x ?? 0, 0.13, 0.08);
     sfx.pick();
@@ -286,6 +288,7 @@ export class Lab {
   moveTo(vid) {
     const id = this.S.held.id, p = this.S.pip[id];
     const vs = this.V(vid), vdef = this.w.vessels[vid];
+    if (vs.cap === true && this.express) { if (vdef.stripIndex != null) for (let i = 1; i <= 8; i++) this.V(`pcr${i}`).cap = false; else vs.cap = false; sfx.cap(true); }
     if (vs.cap === true) { this.toast(`${this.vesselLabel(vid)} is closed. Open the cap first.`, 'warn'); this.select(vdef.objId); return; }
     if (vdef.objId && this.S.items[vdef.objId]?.loc === 'held') { this.toast('Put the tube in a rack before pipetting into it.'); return; }
     if (!p.tip) {
@@ -493,6 +496,12 @@ export class Lab {
       return;
     }
     if (it.loc?.startsWith('cfg#') && this.S.inst.cfg.running) { this.toast('The rotor is spinning — wait for it to stop.', 'warn'); return; }
+    if (this.express) {
+      if (it.loc?.startsWith('cfg#')) this.S.inst.cfg.lid = true;
+      if (it.loc === 'tc-block' && !this.S.inst.tc.running) this.S.inst.tc.lid = true;
+      if (id === 'strip') for (let i = 1; i <= 8; i++) this.V(`pcr${i}`).cap = true;
+      if (id === 'tray' && it.loc === 'chamber') this.S.inst.chamberLid = false;
+    }
     if (it.loc?.startsWith('cfg#') && !this.S.inst.cfg.lid) { this.toast('Open the centrifuge lid first.'); this.bus.emit('panel', { inst: 'cfg' }); return; }
     if (it.loc === 'tc-block' && !this.S.inst.tc.lid) { this.toast('Open the thermocycler lid first.'); this.bus.emit('panel', { inst: 'tc' }); return; }
     if (it.loc === 'tc-block' && this.S.inst.tc.running) { this.toast('The PCR program is still running.'); return; }
@@ -510,6 +519,7 @@ export class Lab {
     const id = this.S.held.id, it = this.S.items[id];
     const type = this.w.objects[id].itemType;
     if (type === 'tissue' && (o.id === 'A' || o.id === 'B')) return this.tissueInto(o.id);
+    if (this.express && type === 'micro' && o.id !== id && (o.id === 'liqwaste1' || (this.w.objects[o.id]?.itemType === 'micro' && this.S.items[o.id]?.loc?.startsWith('rack1')))) return this.decant(id, o.id);
     if (type === 'pestle' && this.w.vessels[o.id]) return this.pestleInto(o.id);
     if ((type === 'flask' || type === 'bottle') && (o.id === 'tray' || o.id === 'chamber' || o.id === 'caststand')) return this.dockPour(o.id === 'caststand' ? 'tray' : o.id);
     if (o.kind === 'item' && o.id !== id && this.S.items[o.id]?.loc && this.w.slots[this.S.items[o.id].loc]) {
@@ -538,6 +548,8 @@ export class Lab {
   }
   placeAt(slotId) {
     const id = this.S.held.id, it = this.S.items[id], slot = this.w.slots[slotId];
+    if (this.express && slot.owner === 'centrifuge') this.S.inst.cfg.lid = true;
+    if (this.express && slot.owner === 'cycler') this.S.inst.tc.lid = true;
     if (slot.owner === 'centrifuge' && !this.S.inst.cfg.lid) { this.toast('Open the centrifuge lid first.', 'warn'); this.bus.emit('panel', { inst: 'cfg' }); return; }
     if (slot.owner === 'cycler' && !this.S.inst.tc.lid) { this.toast('Open the thermocycler lid first.', 'warn'); this.bus.emit('panel', { inst: 'tc' }); return; }
     if (slot.owner === 'spinner' && !this.S.inst.spinner.lid) { this.toast('Open the mini-spinner lid first.', 'warn'); this.bus.emit('panel', { inst: 'spinner' }); return; }
@@ -547,6 +559,7 @@ export class Lab {
     if (m && m.block) { this.mistake(m); return; }
     this.snapshot('place');
     it.loc = slotId; this.S.held = null;
+    if (this.express && slot.owner === 'cycler') this.S.inst.tc.lid = false;
     if (slot.owner === 'tray' && id === 'comb' && this.S.gel.poured > 0) {
       this.toast('Comb inserted into liquid agarose — wells will still form, but insert the comb before pouring next time.', 'warn');
     }
@@ -616,6 +629,62 @@ export class Lab {
     this.emit('rotate', { rot: this.S.items.tray.rot });
   }
 
+  // ---------------------------------------------------------------- express shortcuts
+  get express() { return this.mode === 'simple'; }
+  quickSpin() {
+    const I = this.S.inst.cfg; if (I.running) return;
+    const step = this.engine?.step.id;
+    const tube = this.S.held?.kind === 'item' && this.w.objects[this.S.held.id].itemType === 'micro' ? this.S.held.id : step === 'x-dna' ? 'B' : 'A';
+    this.snapshot('quick spin');
+    for (const [id, slot] of [[tube, 'cfg#0'], ['BAL', 'cfg#6']]) {
+      const occ = this.occupant(slot); if (occ && occ !== id) this.S.items[occ].loc = this.rackHome(occ);
+      this.V(id).cap = true; this.S.items[id].from = this.S.items[id].loc === 'held' ? this.S.items[id].from : this.S.items[id].loc;
+      this.S.items[id].loc = slot;
+    }
+    if (this.S.held?.id === tube) this.S.held = null;
+    // fill the balance tube with water to match the sample's mass
+    const bal = this.V('BAL'); bal.liq.water = Math.max(50, (bal.liq.water || 0) + (this.massOf(tube) - this.massOf('BAL')) * 1000);
+    I.lid = false; I.g = 13000; I.sec = (step === 'x-dna' ? 5 : 1) * 60;
+    this.version++;
+    this.cfgStart();
+  }
+  decant(from, to) {
+    const src = this.V(from), dst = this.V(to);
+    const keep = 20;
+    const amount = Math.max(0, this.vol(from) - keep);
+    if (amount < 1) { this.toast('Nothing to pour.'); return; }
+    this.snapshot('decant');
+    src.cap = false; if (dst.cap !== null) dst.cap = false;
+    const part = this.take(src, amount); this.put(dst, part);
+    if (to === 'liqwaste1') { for (const k of ['iso', 'etoh70']) delete src.liq[k]; this.process(from); }
+    this.process(to);
+    this.S.held = null; this.S.items[from].loc = this.rackHome(from);
+    sfx.pour(true); setTimeout(() => sfx.pour(false), 600);
+    this.emit('decant', { from, to, vol: amount });
+  }
+  rackHome(id) {
+    const home = { A: 'rack1#5', B: 'rack1#6', BAL: 'rack1#9' }[id];
+    if (home && !this.occupant(home)) return home;
+    return Object.values(this.w.slots).find(s => s.owner === 'rack1' && !this.occupant(s.id))?.id || this.S.items[id].loc;
+  }
+  invertMany(id, n) { if (this.V(id).cap === false) { this.V(id).cap = true; sfx.cap(false); } for (let i = 0; i < n; i++) this.invert(id); }
+  addTE(id = 'B') {
+    const vs = this.V(id);
+    if (!(vs.pel.gdna > 0)) { this.toast('Spin and pour off first so the DNA pellet is in the tube.'); return; }
+    this.snapshot('TE');
+    vs.liq.te = (vs.liq.te || 0) + PROTOCOL.extraction.teVol;
+    vs.sol.gdna = (vs.sol.gdna || 0) + (vs.pel.gdna || 0) + (vs.sol.gppt || 0); vs.pel.gdna = 0; delete vs.sol.gppt;
+    vs.cap = true; vs.mixed = true; this.process(id);
+    sfx.flick();
+    this.emit('dispense', { id: 'P200a', vid: id, vol: PROTOCOL.extraction.teVol, reagent: 'te', from: 'st_te' });
+    this.emit('mix', { vid: id, how: 'flick' });
+  }
+  quickRunGel() {
+    if (this.S.items.tray.loc !== 'chamber') { this.toast('The gel is not in the tank.'); return; }
+    this.S.inst.chamberLid = true; this.S.inst.ps.leads = 'correct';
+    this.psStart();
+  }
+
   // ---------------------------------------------------------------- sample prep
   cutSample() {
     if (this.S.cutDone) { this.toast('You already have a tissue piece on the board.'); return; }
@@ -655,13 +724,16 @@ export class Lab {
     const loc = this.S.items.pestle.loc; if (!loc?.startsWith('in:')) return;
     const vid = loc.slice(3), vs = this.V(vid);
     if (!vs.tissue) return;
-    vs.tissue.lysed = Math.min(1, vs.tissue.lysed + delta);
+    vs.tissue.lysed = Math.min(1, vs.tissue.lysed + delta * (this.express ? 3 : 1));
     this.grindPhase += delta * 60;
     this.process(vid);
     this.version++;
     if (Math.random() < 0.25) sfx.grind();
     this.bus.emit('grind', { vid, lysed: vs.tissue.lysed });
-    if (vs.tissue.lysed >= 1 && !vs.tissue.doneEv) { vs.tissue.doneEv = true; this.emit('ground', { vid }); }
+    if (vs.tissue.lysed >= 1 && !vs.tissue.doneEv) {
+      vs.tissue.doneEv = true; this.emit('ground', { vid });
+      if (this.express) { this.removePestle(); vs.cap = true; this.toast('Fully homogenised — pestle removed and Tube A closed.', 'ok'); }
+    }
   }
   removePestle() {
     const loc = this.S.items.pestle.loc; if (!loc?.startsWith('in:')) return;
@@ -924,6 +996,10 @@ export class Lab {
       // evaporation if lid was open is prevented; template denatured
     }
     this.S.pcr = { ran: true, results, program: clone(prog) };
+    if (this.express) {
+      for (const [src, well] of [['pcr2', 'well3'], ['pcr3', 'well4']]) { const part = this.take(this.V(src), 10); this.put(this.V(well), part); }
+      this.toast('Your lab partner loaded the + control and NTC into wells 3 and 4.', 'info');
+    }
     t.running = false; t.done = true;
     sfx.beep(3);
     this.emit('tcDone', { results });
@@ -983,6 +1059,7 @@ export class Lab {
     const tr = this.S.inst.trans;
     this.snapshot('trans');
     tr[key] = !tr[key]; sfx.click(0.5);
+    if (this.express && key === 'on' && tr.on) tr.shield = true;
     if (key === 'on' && tr.on) sfx.hum();
     this.emit('trans', { key, val: tr[key] });
     if (key === 'on' && tr.on && !tr.shield) this.toast('Lower the amber shield — it filters the blue excitation light so only the orange SYBR Safe emission reaches your eyes.', 'warn');
@@ -1000,6 +1077,7 @@ export class Lab {
         I.cfg.running = false; I.cfg.remain = 0; I.cfg.runs++;
         for (const t of this.cfgTubes()) this.centrifugeVessel(t.id, I.cfg.g, I.cfg.sec);
         sfx.centrifuge(false); sfx.beep(3);
+        if (this.express) I.cfg.lid = true;
         this.emit('cfgDone', { g: I.cfg.g, sec: I.cfg.sec, tubes: this.cfgTubes().map(t => t.id) });
       }
     }

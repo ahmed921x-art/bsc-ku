@@ -57,6 +57,8 @@ export class Engine {
     if (all && !this.completed.has(this.idx)) {
       this.completed.add(this.idx);
       this.bus.emit('stepComplete', { idx: this.idx, step: st });
+      // Express version keeps the demonstration moving.
+      if (this.mode === 'simple' && this.idx < this.steps.length - 1) { const i = this.idx; setTimeout(() => { if (this.idx === i) this.next(); }, 1400); }
     }
     this.bus.emit('stepUpdate', {});
   }
