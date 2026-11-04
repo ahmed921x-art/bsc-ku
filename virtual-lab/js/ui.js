@@ -152,8 +152,11 @@ export class UI {
       if (this.chartOpen) this.drawChart();
       this.renderTasksThrottled();
     }
-    $('#clock').textContent = fmtClock(L.S.t);
-    if (this.mol && this.molOpen) $('#molCaption').textContent = this.mol.caption || '';
+    // Write only on change: a DOM write every frame forces a full layout when main.js reads panel sizes.
+    const clock = fmtClock(L.S.t);
+    if (clock !== this._clock) { this._clock = clock; $('#clock').textContent = clock; }
+    const cap = this.mol && this.molOpen ? this.mol.caption || '' : null;
+    if (cap !== null && cap !== this._molCap) { this._molCap = cap; $('#molCaption').textContent = cap; }
   }
   renderTasksThrottled() { const now = performance.now(); if (now - (this._tt || 0) > 250) { this._tt = now; this.renderTasks(); } else { clearTimeout(this._tto); this._tto = setTimeout(() => this.renderTasks(), 260); } }
   renderPPE() {

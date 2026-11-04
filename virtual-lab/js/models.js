@@ -49,7 +49,7 @@ export class Liquid {
     this.v = -1;
   }
   set(v, color) {
-    if (color) this.mat.color.set(color);
+    if (color && color !== this.color) { this.color = color; this.mat.color.set(color); }
     if (Math.abs(v - this.v) < 0.001) return;
     this.v = v;
     this.mesh.visible = v > 0.02;
@@ -227,8 +227,12 @@ export function tipMesh(tipType) {
   const collar = mesh(new THREE.CylinderGeometry(t.rTop * 1.12, t.rTop * 1.05, t.len * 0.12, 18, 1, true), mat, 0, -t.len * 0.06, 0); g.add(collar);
   const liqMat = new THREE.MeshPhysicalMaterial({ color: 0xdfe9f7, roughness: 0.1, transparent: true, opacity: 0.9 });
   const liq = new THREE.Mesh(new THREE.BufferGeometry(), liqMat); liq.renderOrder = 2; g.add(liq);
+  let lastV = -1, lastColor = null;
   g.userData = { spec: t, liq, liqMat, setVolume(v, color) {
-    if (color) liqMat.color.set(color);
+    // Called every frame while the tip is mounted: only rebuild when something changed.
+    if (color && color !== lastColor) { lastColor = color; liqMat.color.set(color); }
+    if (Math.abs(v - lastV) < 0.001) return;
+    lastV = v;
     liq.visible = v > 0.005;
     if (!liq.visible) return;
     const f = Math.min(1, v / t.cap);

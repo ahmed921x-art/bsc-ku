@@ -53,6 +53,15 @@ export class MolViewer {
     this.camera.lookAt(0, 0, 0);
   }
   set(params) { Object.assign(this.params, params); }
+  // Build every view and compile its shaders ahead of time, one per idle slice,
+  // so switching steps never stalls on scene construction or shader compiles.
+  async prewarm() {
+    for (const key of ['cells', 'lysis', 'spin-debris', 'spin-dna', 'precip', 'dissolve', 'pcr-intro', 'pcr', 'gel-mesh', 'gel-run']) {
+      if (!this.cache[key]) this.cache[key] = this.build(key);
+      await this.renderer.compileAsync(this.cache[key].group, this.camera, this.scene);
+      await new Promise((r) => setTimeout(r, 30));
+    }
+  }
   render(dt) {
     if (!this.cur) return;
     const c = this.canvas, pr = this.renderer.getPixelRatio();
@@ -162,8 +171,14 @@ function cellsScene(lysis) {
         if (Math.abs(pq - c.lastP) > 0.004) {
           c.lastP = pq;
           const pts = c.dna.map((d, i) => d.center.clone().add(d.comp.clone().lerp(d.ext.clone().multiplyScalar(1.6), ease(release))).add(new THREE.Vector3(Math.sin(t * 0.8 + i * 0.3) * 0.05 * release, Math.cos(t * 0.7 + i * 0.2) * 0.05 * release, 0)));
-          c.dnaMesh.geometry.dispose();
-          c.dnaMesh.geometry = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 160, 0.045 + release * 0.01, 5, false);
+          // Refill the existing GPU buffers instead of allocating a new geometry twice a second.
+          const tube = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 160, 0.045 + release * 0.01, 5, false);
+          const cur = c.dnaMesh.geometry;
+          if (cur.attributes.position?.count === tube.attributes.position.count) {
+            for (const k of ['position', 'normal']) { cur.attributes[k].array.set(tube.attributes[k].array); cur.attributes[k].needsUpdate = true; }
+            cur.computeBoundingSphere();
+            tube.dispose();
+          } else { cur.dispose(); c.dnaMesh.geometry = tube; }
         }
       }
       if (lysis) {

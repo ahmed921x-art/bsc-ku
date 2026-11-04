@@ -22,6 +22,9 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+// The key light is directional, so its shadow map does not depend on the camera:
+// redraw it only on frames where a shadow caster (or the light) actually moved.
+renderer.shadowMap.autoUpdate = false;
 
 const camera = new THREE.PerspectiveCamera(38, 1, 0.01, 30);
 const MODE = window.LAB_MODE === 'simple' ? 'simple' : 'full';
@@ -79,7 +82,26 @@ function applyQuality() {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, q.pr));
   world.key.shadow.mapSize.set(q.shadow, q.shadow);
   if (world.key.shadow.map) { world.key.shadow.map.dispose(); world.key.shadow.map = null; }
+  shadowSig = NaN;
   resize();
+}
+// Cheap fingerprint of everything the shadow map depends on: caster transforms,
+// visibility, geometry swaps and the key light's placement.
+let shadowSig = NaN;
+function shadowSignature() {
+  let s = 0, i = 0;
+  world.scene.traverseVisible((o) => {
+    if (!o.castShadow || !o.isMesh) return;
+    const e = o.matrixWorld.elements; i++;
+    s += i * (e[0] + e[1] * 1.3 + e[2] * 1.7 + e[4] * 1.9 + e[5] * 2.1 + e[6] * 2.3 + e[8] * 2.6 + e[9] * 2.9 + e[10] * 3.1 + e[12] * 3.7 + e[13] * 4.1 + e[14] * 4.3) + o.geometry.id * 0.017 + (o.isInstancedMesh ? o.instanceMatrix.version * 0.31 + o.count : 0);
+  });
+  const k = world.key;
+  return s + i * 1e6 + k.position.x * 5.3 + k.position.y * 5.9 + k.position.z * 6.1 + k.target.position.x * 6.7 + k.target.position.z * 7.1;
+}
+function updateShadows() {
+  world.scene.updateMatrixWorld();
+  const sig = shadowSignature();
+  if (sig !== shadowSig) { shadowSig = sig; renderer.shadowMap.needsUpdate = true; }
 }
 let viewShift = 0;
 function resize() {
@@ -207,6 +229,11 @@ bus.on('stepChange', () => { stepEnteredAt = lab.S.t; });
 const clock = new THREE.Clock();
 let lastVer = -1, molFrame = 0, darkness = 0;
 rig.setView(STATIONS.overview, true);
+// Compile every shader up front so the first time an object or molecular view
+// appears it does not freeze the bench while its program builds.
+renderer.compileAsync(world.scene, camera).catch(() => {});
+const idle = window.requestIdleCallback || ((f) => setTimeout(f, 200));
+idle(() => mol.prewarm().catch(() => {}));
 function frame() {
   const dt = Math.min(0.05, clock.getDelta());
   lab.tick(dt);
@@ -233,6 +260,7 @@ function frame() {
   }
   if (lab.selected && !world.objects[lab.selected]?.group.visible) setHL(highlights.sel, null);
   if (lab.S.held && highlights.sel.visible) { lab.selected = null; setHL(highlights.sel, null); }
+  updateShadows();
   renderer.render(world.scene, camera);
   ui.update();
   if (ui.molOpen && app.molKey && !document.hidden) {
